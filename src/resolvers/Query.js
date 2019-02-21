@@ -32,7 +32,9 @@ const Query = {
 
 		const dates = args.dates ? setDates(args.dates.toString()) : undefined;
 		let events;
+		console.log('inside getEvents', location, cats, dates, page, location);
 		let response = await fetchEvents(location, cats, dates, page, 200);
+		console.log(response);
 		console.log(response.data, 'response getEvents');
 		events = response.data._embedded.events;
 
