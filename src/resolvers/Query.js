@@ -26,7 +26,6 @@ const Query = {
 	},
 	async getEvents(parent, { location, alt, page, ...args }, ctx, info) {
 		location = location.split(',')[0].toLowerCase();
-		console.log(args.categories.length);
 		let cats = args.categories
 			? args.categories
 			: ['KZFzniwnSyZfZ7v7nJ', 'KZFzniwnSyZfZ7v7na', 'KZFzniwnSyZfZ7v7nE', 'KZFzniwnSyZfZ7v7n1'];
