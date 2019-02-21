@@ -32,8 +32,10 @@ module.exports = {
 						venue: ev._embedded.venues[0].name,
 						address: ev._embedded.venues[0].address && ev._embedded.venues[0].address.line1,
 						city: ev._embedded.venues[0].city.name,
-						lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
-						long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
+						latLong: {
+							lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
+							long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
+						}
 					}
 				});
 			}

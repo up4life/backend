@@ -114,10 +114,10 @@ type FirebasePayload {
 }
 
 type Invoice {
-	receipt_number: String
-	amount_due: Int
-	amount_paid: Int
-	date: Int
-	hosted_invoice_url: String
+	receipt_number: String,
+	amount_due: Int,
+	amount_paid: Int,
+	date: Int,
+	hosted_invoice_url: String,
 	invoice_pdf: String
 }
