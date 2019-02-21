@@ -33,7 +33,7 @@ const Query = {
 		const dates = args.dates ? setDates(args.dates.toString()) : undefined;
 		let events;
 		let response = await fetchEvents(location, cats, dates, page, 200);
-
+		console.log(response.data, 'response getEvents');
 		events = response.data._embedded.events;
 
 		let uniques = events.reduce((a, t) => {
@@ -46,7 +46,7 @@ const Query = {
 				page = page + 1;
 
 				let res = await fetchEvents(location, cats, dates, page, 200);
-
+				console.log(res.data, 'unique events response');
 				if (!res.data._embedded) break;
 				else {
 					events = [...events, ...res.data._embedded.events];

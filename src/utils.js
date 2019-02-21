@@ -146,6 +146,7 @@ module.exports = {
 		}
 	},
 	fetchEvents: function(geoHash, cats, dates, page, size) {
+		console.log(cats, dates, page, size, 'inside fetchevents');
 		if (dates) {
 			return axios.get(
 				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${

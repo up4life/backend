@@ -28,6 +28,7 @@ server.express.use(async (req, res, next) => {
 		{ where: { id: req.userId } },
 		'{ id, email, firstName, lastName, location, permissions, stripeCustomerId, stripeSubscriptionId, events { id } }'
 	);
+	console.log(user);
 	req.user = user;
 	next();
 });
