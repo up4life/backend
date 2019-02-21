@@ -22,15 +22,15 @@ server.express.use(async (req, res, next) => {
 	next();
 });
 
-// server.express.use(async (req, res, next) => {
-// 	if (!req.userId) return next();
-// 	const user = await db.query.user(
-// 		{ where: { id: req.userId } },
-// 		'{ id, email, firstName, lastName, location, permissions, stripeCustomerId, stripeSubscriptionId, events { id } }'
-// 	);
-// 	req.user = user;
-// 	next();
-// });
+server.express.use(async (req, res, next) => {
+	if (!req.userId) return next();
+	const user = await db.query.user(
+		{ where: { id: req.userId } },
+		'{ id, email, firstName, lastName, location, permissions, stripeCustomerId, stripeSubscriptionId, events { id } }'
+	);
+	req.user = user;
+	next();
+});
 
 server.start(
 	{

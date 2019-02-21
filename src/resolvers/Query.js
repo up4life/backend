@@ -78,7 +78,6 @@ const Query = {
 		return {
 			title: data.name,
 			id: data.id,
-			eventfulID: data.id,
 			url: data.url,
 			location: {
 				city: data._embedded ? data._embedded.venues[0].city.name : 'poop',
