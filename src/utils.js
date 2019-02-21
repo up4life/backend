@@ -20,7 +20,7 @@ module.exports = {
 					url: ev.url,
 					image_url: eventImage.url,
 					times: [ev.dates.start.dateTime],
-					genre: ev.classifications[0].genre && ev.classifications[0].genre.name,
+					genres: ev.classifications[0].genre && ev.classifications[0].genre.name,
 					info: ev.info || 'no info provided',
 					description: ev.pleaseNote || 'no notes included',
 					price: {
@@ -29,11 +29,13 @@ module.exports = {
 						curr: ev.priceRanges ? ev.priceRanges[0].currency : 'USD'
 					},
 					location: {
-						city: ev._embedded.venues[0].city.name,
 						venue: ev._embedded.venues[0].name,
 						address: ev._embedded.venues[0].address && ev._embedded.venues[0].address.line1,
-						lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
-						long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
+						city: ev._embedded.venues[0].city.name,
+						latLong: {
+							lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
+							long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
+						}
 					}
 				});
 			}
@@ -176,17 +178,16 @@ module.exports = {
 			return { id, admin };
 		}
 		return null;
-	},
-	async getGeoHash(city) {
-		const response = await axios(
-			`https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${
-				process.env.GOOGLE_API_KEY
-			}`
-		);
-		let { lat, lng } = response.data.results[0].geometry.location;
-
-		const geoResponse = await axios(`http://geohash.org?q=${lat},${lng}&format=url`);
-		let geoHash = geoResponse.data.replace('http://geohash.org/', '').slice(0, 8);
-		return { geoHash };
 	}
+	// async getGeoHash(city) {
+	// 	const response = await axios(
+	// 		`https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${process.env
+	// 			.GOOGLE_API_KEY}`,
+	// 	);
+	// 	let { lat, lng } = response.data.results[0].geometry.location;
+
+	// 	const geoResponse = await axios(`http://geohash.org?q=${lat},${lng}&format=url`);
+	// 	let geoHash = geoResponse.data.replace('http://geohash.org/', '').slice(0, 8);
+	// 	return { geoHash };
+	// },
 };

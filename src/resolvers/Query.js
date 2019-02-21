@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { transformEvents, fetchEvents, setDates } = require('../utils');
+const stripe = require('../stripe');
 
 const Query = {
 	currentUser(parent, args, { db, request }, info) {
@@ -32,15 +33,9 @@ const Query = {
 
 		const dates = args.dates ? setDates(args.dates.toString()) : undefined;
 		let events;
-		console.log('inside getEvents', location, cats, dates, page, location);
-		let response;
-		try {
-			response = await fetchEvents(location, cats, dates, page, 200);
-		} catch (err) {
-			console.log(err);
-		}
-		console.log(response);
-		console.log(response.data, 'response getEvents');
+		console.log(dates);
+		let response = await fetchEvents(location, cats, dates, page, 200);
+
 		events = response.data._embedded.events;
 
 		let uniques = events.reduce((a, t) => {
@@ -53,7 +48,7 @@ const Query = {
 				page = page + 1;
 
 				let res = await fetchEvents(location, cats, dates, page, 200);
-				console.log(res.data, 'unique events response');
+
 				if (!res.data._embedded) break;
 				else {
 					events = [...events, ...res.data._embedded.events];
@@ -183,33 +178,14 @@ const Query = {
 		return { count: datesCount - user.events.length };
 	},
 	async invoicesList(parent, args, ctx, info) {
-		// Check user's login status
-		const { userId } = ctx.request;
+		const { userId, user } = ctx.request;
 		if (!userId) throw new Error('You must be signed in to access this app.');
-
-		const user = await ctx.db.query.user(
-			{ where: { id: userId } },
-			`
-				{id permissions events {id}}
-			`
-		);
 
 		const invoices = await stripe.invoices.list({
 			customer: user.stripeCustomerId
 		});
-		console.log(
-			invoices.map(invoice => ({
-				receipt_number: invoice.receipt_number,
-				amount_due: invoice.amount_due,
-				amount_paid: invoice.amount_paid,
-				date: invoice.date,
-				hosted_url: invoice.hosted_invoice_url,
-				pdf_url: invoice.invoice_pdf
-			}))
-		);
-		return {
-			message: 'invoices'
-		};
+
+		return invoices.data;
 	}
 };
 
