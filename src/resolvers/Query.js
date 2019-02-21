@@ -33,7 +33,6 @@ const Query = {
 
 		const dates = args.dates ? setDates(args.dates.toString()) : undefined;
 		let events;
-
 		let response = await fetchEvents(location, cats, dates, page, 200);
 
 		events = response.data._embedded.events;
@@ -87,6 +86,8 @@ const Query = {
 				address: data._embedded ? data._embedded.venues[0].address.line1 : 'damnit 3',
 				zipCode: data._embedded ? data._embedded.venues[0].postalCode : 'shit 4'
 			},
+			// img in 3_2 or 16_9 ratio is nicer quality, just need to figure out how to get it to be responsive
+			// or we could keep it at 4_3 i'm cool either way
 			image_url: img.url,
 			description: data.info,
 			times: [data.dates.start.dateTime]

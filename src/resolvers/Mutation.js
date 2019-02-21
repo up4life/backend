@@ -40,6 +40,7 @@ const Mutation = {
 	},
 	async firebaseAuth(parent, args, ctx, info) {
 		const { uid, email, user_id } = await verifyIdToken(args.idToken);
+		console.log(email);
 		const firebaseUser = await getUserRecord(uid);
 		const { displayName } = firebaseUser;
 		// check to see if user already exists in our db
@@ -129,7 +130,7 @@ const Mutation = {
 		// });
 		return { message: 'Thanks!' };
 	},
-	async updateImage(parent, { thumbnail, image }, { db, request }, info) {
+	async updateImage(parent, { thumbnail, image }, { db, response, request }, info) {
 		const { userId, user } = request;
 		if (!userId) throw new Error('You must be logged in!');
 
@@ -203,6 +204,7 @@ const Mutation = {
 		if (user.permissions[0] === args.subscription) {
 			throw new Error(`User already has ${args.subscription} subscription`);
 		}
+
 		// Create new stripe customer if user is not one already
 		let customer;
 		if (!user.stripeCustomerId) {
@@ -211,6 +213,7 @@ const Mutation = {
 				source: args.token
 			});
 		}
+
 		// Create a subscription if user does not have one already
 		let subscription;
 		if (!user.stripeSubscriptionId) {
@@ -234,6 +237,7 @@ const Mutation = {
 				]
 			});
 		}
+
 		// Update user's permission type
 		ctx.db.mutation.updateUser({
 			data: {
@@ -260,6 +264,7 @@ const Mutation = {
 		if (!user.stripeCustomerId || !user.stripeSubscriptionId) {
 			throw new Error('User has no stripe customer Id or subscription Id');
 		}
+
 		const canceled = await stripe.subscriptions.del(user.stripeSubscriptionId, {
 			invoice_now: true,
 			prorate: true
@@ -277,6 +282,7 @@ const Mutation = {
 				id: user.id
 			}
 		});
+
 		return {
 			message: `Your subscription has been ${canceled.status} at the end of the billing period`
 		};
