@@ -26,22 +26,22 @@ const Query = {
 	},
 	async getEvents(parent, { location, alt, page, ...args }, ctx, info) {
 		location = location.split(',')[0].toLowerCase();
-		let cats = args.categories
+		let cats = args.categories.length
 			? args.categories
 			: ['KZFzniwnSyZfZ7v7nJ', 'KZFzniwnSyZfZ7v7na', 'KZFzniwnSyZfZ7v7nE', 'KZFzniwnSyZfZ7v7n1'];
-		console.log(location, cats, args.dates, page);
-		const dates = args.dates ? setDates(args.dates.toString()) : undefined;
-		console.log(dates);
+
+		const dates = args.dates.length ? setDates(args.dates.toString()) : undefined;
+
 		let events;
 		let response = await fetchEvents(location, cats, dates, page, 200);
-		console.log(response.data);
+
 		events = response.data._embedded.events;
 
 		let uniques = events.reduce((a, t) => {
 			if (!a.includes(t.name)) a.push(t.name);
 			return a;
 		}, []);
-		console.log(response.data.page.totalElements);
+
 		if (response.data.page.totalElements > 20) {
 			while (uniques.length < 20) {
 				page = page + 1;
@@ -58,7 +58,7 @@ const Query = {
 				}
 			}
 		}
-		console.log(events.length);
+
 		return {
 			events: transformEvents(events),
 			page_count: response.data.page.size,
