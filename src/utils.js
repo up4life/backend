@@ -24,18 +24,16 @@ module.exports = {
 					info: ev.info || 'no info provided',
 					description: ev.pleaseNote || 'no notes included',
 					price: {
-						min: ev.priceRanges ? ev.priceRanges[0].min : 'min',
-						max: ev.priceRanges ? ev.priceRanges[0].max : 'max',
-						curr: ev.priceRanges ? ev.priceRanges[0].currency : 'USD'
+						min: ev.priceRanges[0].min,
+						max: ev.priceRanges[0].max,
+						curr: ev.priceRanges[0].currency
 					},
 					location: {
 						venue: ev._embedded.venues[0].name,
 						address: ev._embedded.venues[0].address && ev._embedded.venues[0].address.line1,
 						city: ev._embedded.venues[0].city.name,
-						latLong: {
-							lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
-							long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
-						}
+						lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
+						long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
 					}
 				});
 			}
