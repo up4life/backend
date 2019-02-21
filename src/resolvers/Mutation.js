@@ -40,6 +40,7 @@ const Mutation = {
 	},
 	async firebaseAuth(parent, args, ctx, info) {
 		const { uid, email, user_id } = await verifyIdToken(args.idToken);
+		console.log(email);
 		const firebaseUser = await getUserRecord(uid);
 		const { displayName } = firebaseUser;
 		// check to see if user already exists in our db
@@ -335,7 +336,8 @@ const Mutation = {
 			throw new Error("You've already saved that event!");
 		}
 
-		const [img] = data.images.filter(img => img.ratio === '4_3');
+		const [img] = data.images.filter(img => img.width > 600);
+		console.log(img);
 		await db.mutation.upsertEvent({
 			where: {
 				eventfulID: data.id
@@ -355,6 +357,7 @@ const Mutation = {
 				description: data.info,
 				times: { set: [data.dates.start.dateTime] },
 				image_url: img.url,
+
 				attending: {
 					connect: {
 						id: user.id

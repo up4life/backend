@@ -13,12 +13,14 @@ module.exports = {
 						return obj.url;
 					}
 				});
+				const [img] = ev.images.filter(img => img.width > 500);
+
 				events.push({
 					id: ev.id,
 					title: ev.name,
-					// I think we'll wanna add in each events url so we can make the date/time a clickable link since each event url is unique
 					url: ev.url,
 					image_url: eventImage.url,
+					large_url: img.url,
 					times: [ev.dates.start.dateTime],
 					genres: ev.classifications[0].genre && ev.classifications[0].genre.name,
 					info: ev.info || 'no info provided',
@@ -32,10 +34,8 @@ module.exports = {
 						venue: ev._embedded.venues[0].name,
 						address: ev._embedded.venues[0].address && ev._embedded.venues[0].address.line1,
 						city: ev._embedded.venues[0].city.name,
-						latLong: {
-							lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
-							long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
-						}
+						lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
+						long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
 					}
 				});
 			}
@@ -147,12 +147,30 @@ module.exports = {
 				return events.filter(ev => ev.times.some(t => moment(t).format('YYYY-MM-DD') === date));
 		}
 	},
-	fetchEvents: function(geoHash, cats, dates, page, size) {
+	fetchEvents: function(geoHash, cats, dates, page, size, genres) {
 		if (dates) {
+			if (genres && genres.length) {
+				return axios.get(
+					`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${
+						dates.start
+					}&endDateTime=${
+						dates.end
+					}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${
+						process.env.TKTMSTR_KEY
+					}`
+				);
+			}
 			return axios.get(
 				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${
 					dates.start
 				}&endDateTime=${dates.end}&classificationId=${cats}&city=${geoHash}&apikey=${
+					process.env.TKTMSTR_KEY
+				}`
+			);
+		}
+		if (genres && genres.length) {
+			return axios.get(
+				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${
 					process.env.TKTMSTR_KEY
 				}`
 			);
