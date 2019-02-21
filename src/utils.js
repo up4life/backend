@@ -20,7 +20,7 @@ module.exports = {
 					url: ev.url,
 					image_url: eventImage.url,
 					times: [ev.dates.start.dateTime],
-					genres: ev.classifications[0].genre && ev.classifications[0].genre.name,
+					genre: ev.classifications[0].genre && ev.classifications[0].genre.name,
 					info: ev.info || 'no info provided',
 					description: ev.pleaseNote || 'no notes included',
 					price: {
@@ -29,13 +29,11 @@ module.exports = {
 						curr: ev.priceRanges ? ev.priceRanges[0].currency : 'USD'
 					},
 					location: {
+						city: ev._embedded.venues[0].city.name,
 						venue: ev._embedded.venues[0].name,
 						address: ev._embedded.venues[0].address && ev._embedded.venues[0].address.line1,
-						city: ev._embedded.venues[0].city.name,
-						latLong: {
-							lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
-							long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
-						}
+						lat: ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
+						long: ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
 					}
 				});
 			}

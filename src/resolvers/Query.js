@@ -26,11 +26,11 @@ const Query = {
 	async getEvents(parent, { location, alt, page, ...args }, ctx, info) {
 		location = location.split(',')[0].toLowerCase();
 
-		let cats = args.categories
+		let cats = args.categories.length
 			? args.categories
 			: ['KZFzniwnSyZfZ7v7nJ', 'KZFzniwnSyZfZ7v7na', 'KZFzniwnSyZfZ7v7nE', 'KZFzniwnSyZfZ7v7n1'];
 
-		const dates = args.dates ? setDates(args.dates.toString()) : undefined;
+		const dates = args.dates.length ? setDates(args.dates.toString()) : undefined;
 		let events;
 		let response = await fetchEvents(location, cats, dates, page, 200);
 
@@ -78,6 +78,7 @@ const Query = {
 		return {
 			title: data.name,
 			id: data.id,
+			eventfulID: data.id,
 			url: data.url,
 			location: {
 				city: data._embedded ? data._embedded.venues[0].city.name : 'poop',
