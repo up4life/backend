@@ -73,7 +73,7 @@ const Mutation = {
 		return { token, user };
 	},
 	async signin(parent, { email, password }, { db, response }, info) {
-		const user = await db.query.user({ where: { email } }, info);
+		const user = await db.query.user({ where: { email } });
 		if (!user) {
 			throw new Error(`No such user found for email ${email}`);
 		}
