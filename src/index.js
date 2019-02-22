@@ -36,7 +36,8 @@ server.start(
 	{
 		cors: {
 			credentials: true,
-			origin: [process.env.FRONTEND_URL, 'https://up4api.herokuapp.com', 'www.up4.life']
+			rejectUnauthorized: false,
+			origin: process.env.FRONTEND_URL
 		}
 	},
 	details => {
