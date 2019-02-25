@@ -10,10 +10,13 @@ type Mutation {
 	signout: Message
 	updateImage(thumbnail: String!, image: String!): User!
 	updateLocation(city: String!): User!
-	addEvent(eventId: String!): Message
-	deleteEvent(eventId: String!): Message
+	addEvent(event: AddEventInput): Message
+	deleteEvent(id: String!, eventId: String!): User!
 	createOrder(token: String!, subscription: Permission!): Message
-	cancelSubscription: Message
+	cancelSubscription(id: String!): User!
+	updateUser(data: UserUpdateInput!): User
+	createChat(id: String!, message: String!): Chat!
+	deleteChat(id: String): Message
 }
 
 type Query {
@@ -30,9 +33,24 @@ type Query {
 	user(where: UserWhereUniqueInput!): User
 	getLocation(latitude: Float!, longitude: Float!): Location!
 	locationSearch(city: String!): [Location]
-	getUserOrder(userId: String!): [Order!]!
 	getRemainingDates: DatesCount!
 	invoicesList(userStripeCustomerId: String!): [Invoice]
+	getChat(id: String!): Chat
+	getUserChats: [Chat]!
+	getConversation(id: String): Chat
+}
+
+input AddEventInput {
+	title: String!
+	venue: String!
+	image_url: String
+	description: String
+	times: [String]
+	url: String
+	address: String
+	city: String
+	lat: String
+	long: String
 }
 
 type User {
@@ -42,34 +60,34 @@ type User {
 	email: String!
 	location: String
 	gender: Gender
+	biography: String
+	age: Int
+	dob: String
 	password: String
 	imageThumbnail: String
 	imageLarge: String
-	permissions: [Permission!]!
+	img: [ProfilePic]
+	permissions: Permission
 	interests: [Category]
 	events: [Event!]!
 	createdAt: DateTime!
 	updatedAt: DateTime!
 	stripeCustomerId: String
 	stripeSubscriptionId: String
-	# stripe: StripeInfo
 }
-
-# type StripeInfo {
-# 	customerId: String
-# 	subscriptionId: String
-#
-# }
 
 type Event {
 	id: ID!
-	eventfulID: String!
+	eventfulID: String
 	title: String!
 	url: String
 	description: String
 	times: [String]
 	attending: [User!]!
 	location: LocationInfo
+	city: String
+	venue: String
+	address: String
 	image_url: String
 	large_url: String
 	price: PriceRange

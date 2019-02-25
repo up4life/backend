@@ -2,34 +2,53 @@ const moment = require('moment');
 const axios = require('axios');
 
 module.exports = {
-	transformEvents: function(eventsArr) {
-		return eventsArr.reduce((events, ev) => {
+	transformEvents: function(eventsArr, db) {
+		return eventsArr.reduce(async (previousPromise, ev) => {
+			let events = await previousPromise;
 			let existingEvent = events.findIndex(e => e.title === ev.name);
 			if (existingEvent !== -1) {
 				events[existingEvent].times.push(ev.dates.start.dateTime);
 			} else {
-				const [eventImage] = ev.images.filter(obj => {
-					if (obj.ratio === '4_3') {
-						return obj.url;
-					}
-				});
+				// const [ eventImage ] = ev.images.filter(obj => {
+				// 	if (obj.ratio === '4_3') {
+				// 		return obj.url;
+				// 	}
+				// });
+				let [eventInDb] = await db.query.events(
+					{
+						where: {
+							AND: [
+								{
+									venue: ev._embedded.venues[0].name
+								},
+								{
+									title: ev.name
+								}
+							]
+						}
+					},
+					`{id times attending {id firstName imageThumbnail}}`
+				);
+
 				const [img] = ev.images.filter(img => img.width > 500);
 
 				events.push({
-					id: ev.id,
+					id: eventInDb ? eventInDb.id : ev.id,
+					eventfulId: ev.id,
 					title: ev.name,
 					url: ev.url,
-					image_url: eventImage.url,
-					large_url: img.url,
+					image_url: img.url,
+					//large_url: img.url,
 					times: [ev.dates.start.dateTime],
 					genres: ev.classifications[0].genre && ev.classifications[0].genre.name,
-					info: ev.info || 'no info provided',
-					description: ev.pleaseNote || 'no notes included',
+					info: ev.info || null,
+					description: ev.pleaseNote || null,
 					price: {
 						min: ev.priceRanges ? ev.priceRanges[0].min : 'min',
 						max: ev.priceRanges ? ev.priceRanges[0].max : 'max',
 						curr: ev.priceRanges ? ev.priceRanges[0].currency : 'USD'
 					},
+					attending: eventInDb ? eventInDb.attending : [],
 					location: {
 						venue: ev._embedded.venues[0].name,
 						address: ev._embedded.venues[0].address && ev._embedded.venues[0].address.line1,
@@ -41,7 +60,7 @@ module.exports = {
 			}
 
 			return events;
-		}, []);
+		}, Promise.resolve([]));
 	},
 	setDates: function(dates) {
 		let start, end;
@@ -170,13 +189,13 @@ module.exports = {
 		}
 		if (genres && genres.length) {
 			return axios.get(
-				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${
+				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${
 					process.env.TKTMSTR_KEY
 				}`
 			);
 		}
 		return axios.get(
-			`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&classificationId=${cats}&city=${geoHash}&apikey=${
+			`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&city=${geoHash}&apikey=${
 				process.env.TKTMSTR_KEY
 			}`
 		);

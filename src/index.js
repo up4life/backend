@@ -26,7 +26,7 @@ server.express.use(async (req, res, next) => {
 	if (!req.userId) return next();
 	const user = await db.query.user(
 		{ where: { id: req.userId } },
-		'{ id, email, firstName, lastName, location, permissions, stripeCustomerId, stripeSubscriptionId, events { id } }'
+		'{ id, email, firstName, lastName, img { img_url}, location, permissions, stripeCustomerId, stripeSubscriptionId, events { id } }'
 	);
 	req.user = user;
 	next();
@@ -36,7 +36,6 @@ server.start(
 	{
 		cors: {
 			credentials: true,
-			rejectUnauthorized: false,
 			origin: process.env.FRONTEND_URL
 		}
 	},
