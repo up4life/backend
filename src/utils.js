@@ -9,11 +9,6 @@ module.exports = {
 			if (existingEvent !== -1) {
 				events[existingEvent].times.push(ev.dates.start.dateTime);
 			} else {
-				// const [ eventImage ] = ev.images.filter(obj => {
-				// 	if (obj.ratio === '4_3') {
-				// 		return obj.url;
-				// 	}
-				// });
 				let [eventInDb] = await db.query.events(
 					{
 						where: {
@@ -38,8 +33,9 @@ module.exports = {
 					title: ev.name,
 					url: ev.url,
 					image_url: img.url,
-					//large_url: img.url,
-					times: [ev.dates.start.dateTime],
+					times: ev.dates.start.noSpecificTime
+						? [ev.dates.start.localDate]
+						: [ev.dates.start.dateTime],
 					genres: ev.classifications[0].genre && ev.classifications[0].genre.name,
 					info: ev.info || null,
 					description: ev.pleaseNote || null,
@@ -216,15 +212,4 @@ module.exports = {
 		}
 		return null;
 	}
-	// async getGeoHash(city) {
-	// 	const response = await axios(
-	// 		`https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${process.env
-	// 			.GOOGLE_API_KEY}`,
-	// 	);
-	// 	let { lat, lng } = response.data.results[0].geometry.location;
-
-	// 	const geoResponse = await axios(`http://geohash.org?q=${lat},${lng}&format=url`);
-	// 	let geoHash = geoResponse.data.replace('http://geohash.org/', '').slice(0, 8);
-	// 	return { geoHash };
-	// },
 };
