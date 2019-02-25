@@ -57,6 +57,7 @@ type DirectMessage {
 	text: String!
 	from: User!
 	createdAt: DateTime!
+	chat: Chat!
 }
 
 type ProfilePic {

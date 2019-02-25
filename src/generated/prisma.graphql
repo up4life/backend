@@ -1,5 +1,5 @@
-# source: https://up4v2-130f000aa8.herokuapp.com/up4version2/dev
-# timestamp: Mon Feb 25 2019 10:28:20 GMT-0600 (Central Standard Time)
+# source: https://labs-dateplan-3b7949a916.herokuapp.com/dateplan-backend/dev
+# timestamp: Mon Feb 25 2019 16:28:59 GMT-0600 (Central Standard Time)
 
 type AggregateChat {
 	count: Int!
@@ -74,7 +74,7 @@ type ChatConnection {
 
 input ChatCreateInput {
 	users: UserCreateManyWithoutChatsInput
-	messages: DirectMessageCreateManyInput
+	messages: DirectMessageCreateManyWithoutChatInput
 }
 
 input ChatCreateManyWithoutUsersInput {
@@ -82,8 +82,17 @@ input ChatCreateManyWithoutUsersInput {
 	connect: [ChatWhereUniqueInput!]
 }
 
+input ChatCreateOneWithoutMessagesInput {
+	create: ChatCreateWithoutMessagesInput
+	connect: ChatWhereUniqueInput
+}
+
+input ChatCreateWithoutMessagesInput {
+	users: UserCreateManyWithoutChatsInput
+}
+
 input ChatCreateWithoutUsersInput {
-	messages: DirectMessageCreateManyInput
+	messages: DirectMessageCreateManyWithoutChatInput
 }
 
 """
@@ -244,7 +253,7 @@ input ChatSubscriptionWhereInput {
 
 input ChatUpdateInput {
 	users: UserUpdateManyWithoutChatsInput
-	messages: DirectMessageUpdateManyInput
+	messages: DirectMessageUpdateManyWithoutChatInput
 }
 
 input ChatUpdateManyWithoutUsersInput {
@@ -257,13 +266,29 @@ input ChatUpdateManyWithoutUsersInput {
 	upsert: [ChatUpsertWithWhereUniqueWithoutUsersInput!]
 }
 
+input ChatUpdateOneRequiredWithoutMessagesInput {
+	create: ChatCreateWithoutMessagesInput
+	connect: ChatWhereUniqueInput
+	update: ChatUpdateWithoutMessagesDataInput
+	upsert: ChatUpsertWithoutMessagesInput
+}
+
+input ChatUpdateWithoutMessagesDataInput {
+	users: UserUpdateManyWithoutChatsInput
+}
+
 input ChatUpdateWithoutUsersDataInput {
-	messages: DirectMessageUpdateManyInput
+	messages: DirectMessageUpdateManyWithoutChatInput
 }
 
 input ChatUpdateWithWhereUniqueWithoutUsersInput {
 	where: ChatWhereUniqueInput!
 	data: ChatUpdateWithoutUsersDataInput!
+}
+
+input ChatUpsertWithoutMessagesInput {
+	update: ChatUpdateWithoutMessagesDataInput!
+	create: ChatCreateWithoutMessagesInput!
 }
 
 input ChatUpsertWithWhereUniqueWithoutUsersInput {
@@ -372,6 +397,7 @@ type DirectMessage implements Node {
 	text: String!
 	from: User!
 	createdAt: DateTime!
+	chat: Chat!
 }
 
 """
@@ -393,11 +419,17 @@ type DirectMessageConnection {
 input DirectMessageCreateInput {
 	text: String!
 	from: UserCreateOneInput!
+	chat: ChatCreateOneWithoutMessagesInput!
 }
 
-input DirectMessageCreateManyInput {
-	create: [DirectMessageCreateInput!]
+input DirectMessageCreateManyWithoutChatInput {
+	create: [DirectMessageCreateWithoutChatInput!]
 	connect: [DirectMessageWhereUniqueInput!]
+}
+
+input DirectMessageCreateWithoutChatInput {
+	text: String!
+	from: UserCreateOneInput!
 }
 
 """
@@ -662,33 +694,29 @@ input DirectMessageSubscriptionWhereInput {
 	node: DirectMessageWhereInput
 }
 
-input DirectMessageUpdateDataInput {
-	text: String
-	from: UserUpdateOneRequiredInput
-}
-
 input DirectMessageUpdateInput {
 	text: String
 	from: UserUpdateOneRequiredInput
+	chat: ChatUpdateOneRequiredWithoutMessagesInput
 }
 
 input DirectMessageUpdateManyDataInput {
 	text: String
 }
 
-input DirectMessageUpdateManyInput {
-	create: [DirectMessageCreateInput!]
+input DirectMessageUpdateManyMutationInput {
+	text: String
+}
+
+input DirectMessageUpdateManyWithoutChatInput {
+	create: [DirectMessageCreateWithoutChatInput!]
 	connect: [DirectMessageWhereUniqueInput!]
 	disconnect: [DirectMessageWhereUniqueInput!]
 	delete: [DirectMessageWhereUniqueInput!]
-	update: [DirectMessageUpdateWithWhereUniqueNestedInput!]
+	update: [DirectMessageUpdateWithWhereUniqueWithoutChatInput!]
 	updateMany: [DirectMessageUpdateManyWithWhereNestedInput!]
 	deleteMany: [DirectMessageScalarWhereInput!]
-	upsert: [DirectMessageUpsertWithWhereUniqueNestedInput!]
-}
-
-input DirectMessageUpdateManyMutationInput {
-	text: String
+	upsert: [DirectMessageUpsertWithWhereUniqueWithoutChatInput!]
 }
 
 input DirectMessageUpdateManyWithWhereNestedInput {
@@ -696,15 +724,20 @@ input DirectMessageUpdateManyWithWhereNestedInput {
 	data: DirectMessageUpdateManyDataInput!
 }
 
-input DirectMessageUpdateWithWhereUniqueNestedInput {
-	where: DirectMessageWhereUniqueInput!
-	data: DirectMessageUpdateDataInput!
+input DirectMessageUpdateWithoutChatDataInput {
+	text: String
+	from: UserUpdateOneRequiredInput
 }
 
-input DirectMessageUpsertWithWhereUniqueNestedInput {
+input DirectMessageUpdateWithWhereUniqueWithoutChatInput {
 	where: DirectMessageWhereUniqueInput!
-	update: DirectMessageUpdateDataInput!
-	create: DirectMessageCreateInput!
+	data: DirectMessageUpdateWithoutChatDataInput!
+}
+
+input DirectMessageUpsertWithWhereUniqueWithoutChatInput {
+	where: DirectMessageWhereUniqueInput!
+	update: DirectMessageUpdateWithoutChatDataInput!
+	create: DirectMessageCreateWithoutChatInput!
 }
 
 input DirectMessageWhereInput {
@@ -891,6 +924,7 @@ input DirectMessageWhereInput {
 	"""
 	createdAt_gte: DateTime
 	from: UserWhereInput
+	chat: ChatWhereInput
 }
 
 input DirectMessageWhereUniqueInput {
@@ -2817,28 +2851,33 @@ scalar Long
 
 type Mutation {
 	createChat(data: ChatCreateInput!): Chat!
+	createDirectMessage(data: DirectMessageCreateInput!): DirectMessage!
 	createProfilePic(data: ProfilePicCreateInput!): ProfilePic!
 	createEvent(data: EventCreateInput!): Event!
-	createDirectMessage(data: DirectMessageCreateInput!): DirectMessage!
 	createUser(data: UserCreateInput!): User!
 	updateChat(data: ChatUpdateInput!, where: ChatWhereUniqueInput!): Chat
-	updateProfilePic(data: ProfilePicUpdateInput!, where: ProfilePicWhereUniqueInput!): ProfilePic
-	updateEvent(data: EventUpdateInput!, where: EventWhereUniqueInput!): Event
 	updateDirectMessage(
 		data: DirectMessageUpdateInput!
 		where: DirectMessageWhereUniqueInput!
 	): DirectMessage
+	updateProfilePic(data: ProfilePicUpdateInput!, where: ProfilePicWhereUniqueInput!): ProfilePic
+	updateEvent(data: EventUpdateInput!, where: EventWhereUniqueInput!): Event
 	updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
 	deleteChat(where: ChatWhereUniqueInput!): Chat
+	deleteDirectMessage(where: DirectMessageWhereUniqueInput!): DirectMessage
 	deleteProfilePic(where: ProfilePicWhereUniqueInput!): ProfilePic
 	deleteEvent(where: EventWhereUniqueInput!): Event
-	deleteDirectMessage(where: DirectMessageWhereUniqueInput!): DirectMessage
 	deleteUser(where: UserWhereUniqueInput!): User
 	upsertChat(
 		where: ChatWhereUniqueInput!
 		create: ChatCreateInput!
 		update: ChatUpdateInput!
 	): Chat!
+	upsertDirectMessage(
+		where: DirectMessageWhereUniqueInput!
+		create: DirectMessageCreateInput!
+		update: DirectMessageUpdateInput!
+	): DirectMessage!
 	upsertProfilePic(
 		where: ProfilePicWhereUniqueInput!
 		create: ProfilePicCreateInput!
@@ -2849,30 +2888,25 @@ type Mutation {
 		create: EventCreateInput!
 		update: EventUpdateInput!
 	): Event!
-	upsertDirectMessage(
-		where: DirectMessageWhereUniqueInput!
-		create: DirectMessageCreateInput!
-		update: DirectMessageUpdateInput!
-	): DirectMessage!
 	upsertUser(
 		where: UserWhereUniqueInput!
 		create: UserCreateInput!
 		update: UserUpdateInput!
 	): User!
+	updateManyDirectMessages(
+		data: DirectMessageUpdateManyMutationInput!
+		where: DirectMessageWhereInput
+	): BatchPayload!
 	updateManyProfilePics(
 		data: ProfilePicUpdateManyMutationInput!
 		where: ProfilePicWhereInput
 	): BatchPayload!
 	updateManyEvents(data: EventUpdateManyMutationInput!, where: EventWhereInput): BatchPayload!
-	updateManyDirectMessages(
-		data: DirectMessageUpdateManyMutationInput!
-		where: DirectMessageWhereInput
-	): BatchPayload!
 	updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
 	deleteManyChats(where: ChatWhereInput): BatchPayload!
+	deleteManyDirectMessages(where: DirectMessageWhereInput): BatchPayload!
 	deleteManyProfilePics(where: ProfilePicWhereInput): BatchPayload!
 	deleteManyEvents(where: EventWhereInput): BatchPayload!
-	deleteManyDirectMessages(where: DirectMessageWhereInput): BatchPayload!
 	deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
@@ -2922,10 +2956,6 @@ enum Permission {
 	MONTHLY
 	YEARLY
 	ADMIN
-}
-
-enum PrismaDatabase {
-	default
 }
 
 type ProfilePic implements Node {
@@ -3220,7 +3250,6 @@ input ProfilePicUpdateManyMutationInput {
 input ProfilePicUpdateManyWithoutUserInput {
 	create: [ProfilePicCreateWithoutUserInput!]
 	connect: [ProfilePicWhereUniqueInput!]
-	set: [ProfilePicWhereUniqueInput!]
 	disconnect: [ProfilePicWhereUniqueInput!]
 	delete: [ProfilePicWhereUniqueInput!]
 	update: [ProfilePicUpdateWithWhereUniqueWithoutUserInput!]
@@ -3420,6 +3449,15 @@ type Query {
 		first: Int
 		last: Int
 	): [Chat]!
+	directMessages(
+		where: DirectMessageWhereInput
+		orderBy: DirectMessageOrderByInput
+		skip: Int
+		after: String
+		before: String
+		first: Int
+		last: Int
+	): [DirectMessage]!
 	profilePics(
 		where: ProfilePicWhereInput
 		orderBy: ProfilePicOrderByInput
@@ -3438,15 +3476,6 @@ type Query {
 		first: Int
 		last: Int
 	): [Event]!
-	directMessages(
-		where: DirectMessageWhereInput
-		orderBy: DirectMessageOrderByInput
-		skip: Int
-		after: String
-		before: String
-		first: Int
-		last: Int
-	): [DirectMessage]!
 	users(
 		where: UserWhereInput
 		orderBy: UserOrderByInput
@@ -3457,9 +3486,9 @@ type Query {
 		last: Int
 	): [User]!
 	chat(where: ChatWhereUniqueInput!): Chat
+	directMessage(where: DirectMessageWhereUniqueInput!): DirectMessage
 	profilePic(where: ProfilePicWhereUniqueInput!): ProfilePic
 	event(where: EventWhereUniqueInput!): Event
-	directMessage(where: DirectMessageWhereUniqueInput!): DirectMessage
 	user(where: UserWhereUniqueInput!): User
 	chatsConnection(
 		where: ChatWhereInput
@@ -3470,6 +3499,15 @@ type Query {
 		first: Int
 		last: Int
 	): ChatConnection!
+	directMessagesConnection(
+		where: DirectMessageWhereInput
+		orderBy: DirectMessageOrderByInput
+		skip: Int
+		after: String
+		before: String
+		first: Int
+		last: Int
+	): DirectMessageConnection!
 	profilePicsConnection(
 		where: ProfilePicWhereInput
 		orderBy: ProfilePicOrderByInput
@@ -3488,15 +3526,6 @@ type Query {
 		first: Int
 		last: Int
 	): EventConnection!
-	directMessagesConnection(
-		where: DirectMessageWhereInput
-		orderBy: DirectMessageOrderByInput
-		skip: Int
-		after: String
-		before: String
-		first: Int
-		last: Int
-	): DirectMessageConnection!
 	usersConnection(
 		where: UserWhereInput
 		orderBy: UserOrderByInput
@@ -3520,9 +3549,9 @@ type Query {
 
 type Subscription {
 	chat(where: ChatSubscriptionWhereInput): ChatSubscriptionPayload
+	directMessage(where: DirectMessageSubscriptionWhereInput): DirectMessageSubscriptionPayload
 	profilePic(where: ProfilePicSubscriptionWhereInput): ProfilePicSubscriptionPayload
 	event(where: EventSubscriptionWhereInput): EventSubscriptionPayload
-	directMessage(where: DirectMessageSubscriptionWhereInput): DirectMessageSubscriptionPayload
 	user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
@@ -5065,7 +5094,6 @@ input UserUpdateManyDataInput {
 input UserUpdateManyInput {
 	create: [UserCreateInput!]
 	connect: [UserWhereUniqueInput!]
-	set: [UserWhereUniqueInput!]
 	disconnect: [UserWhereUniqueInput!]
 	delete: [UserWhereUniqueInput!]
 	update: [UserUpdateWithWhereUniqueNestedInput!]
@@ -5109,7 +5137,6 @@ input UserUpdateManyWithoutChatsInput {
 input UserUpdateManyWithoutEventsInput {
 	create: [UserCreateWithoutEventsInput!]
 	connect: [UserWhereUniqueInput!]
-	set: [UserWhereUniqueInput!]
 	disconnect: [UserWhereUniqueInput!]
 	delete: [UserWhereUniqueInput!]
 	update: [UserUpdateWithWhereUniqueWithoutEventsInput!]
