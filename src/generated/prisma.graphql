@@ -1,5 +1,5 @@
 # source: https://labs-dateplan-3b7949a916.herokuapp.com/dateplan-backend/dev
-# timestamp: Mon Feb 25 2019 16:28:59 GMT-0600 (Central Standard Time)
+# timestamp: Wed Feb 27 2019 17:18:07 GMT-0600 (Central Standard Time)
 
 type AggregateChat {
 	count: Int!
@@ -3590,6 +3590,9 @@ type User implements Node {
 		first: Int
 		last: Int
 	): [Event!]
+	genderPrefs: [Gender!]!
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission!
 	createdAt: DateTime!
 	updatedAt: DateTime!
@@ -3640,6 +3643,10 @@ type UserConnection {
 	aggregate: AggregateUser!
 }
 
+input UserCreategenderPrefsInput {
+	set: [Gender!]
+}
+
 input UserCreateInput {
 	firstName: String!
 	lastName: String!
@@ -3655,10 +3662,13 @@ input UserCreateInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission!
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserCreateinterestsInput
+	genderPrefs: UserCreategenderPrefsInput
 	img: ProfilePicCreateManyWithoutUserInput
 	events: EventCreateManyWithoutAttendingInput
 	liked: UserCreateManyInput
@@ -3710,10 +3720,13 @@ input UserCreateWithoutChatsInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission!
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserCreateinterestsInput
+	genderPrefs: UserCreategenderPrefsInput
 	img: ProfilePicCreateManyWithoutUserInput
 	events: EventCreateManyWithoutAttendingInput
 	liked: UserCreateManyInput
@@ -3735,10 +3748,13 @@ input UserCreateWithoutEventsInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission!
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserCreateinterestsInput
+	genderPrefs: UserCreategenderPrefsInput
 	img: ProfilePicCreateManyWithoutUserInput
 	liked: UserCreateManyInput
 	blocked: UserCreateManyInput
@@ -3760,10 +3776,13 @@ input UserCreateWithoutImgInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission!
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserCreateinterestsInput
+	genderPrefs: UserCreategenderPrefsInput
 	events: EventCreateManyWithoutAttendingInput
 	liked: UserCreateManyInput
 	blocked: UserCreateManyInput
@@ -3816,6 +3835,10 @@ enum UserOrderByInput {
 	resetToken_DESC
 	resetTokenExpiry_ASC
 	resetTokenExpiry_DESC
+	minAgePref_ASC
+	minAgePref_DESC
+	maxAgePref_ASC
+	maxAgePref_DESC
 	permissions_ASC
 	permissions_DESC
 	createdAt_ASC
@@ -3845,6 +3868,9 @@ type UserPreviousValues {
 	resetToken: String
 	resetTokenExpiry: Float
 	interests: [Category!]!
+	genderPrefs: [Gender!]!
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission!
 	createdAt: DateTime!
 	updatedAt: DateTime!
@@ -4747,6 +4773,78 @@ input UserScalarWhereInput {
 	All values greater than or equal the given value.
 	"""
 	resetTokenExpiry_gte: Float
+	minAgePref: Int
+
+	"""
+	All values that are not equal to given value.
+	"""
+	minAgePref_not: Int
+
+	"""
+	All values that are contained in given list.
+	"""
+	minAgePref_in: [Int!]
+
+	"""
+	All values that are not contained in given list.
+	"""
+	minAgePref_not_in: [Int!]
+
+	"""
+	All values less than the given value.
+	"""
+	minAgePref_lt: Int
+
+	"""
+	All values less than or equal the given value.
+	"""
+	minAgePref_lte: Int
+
+	"""
+	All values greater than the given value.
+	"""
+	minAgePref_gt: Int
+
+	"""
+	All values greater than or equal the given value.
+	"""
+	minAgePref_gte: Int
+	maxAgePref: Int
+
+	"""
+	All values that are not equal to given value.
+	"""
+	maxAgePref_not: Int
+
+	"""
+	All values that are contained in given list.
+	"""
+	maxAgePref_in: [Int!]
+
+	"""
+	All values that are not contained in given list.
+	"""
+	maxAgePref_not_in: [Int!]
+
+	"""
+	All values less than the given value.
+	"""
+	maxAgePref_lt: Int
+
+	"""
+	All values less than or equal the given value.
+	"""
+	maxAgePref_lte: Int
+
+	"""
+	All values greater than the given value.
+	"""
+	maxAgePref_gt: Int
+
+	"""
+	All values greater than or equal the given value.
+	"""
+	maxAgePref_gte: Int
 	permissions: Permission
 
 	"""
@@ -5029,15 +5127,22 @@ input UserUpdateDataInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserUpdateinterestsInput
+	genderPrefs: UserUpdategenderPrefsInput
 	img: ProfilePicUpdateManyWithoutUserInput
 	events: EventUpdateManyWithoutAttendingInput
 	liked: UserUpdateManyInput
 	blocked: UserUpdateManyInput
 	chats: ChatUpdateManyWithoutUsersInput
+}
+
+input UserUpdategenderPrefsInput {
+	set: [Gender!]
 }
 
 input UserUpdateInput {
@@ -5055,10 +5160,13 @@ input UserUpdateInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserUpdateinterestsInput
+	genderPrefs: UserUpdategenderPrefsInput
 	img: ProfilePicUpdateManyWithoutUserInput
 	events: EventUpdateManyWithoutAttendingInput
 	liked: UserUpdateManyInput
@@ -5085,10 +5193,13 @@ input UserUpdateManyDataInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserUpdateinterestsInput
+	genderPrefs: UserUpdategenderPrefsInput
 }
 
 input UserUpdateManyInput {
@@ -5117,10 +5228,13 @@ input UserUpdateManyMutationInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserUpdateinterestsInput
+	genderPrefs: UserUpdategenderPrefsInput
 }
 
 input UserUpdateManyWithoutChatsInput {
@@ -5179,10 +5293,13 @@ input UserUpdateWithoutChatsDataInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserUpdateinterestsInput
+	genderPrefs: UserUpdategenderPrefsInput
 	img: ProfilePicUpdateManyWithoutUserInput
 	events: EventUpdateManyWithoutAttendingInput
 	liked: UserUpdateManyInput
@@ -5204,10 +5321,13 @@ input UserUpdateWithoutEventsDataInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserUpdateinterestsInput
+	genderPrefs: UserUpdategenderPrefsInput
 	img: ProfilePicUpdateManyWithoutUserInput
 	liked: UserUpdateManyInput
 	blocked: UserUpdateManyInput
@@ -5229,10 +5349,13 @@ input UserUpdateWithoutImgDataInput {
 	imageLarge: String
 	resetToken: String
 	resetTokenExpiry: Float
+	minAgePref: Int
+	maxAgePref: Int
 	permissions: Permission
 	stripeCustomerId: String
 	stripeSubscriptionId: String
 	interests: UserUpdateinterestsInput
+	genderPrefs: UserUpdategenderPrefsInput
 	events: EventUpdateManyWithoutAttendingInput
 	liked: UserUpdateManyInput
 	blocked: UserUpdateManyInput
@@ -6177,6 +6300,78 @@ input UserWhereInput {
 	All values greater than or equal the given value.
 	"""
 	resetTokenExpiry_gte: Float
+	minAgePref: Int
+
+	"""
+	All values that are not equal to given value.
+	"""
+	minAgePref_not: Int
+
+	"""
+	All values that are contained in given list.
+	"""
+	minAgePref_in: [Int!]
+
+	"""
+	All values that are not contained in given list.
+	"""
+	minAgePref_not_in: [Int!]
+
+	"""
+	All values less than the given value.
+	"""
+	minAgePref_lt: Int
+
+	"""
+	All values less than or equal the given value.
+	"""
+	minAgePref_lte: Int
+
+	"""
+	All values greater than the given value.
+	"""
+	minAgePref_gt: Int
+
+	"""
+	All values greater than or equal the given value.
+	"""
+	minAgePref_gte: Int
+	maxAgePref: Int
+
+	"""
+	All values that are not equal to given value.
+	"""
+	maxAgePref_not: Int
+
+	"""
+	All values that are contained in given list.
+	"""
+	maxAgePref_in: [Int!]
+
+	"""
+	All values that are not contained in given list.
+	"""
+	maxAgePref_not_in: [Int!]
+
+	"""
+	All values less than the given value.
+	"""
+	maxAgePref_lt: Int
+
+	"""
+	All values less than or equal the given value.
+	"""
+	maxAgePref_lte: Int
+
+	"""
+	All values greater than the given value.
+	"""
+	maxAgePref_gt: Int
+
+	"""
+	All values greater than or equal the given value.
+	"""
+	maxAgePref_gte: Int
 	permissions: Permission
 
 	"""

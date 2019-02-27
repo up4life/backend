@@ -44,7 +44,7 @@ const Mutation = {
 		const { uid } = await verifyIdToken(args.idToken);
 		const { providerData } = await getUserRecord(uid);
 		const { email, displayName, photoURL } = providerData[0];
-		console.log(email, displayName, photoURL);
+		// console.log(email, displayName, photoURL);
 		// check to see if user already exists in our db
 		let user = await ctx.db.query.user({
 			where: { email }
@@ -136,7 +136,7 @@ const Mutation = {
 		// });
 		return { message: 'Thanks!' };
 	},
-	async updateImage(parent, { thumbnail, image }, { db, response, request }, info) {
+	async updateImage(parent, { thumbnail, image }, { db, request }, info) {
 		const { userId, user } = request;
 		if (!userId) throw new Error('You must be logged in!');
 
@@ -321,14 +321,8 @@ const Mutation = {
 	},
 	async addEvent(parent, { event }, { db, request }, info) {
 		const { userId, user } = request;
-
 		if (!userId) throw new Error('You must be signed in to add an event.');
 
-		// const { data } = await axios.get(
-		// 	`https://app.ticketmaster.com/discovery/v2/events/${args.eventId}.json?apikey=${process
-		// 		.env.TKTMSTR_KEY}`,
-		// );
-		//	console.log(event);
 		const [existingEvents] = await db.query.events({
 			where: {
 				AND: [
@@ -350,39 +344,38 @@ const Mutation = {
 				throw new Error("You've already saved that event!");
 			}
 		}
-		//const [ img ] = data.images.filter(img => img.width > 600);
-		// console.log(img);
-		await db.mutation.upsertEvent({
-			where: {
-				id: eventId
-			},
-			update: {
-				attending: {
-					connect: {
-						id: user.id
+		return db.mutation.upsertEvent(
+			{
+				where: {
+					id: eventId
+				},
+				update: {
+					attending: {
+						connect: {
+							id: user.id
+						}
+					}
+				},
+				create: {
+					title: event.title,
+					url: event.url,
+					venue: event.venue,
+					description: event.description,
+					times: { set: event.times },
+					image_url: event.image_url,
+					address: event.address,
+					city: event.city,
+					lat: event.lat,
+					long: event.long,
+					attending: {
+						connect: {
+							id: user.id
+						}
 					}
 				}
 			},
-			create: {
-				title: event.title,
-				url: event.url,
-				venue: event.venue,
-				description: event.description,
-				times: { set: event.times },
-				image_url: event.image_url,
-				address: event.address,
-				city: event.city,
-				lat: event.lat,
-				long: event.long,
-				attending: {
-					connect: {
-						id: user.id
-					}
-				}
-			}
-		});
-
-		return { message: 'Event successfully added!' };
+			info
+		);
 	},
 	async deleteEvent(parent, args, { db, request }, info) {
 		const { userId } = request;

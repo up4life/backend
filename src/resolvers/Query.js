@@ -29,7 +29,6 @@ const Query = {
 	},
 	async getEvents(parent, { location, alt, page, ...args }, { db }, info) {
 		location = location.split(',')[0].toLowerCase();
-
 		let cats =
 			!args.categories || !args.categories.length
 				? ['KZFzniwnSyZfZ7v7nJ', 'KZFzniwnSyZfZ7v7na', 'KZFzniwnSyZfZ7v7n1']
@@ -38,7 +37,7 @@ const Query = {
 		const dates = !args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
 
 		let events;
-		let response = await fetchEvents(location, cats, dates, page, 200, args.genres);
+		let response = await fetchEvents(location, cats, dates, page, 50, args.genres);
 
 		events = response.data._embedded.events;
 
@@ -47,11 +46,11 @@ const Query = {
 			return a;
 		}, []);
 
-		if (response.data.page.totalElements > 20) {
-			while (uniques.length < 20) {
+		if (response.data.page.totalElements > 50) {
+			while (uniques.length < 50) {
 				page = page + 1;
 
-				let res = await fetchEvents(location, cats, dates, page, 200, args.genres);
+				let res = await fetchEvents(location, cats, dates, page, 50, args.genres);
 
 				if (!res.data._embedded) break;
 				else {
@@ -92,21 +91,9 @@ const Query = {
 				address: data._embedded ? data._embedded.venues[0].address.line1 : 'damnit 3',
 				zipCode: data._embedded ? data._embedded.venues[0].postalCode : 'shit 4'
 			},
-			// img in 3_2 or 16_9 ratio is nicer quality, just need to figure out how to get it to be responsive
-			// or we could keep it at 4_3 i'm cool either way
 			image_url: img.url,
 			description: data.info,
 			times: [data.dates.start.dateTime]
-			// data.dates.status.code (might be good for things like rescheduled events)
-			// data.pleaseNote (has additional info for things that are rescheduled or something like that it seems)
-			// optional data points to include
-			// data.priceRanges[0].currency
-			// data.priceRanges[0].min (min ticket price)
-			// data.priceRanges[0].max (higheest price)
-			// data.classifications.genre.name or .subGenre.name
-			// data.seatmap.staticUrl (link to seating map)
-			// data.products (includes things sold with it like parking, etc..
-			// data.sales.public.startDateTime && endDateTime (when tickets start and end being on sale to public)
 		};
 	},
 	async getLocation(parent, { latitude, longitude }, ctx, info) {
@@ -148,22 +135,6 @@ const Query = {
 		let geoHash = geoResponse.data.replace('http://geohash.org/', '').slice(0, 8);
 		return { geoHash };
 	},
-	// async getUserOrder(parent, args, ctx, info) {
-	// 	// Check user's login status
-	// 	const { userId } = ctx.request;
-	// 	if (!userId) throw new Error('You must be signed in to access orders.');
-
-	// 	return ctx.db.query.orders(
-	// 		{
-	// 			where: {
-	// 				user: {
-	// 					id: args.userId,
-	// 				},
-	// 			},
-	// 		},
-	// 		info,
-	// 	);
-	// },
 	async getRemainingDates(parent, args, ctx, info) {
 		// Check user's login status
 		const { userId } = ctx.request;
