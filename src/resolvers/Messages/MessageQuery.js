@@ -25,6 +25,20 @@ module.exports = {
 			info
 		);
 	},
+	// async getMessages(parent, args, { request, db }, info) {
+	// 	const { user } = request;
+	// 	if (!user) throw new Error('You must be logged in to start a conversation!');
+
+	// 	return db.query.chats(
+	// 		{
+	// 			where: {
+	// 				users_some: { id: user.id },
+	// 			},
+	// 		},
+	// 		`{messages {id text createdAt seen from { id firstName imageThumbnail dob gender}}}`,
+	// 	);
+
+	// },
 	async getConversation(parent, args, { request, db }, info) {
 		// this is to check if there is already a convo between logged in user and someone else
 		const { user } = request;
@@ -32,11 +46,13 @@ module.exports = {
 
 		const [chat] = await db.query.chats(
 			{
-				where: { AND: [{ users_some: { id: user.id } }, { users_some: { id: args.id } }] }
+				where: {
+					AND: [{ users_some: { id: user.id } }, { users_some: { id: args.id } }]
+				}
 			},
 			info
 		);
-		// console.log(chat);
+
 		return chat;
 	}
 };
