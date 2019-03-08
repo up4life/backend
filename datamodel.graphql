@@ -1,0 +1,91 @@
+enum Category {
+	MUSIC
+	ARTS_THEATRE
+	SPORTS
+}
+
+enum Permission {
+	FREE
+	MONTHLY
+	YEARLY
+	ADMIN
+}
+
+enum Gender {
+	MALE
+	FEMALE
+	OTHER
+}
+
+type User {
+	id: ID! @unique
+	firstName: String!
+	lastName: String!
+	password: String!
+	gender: Gender
+	age: Int
+	dob: String
+	location: String
+	email: String! @unique
+	phone: String @unique
+	biography: String
+	imageThumbnail: String
+	imageLarge: String
+	img: [ProfilePic!]!
+	resetToken: String
+	resetTokenExpiry: Float
+	interests: [Category]
+	events: [Event!]!
+	genderPrefs: [Gender]
+	minAgePref: Int
+	maxAgePref: Int
+	permissions: Permission!
+	createdAt: DateTime!
+	updatedAt: DateTime!
+	stripeCustomerId: String
+	stripeSubscriptionId: String
+	liked: [User!]! @relation(name: "LikedUser")
+	blocked: [User!]! @relation(name: "BlockedUser")
+	chats: [Chat!]!
+}
+
+type Chat {
+	id: ID! @unique 
+	users: [User!]!
+	messages: [DirectMessage!]!
+}
+
+type DirectMessage {
+	id: ID! @unique
+	text: String!
+	from: User!
+	createdAt: DateTime!
+	seen: Boolean @default(value: "false")
+	updatedAt: DateTime!
+	chat: Chat!
+}
+
+type ProfilePic {
+	id: ID! @unique
+	user: User!
+	img_url: String!
+	default: Boolean! @default(value: "false")
+}
+
+type Event {
+	id: ID! @unique
+	eventfulID: String @unique
+	title: String
+	genre: String
+	description: String
+	attending: [User!]!
+	times: [String]
+	location: String
+	image_url: String
+	url: String
+	city: String
+	venue: String
+	address: String
+	lat: String
+	long: String
+}
