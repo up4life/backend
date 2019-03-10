@@ -46,7 +46,9 @@ module.exports = {
 				{
 					data: {
 						users: { connect: [ { id: user.id }, { id } ] },
-						messages: { create: [ { text: message, from: { connect: { id } } } ] },
+						messages: {
+							create: [ { text: message, from: { connect: { id: user.id } } } ],
+						},
 					},
 				},
 				info,
@@ -59,54 +61,13 @@ module.exports = {
 					},
 					data: {
 						messages: {
-							create: [ { text: message, from: { connect: { id } } } ],
+							create: [ { text: message, from: { connect: { id: user.id } } } ],
 						},
 					},
 				},
 				info,
 			);
 		}
-		// return db.mutation.createDirectMessage({
-		// 	data: {
-		// 		text: message,
-		// 		from : { connect: {id}},
-		// 		chat: {
-		// 			connect: {id: chat.id}
-		// 		}
-		// 	}
-		// })
-
-		// check to see if chat between users already exists
-		// check to see if chat between users already exists
-		// let [ chat ] = await db.query.chats({
-		// 	where: { AND: [ { users_some: { id: user.id } }, { users_some: { id: args.id } } ] },
-		// });
-
-		// // if (!chat) throw new Error('No previous conversation between these users');
-		// if (!chat) {
-
-		// }
-		// // create new chat
-		// const message = await db.mutation.createDirectMessage(
-		// 	{
-		// 		data: {
-		// 			text: args.message,
-		// 			from: {
-		// 				connect: {
-		// 					id: user.id,
-		// 				},
-		// 			},
-		// 			chat: {
-		// 				connect: {
-		// 					id: chat.id,
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	info,
-		// );
-
-		// return message;
 	},
 	async deleteChat(parent, args, { request, db }, info) {
 		// simple chat delete to erase entire conversation
