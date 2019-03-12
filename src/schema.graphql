@@ -25,6 +25,8 @@ type Mutation {
 	unblockUser(id: String!): User!
 	unlikeUser(id: String!): User!
 	updateSeenMessage(chatId: String!): Chat!
+	deleteManyGenres(where: GenreWhereInput): BatchPayload!
+	markAllAsSeen(chatId: String!): Chat!
 }
 
 type Query {
@@ -52,10 +54,12 @@ type Query {
 	getMessages: [DirectMessage]
 	genres: [Genre!]
 	userEvents: [Event]
+	getLikedByList: [User!]!
+	getMessageLeft: Int!
 }
 
 type Subscription {
-	myChat(id: String!): ChatSubscriptionPayload!
+	myChat(id: String!): ChatSubscriptionPayload
 	myMessages(id: String!): MessageSubscriptionPayload!
 }
 
@@ -73,6 +77,11 @@ type ChatSubscriptionPayload {
 type MessageSubscriptionPayload {
 	mutation: MutationType!
 	node: DirectMessage
+}
+
+type BatchPayload {
+  """The number of nodes that have been affected by the Batch operation."""
+  count: Long!
 }
 
 type DirectMessage {
@@ -96,7 +105,8 @@ input AddEventInput {
 	city: String
 	lat: String
 	long: String
-	genre: GenreCreateOneInput
+	genre: String
+	category: String
 }
 
 type User {
@@ -154,7 +164,7 @@ type Event {
 	large_url: String
 	price: PriceRange
 	notes: String
-	genreName: String
+	genre: String
 	category: String 
 }
 

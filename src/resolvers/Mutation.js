@@ -1,6 +1,7 @@
 const { randomBytes } = require('crypto');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { forwardTo } = require('prisma-binding');
 const { transport, formatEmail } = require('../mail');
 const authy = require('authy')(process.env.AUTHY_KEY);
 const stripe = require('../stripe');
@@ -16,6 +17,7 @@ const UserMutation = require('./User/UserMutation');
 const Mutation = {
 	...MessageMutation,
 	...UserMutation,
+	deleteManyGenres: forwardTo('db'),
 	async signup(parent, args, { db, response }, info) {
 		// just in case some bozo puts their email in with capitalization for some reason
 		args.email = args.email.toLowerCase();
@@ -81,7 +83,6 @@ const Mutation = {
 	async signin(parent, { email, password }, { db, response }, info) {
 		const user = await db.query.user({ where: { email } });
 		if (!user) {
-			normal;
 			throw new Error(`No such user found for email ${email}`);
 		}
 		const valid = await bcrypt.compare(password, user.password);
@@ -345,6 +346,8 @@ const Mutation = {
 	async addEvent(parent, { event }, { db, request }, info) {
 		const { userId, user } = request;
 		if (!userId) throw new Error('You must be signed in to add an event.');
+		if (user.permissions === 'FREE' && user.events.length >= 10)
+			throw new Error('You have reached maximum saved events for FREE account.');
 
 		const [ existingEvents ] = await db.query.events({
 			where: {
@@ -444,7 +447,7 @@ const Mutation = {
 
 		const verifySent = authy.phones().verification_start(args.phone, '1', 'sms', (err, res) => {
 			if (err) {
-				console.log(err);
+				throw new Error(err);
 			}
 			return res.message;
 		});
