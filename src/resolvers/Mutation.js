@@ -38,7 +38,7 @@ const Mutation = {
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		// adding that token to the cookie bc its neighborly
 		response.cookie("token", token, {
-			// httpOnly: true,
+			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year cookie
 		});
 
@@ -76,7 +76,7 @@ const Mutation = {
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		// attach token to cookie even if that seems kinda obvious
 		ctx.response.cookie("token", token, {
-			// httpOnly: true,
+			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year long cookie bc why not. FIGHT ME
 		});
 
@@ -94,7 +94,7 @@ const Mutation = {
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		// attach token to cookie even if that seems kinda obvious
 		response.cookie("token", token, {
-			// httpOnly: true,
+			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year long cookie bc why not. FIGHT ME
 		});
 
