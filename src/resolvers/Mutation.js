@@ -75,7 +75,7 @@ const Mutation = {
 		const session = await createUserToken(args, ctx);
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		// attach token to cookie even if that seems kinda obvious
-		response.cookie("token", token, {
+		ctx.response.cookie("token", token, {
 			// httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year long cookie bc why not. FIGHT ME
 		});
