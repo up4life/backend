@@ -16,10 +16,10 @@ server.express.use(async (req, res, next) => {
 		req.userId = userId;
 		return next();
 	}
-	if (session) {
-		const firebaseUser = await verifyUserToken(session);
-		req.userId = req.cookies.userId;
-	}
+	// if (session) {
+	// 	const firebaseUser = await verifyUserToken(session);
+	// 	req.userId = req.cookies.userId;
+	// }
 	next();
 });
 
