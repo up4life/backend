@@ -14,6 +14,7 @@ server.express.use(async (req, res, next) => {
 	if (token) {
 		const { userId } = jwt.verify(token, process.env.APP_SECRET);
 		req.userId = userId;
+		return next();
 	}
 	if (session) {
 		const firebaseUser = await verifyUserToken(session);
@@ -26,7 +27,7 @@ server.express.use(async (req, res, next) => {
 	if (!req.userId) return next();
 	const user = await db.query.user(
 		{ where: { id: req.userId } },
-		"{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs age gender blocked { id }}"
+		`{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs age gender blocked { id }}`
 	);
 	req.user = user;
 	next();
