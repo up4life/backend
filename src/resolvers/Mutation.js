@@ -486,10 +486,34 @@ const Mutation = {
 	},
 	async deleteUser(parent, args, { request, db }, info) {
 		const { user } = request;
-		let user = await db.mutation.deleteUser({
+		let res = await db.mutation.deleteUser({
 			where: { id: user.id },
 		});
 		return { message: 'User deleted' };
+	},
+	async uploadImage(parent, { url }, { request, db }, info) {
+		const { user } = request;
+		let res = await db.mutation.createProfilePic(
+			{
+				data: {
+					default: true,
+					img_url: url,
+					user: { connect: { id: user.id } },
+				},
+			},
+			`{id}`,
+		);
+		return db.mutation.updateUser(
+			{
+				where: { id: user.id },
+				data: {
+					img: {
+						updateMany: [ { where: { id_not: res.id }, data: { default: false } } ],
+					},
+				},
+			},
+			info,
+		);
 	},
 };
 
