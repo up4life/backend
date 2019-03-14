@@ -470,6 +470,13 @@ const Mutation = {
 			}
 		});
 	},
+	async deleteUser(parent, args, { request, db }, info) {
+		const { user } = request;
+		let user = await db.mutation.deleteUser({
+			where: { id: user.id },
+		});
+		return { message: 'User deleted' };
+	},
 };
 
 module.exports = Mutation;
