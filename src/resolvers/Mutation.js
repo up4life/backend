@@ -30,7 +30,14 @@ const Mutation = {
 				data: {
 					...args,
 					password,
-					permissions: "FREE" // default permission for user is FREE tier
+					permissions: "FREE", // default permission for user is FREE tier
+					img: {
+						create: {
+							img_url:
+								"https://res.cloudinary.com/dcwn6afsq/image/upload/v1552598409/up4/autftv4fj3l7qlkkt56j.jpg",
+							default: true
+						}
+					}
 				}
 			},
 			info
@@ -61,7 +68,14 @@ const Mutation = {
 						lastName: nameArray[1] || "",
 						email: email,
 						password: "firebaseAuth",
-						img: { create: { img_url: photoURL } },
+						img: {
+							create: {
+								img_url: photoURL
+									? photoURL
+									: "https://res.cloudinary.com/dcwn6afsq/image/upload/v1552598409/up4/autftv4fj3l7qlkkt56j.jpg",
+								default: true
+							}
+						},
 						phone: phoneNumber || null,
 						imageThumbnail: photoURL || "",
 						imageLarge: photoURL || "",
@@ -74,7 +88,6 @@ const Mutation = {
 		}
 		const session = await createUserToken(args, ctx);
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
-		// attach token to cookie even if that seems kinda obvious
 		ctx.response.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year long cookie bc why not. FIGHT ME
@@ -251,7 +264,7 @@ const Mutation = {
 				customer: user.stripeCustomerId || customer.id,
 				items: [
 					{
-						plan: user.subscription === "MONTHLY" ? "plan_EYPPZzmOjy3P3I" : "plan_EYPg6RkTFwJFRA"
+						plan: args.subscription === "MONTHLY" ? "plan_EhVWWzHeQHwdJC" : "plan_EYPg6RkTFwJFRA"
 					}
 				]
 			});
@@ -262,7 +275,7 @@ const Mutation = {
 				items: [
 					{
 						id: subscription.items.data[0].id,
-						plan: args.subscription === "MONTHLY" ? "plan_EYPPZzmOjy3P3I" : "plan_EYPg6RkTFwJFRA"
+						plan: args.subscription === "MONTHLY" ? "plan_EhVWWzHeQHwdJC" : "plan_EYPg6RkTFwJFRA"
 					}
 				]
 			});
@@ -421,7 +434,6 @@ const Mutation = {
 	async updateUser(parent, args, { request, db }, info) {
 		const { user } = request;
 		if (!user) throw new Error("You must be logged in to update your profile!");
-		// console.log(args.data);
 		const updated = await db.mutation.updateUser(
 			{
 				where: { id: user.id },
@@ -441,25 +453,59 @@ const Mutation = {
 			data: { phone: args.phone }
 		});
 
-		const verifySent = authy.phones().verification_start(args.phone, "1", "sms", (err, res) => {
+		authy.phones().verification_start(args.phone, "1", "sms", (err, res) => {
 			if (err) {
+				console.log(err);
 				throw new Error(err);
 			}
-			return res.message;
+			return { message: "Phone verification code sent!" };
 		});
-
-		return { message: "Phone verification code sent!" };
 	},
-	async checkVerify(parent, args, { request }, info) {
+	checkVerify(parent, args, { request, db }, info) {
 		const { user } = request;
 		if (!user) throw new Error("You must be logged in to update your profile!");
 
-		const verified = authy.phones().verification_check(args.phone, "1", args.code, (err, res) => {
+		authy.phones().verification_check(args.phone, "1", args.code, async (err, res) => {
 			if (err) {
 				throw new Error("Phone verification unsuccessful");
 			}
+			let user = await db.mutation.updateUser({
+				where: { id: user.id },
+				data: { verified: true }
+			});
 			return { message: "Phone successfully verified!" };
 		});
+	},
+	async deleteUser(parent, args, { request, db }, info) {
+		const { user } = request;
+		let res = await db.mutation.deleteUser({
+			where: { id: user.id }
+		});
+		return { message: "User deleted" };
+	},
+	async uploadImage(parent, { url }, { request, db }, info) {
+		const { user } = request;
+		let res = await db.mutation.createProfilePic(
+			{
+				data: {
+					default: true,
+					img_url: url,
+					user: { connect: { id: user.id } }
+				}
+			},
+			`{id}`
+		);
+		return db.mutation.updateUser(
+			{
+				where: { id: user.id },
+				data: {
+					img: {
+						updateMany: [{ where: { id_not: res.id }, data: { default: false } }]
+					}
+				}
+			},
+			info
+		);
 	}
 };
 

@@ -27,6 +27,9 @@ type Mutation {
 	updateSeenMessage(chatId: String!): Chat!
 	deleteManyGenres(where: GenreWhereInput): BatchPayload!
 	markAllAsSeen(chatId: String!): Chat!
+	deleteUser: Message
+	uploadImage(url: String!): User!
+	reportUser(id: ID!, message: String!): Message
 }
 
 type Query {
@@ -37,6 +40,7 @@ type Query {
 		dates: [String]
 		genres: [String]
 	): AllEvents
+	remainingMessages: Int
 	getEvent(id: String!): Event
 	geoHash(city: String!): GeoHash
 	currentUser: User
@@ -51,7 +55,7 @@ type Query {
 	getSharedEvents(userToMatchId: String!): [Event!]!
 	getMatchUsers: [MatchScore!]!
 	getScore: Int
-	getMessages: [DirectMessage]
+	getMessages(id: String): [DirectMessage]
 	genres: [Genre!]
 	userEvents: [Event]
 	getLikedByList: [User!]!
@@ -61,6 +65,7 @@ type Query {
 type Subscription {
 	myChat(id: String!): ChatSubscriptionPayload
 	myMessages(id: String!): MessageSubscriptionPayload!
+	myMessage(chatId: String!): MessageSubscriptionPayload!
 }
 
 enum MutationType {
@@ -127,7 +132,7 @@ type User {
 	img: [ProfilePic]
 	permissions: Permission
 	interests: [Genre]
-	genderPrefs: [Gender]
+	genderPrefs: [GenderPrefs]
 	minAgePref: Int
 	maxAgePref: Int
 	events: [Event!]!
@@ -139,6 +144,7 @@ type User {
 	stripeSubscriptionId: String
 	score: Int
 	chats: [Chat]
+	verified: Boolean
 }
 
 type AllEvents {
