@@ -199,7 +199,7 @@ module.exports = {
 			info
 		);
 	},
-	async reportUser(parent, { id, message }, { request }, info) {
+	async reportUser(parent, { id, message }, { request, db }, info) {
 		const { userId } = request;
 		// current user need to login
 		if (!userId) throw new Error("You need to login to report a user");
