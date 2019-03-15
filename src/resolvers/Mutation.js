@@ -454,16 +454,12 @@ const Mutation = {
 		const { user } = request;
 		if (!user) throw new Error("You must be logged in to update your profile!");
 
-		const verified = await authy
-			.phones()
-			.verification_check(args.phone, "1", args.code, (err, res) => {
-				if (err) {
-					throw new Error("Phone verification unsuccessful");
-				}
-				return res;
-			});
-
-		return { message: "Phone successfully verified!" };
+		const verified = authy.phones().verification_check(args.phone, "1", args.code, (err, res) => {
+			if (err) {
+				throw new Error("Phone verification unsuccessful");
+			}
+			return { message: "Phone successfully verified!" };
+		});
 	}
 };
 
