@@ -205,7 +205,7 @@ module.exports = {
 		if (!userId) throw new Error("You need to login to report a user");
 
 		// send mail to Support Team at Up4
-		const mailRes = await transport.sendMail({
+		const mailReport = await transport.sendMail({
 			from: "reportUser@up4.life",
 			to: "support@up4.life",
 			subject: `Report User ID: ${id}`,
@@ -226,7 +226,7 @@ module.exports = {
 			`{ liked { id } }`
 		);
 
-		if (currentUser.liked.findIndex(user => user.id === args.id) !== -1) {
+		if (currentUser.liked.findIndex(user => user.id === id) !== -1) {
 			await db.mutation.updateUser(
 				{
 					where: {
@@ -235,12 +235,12 @@ module.exports = {
 					data: {
 						blocked: {
 							connect: {
-								id: args.id
+								id
 							}
 						},
 						liked: {
 							disconnect: {
-								id: args.id
+								id
 							}
 						}
 					}
@@ -256,7 +256,7 @@ module.exports = {
 					data: {
 						blocked: {
 							connect: {
-								id: args.id
+								id
 							}
 						}
 					}
