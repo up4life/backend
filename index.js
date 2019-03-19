@@ -4,7 +4,6 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const https = require("https");
 const http = require("http");
-// const fs = require('fs')
 
 const schema = require("./src/schema");
 const { bindings } = require("./src/db");
@@ -21,8 +20,6 @@ const apolloServer = new ApolloServer({
 	debug: process.env.NODE_ENV === "development"
 });
 
-// const port = process.env.PORT || 4000;
-
 const corsConfig = {
 	origin: [
 		"https://up4lifee.herokuapp.com",
@@ -37,14 +34,13 @@ const configurations = {
 	production: {
 		ssl: false,
 		port: process.env.PORT || 4000,
-		// hostname: "localhost"
 		hostname: "api.up4.life"
 	},
 	development: { ssl: false, port: process.env.PORT || 4000, hostname: "localhost" }
 };
 
-// const environment = process.env.NODE_ENV || "production";
-const config = configurations["production"];
+const environment = process.env.NODE_ENV || "production";
+const config = configurations[environment];
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -58,13 +54,7 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
 var server;
 if (config.ssl) {
-	server = https.createServer(
-		// {
-		// key: fs.readFileSync(`./ssl/${environment}/server.key`),
-		// cert: fs.readFileSync(`./ssl/${environment}/server.crt`)
-		// },
-		app
-	);
+	server = https.createServer(app);
 } else {
 	server = http.createServer(app);
 }
