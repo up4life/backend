@@ -7,22 +7,23 @@ module.exports = {
 		console.log(req.cookies, "req.cookies here");
 		console.log("\n");
 		const { cookie } = req.headers;
-		console.log(Object.keys(req.headers), "req.headers here");
-		console.log("\n");
+		// console.log(Object.keys(req.headers), "req.headers here");
 		console.log(cookie, "cookie here");
 		console.log("\n");
+		console.log("\n");
 		console.log(req.body, "body here");
-		console.log(req.status, "status here");
+		console.log("\n");
+		console.log(res.body, "status here");
 		if (token) {
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 			req.userId = userId;
 			return next();
 		}
 
-		// if (cookie) {
-		// 	const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
-		// 	req.userId = userId;
-		// }
+		if (cookie !== null) {
+			const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
+			req.userId = userId;
+		}
 		return next();
 	},
 
