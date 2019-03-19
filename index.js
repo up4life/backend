@@ -4,7 +4,6 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const https = require('https');
 const http = require('http');
-const fs = require('fs');
 
 const schema = require('./src/schema');
 const { bindings } = require('./src/db');
@@ -21,24 +20,21 @@ const apolloServer = new ApolloServer({
 	debug: process.env.NODE_ENV === 'development',
 });
 
-const port = process.env.PORT || 4000;
-
 const corsConfig = {
 	origin: [
-		'https://www.up4.life',
+		'https://up4lifee.herokuapp.com',
 		'/.herokuapp.com$/',
-		'http://localhost:4000',
-		'https://up4.life',
-		// "up4.life"
+		'http://localhost:3000',
+		'www.up4.life',
+		'https://www.up4.life',
 	],
 	credentials: true,
 };
 const configurations = {
 	production: {
-		ssl: true,
+		ssl: false,
 		port: process.env.PORT || 4000,
-		hostname: 'localhost',
-		// hostname: "api.up4.life"
+		hostname: 'api.up4.life',
 	},
 	development: { ssl: false, port: process.env.PORT || 4000, hostname: 'localhost' },
 };
@@ -58,22 +54,23 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: '/' });
 
 var server;
 if (config.ssl) {
-	server = https.createServer(
-		// {
-		//     key: fs.readFileSync(`./Certs/www_up4_life.key`),
-		//     cert: fs.readFileSync(`./Certs/www_up4_life.pem`)
-		// },
-		app,
-	);
+	server = http.createServer(app);
 } else {
 	server = http.createServer(app);
 }
 
 apolloServer.installSubscriptionHandlers(server);
 
-server.listen(port, () =>
+server.listen(process.env.PORT || 4000, () => {
 	console.log(
 		'🚀 Server ready at',
-		`http${config.ssl ? 's' : ''}://${config.hostname}:${port}${apolloServer.graphqlPath}`,
-	),
-);
+		`http${config.ssl ? 's' : ''}://${config.hostname}:${process.env.PORT ||
+			4000}${apolloServer.graphqlPath}`,
+	);
+	console.log(apolloServer.subscriptionsPath);
+});
+
+// httpServer.listen(port, () => {
+// 	console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
+// 	console.log(`🚀 Subscriptions ready at ws://localhost:${port}${server.subscriptionsPath}`);
+// });

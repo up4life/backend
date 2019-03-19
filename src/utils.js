@@ -54,7 +54,7 @@ module.exports = {
 
 				events.push({
 					id: eventInDb ? eventInDb.id : ev.id,
-					tmId: ev.id,
+					tmID: ev.id,
 					title: ev.name,
 					city: ev._embedded.venues[0].city.name,
 					venue: ev._embedded.venues[0].name,

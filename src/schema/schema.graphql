@@ -97,6 +97,7 @@ type DirectMessage {
 input AddEventInput {
 	title: String!
 	venue: String!
+	tmID: String!
 	image_url: String
 	times: [String]
 	url: String
