@@ -19,6 +19,12 @@ module.exports = {
 			return next();
 		}
 
+		if (cookie) {
+			const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
+			req.userId = userId;
+			return next();
+		}
+
 		return next();
 	},
 
