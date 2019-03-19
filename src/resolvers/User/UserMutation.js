@@ -1,9 +1,7 @@
 const { transport, report } = require("../../mail");
 
 module.exports = {
-	async blockUser(parent, args, { request, db }, info) {
-		const { userId } = request;
-
+	async blockUser(parent, args, { userId, db }, info) {
 		// current user need to login
 		if (!userId) throw new Error("You need to login to block a user");
 
@@ -69,9 +67,7 @@ module.exports = {
 			);
 		}
 	},
-	async likeUser(parent, args, { request, db }, info) {
-		const { userId } = request;
-
+	async likeUser(parent, args, { userId, db }, info) {
 		// current user need to login
 		if (!userId) throw new Error("You need to login to like a user");
 
@@ -126,9 +122,7 @@ module.exports = {
 			info
 		);
 	},
-	async unblockUser(parent, args, { request, db }, info) {
-		const { userId } = request;
-
+	async unblockUser(parent, args, { userId, db }, info) {
 		// current user need to login
 		if (!userId) throw new Error("You need to login to unblock a user");
 
@@ -163,9 +157,7 @@ module.exports = {
 			info
 		);
 	},
-	async unlikeUser(parent, args, { request, db }, info) {
-		const { userId } = request;
-
+	async unlikeUser(parent, args, { userId, db }, info) {
 		// current user need to login
 		if (!userId) throw new Error("You need to login to unblock a user");
 
@@ -199,8 +191,7 @@ module.exports = {
 			info
 		);
 	},
-	async reportUser(parent, { id, message }, { request, db }, info) {
-		const { userId } = request;
+	async reportUser(parent, { id, message }, { userId, db }, info) {
 		// current user need to login
 		if (!userId) throw new Error("You need to login to report a user");
 

@@ -1,11 +1,19 @@
-const { Prisma } = require('prisma-binding');
+const Bindings = require("prisma-binding");
+const Client = require("./generated/prisma-client");
+const { fragmentReplacements } = require("./resolvers");
 
-// setup db configuration
-const db = new Prisma({
-	typeDefs: 'src/generated/prisma.graphql',
-	endpoint: process.env.PRISMA_ENDPOINT,
-	secret: process.env.PRISMA_SECRET,
-	debug: false // limits amount of nonsense graphql prints to console
-});
-
-module.exports = db;
+module.exports = {
+	prisma: new Client.Prisma({
+		fragmentReplacements,
+		endpoint: process.env.PRISMA_ENDPOINT,
+		secret: process.env.PRISMA_SECRET,
+		debug: false
+	}),
+	bindings: new Bindings.Prisma({
+		typeDefs: "src/generated/prisma.graphql",
+		fragmentReplacements,
+		endpoint: process.env.PRISMA_ENDPOINT,
+		secret: process.env.PRISMA_SECRET,
+		debug: false
+	})
+};

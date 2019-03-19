@@ -1,4 +1,4 @@
-# import * from './generated/prisma.graphql'
+# import * from '../generated/prisma.graphql'
 
 type Mutation {
 	firebaseAuth(idToken: String!): FirebasePayload
@@ -42,7 +42,6 @@ type Query {
 	): AllEvents
 	remainingMessages: Int
 	getEvent(id: String!): Event
-	geoHash(city: String!): GeoHash
 	currentUser: User
 	user(where: UserWhereUniqueInput!): User
 	getLocation(latitude: Float!, longitude: Float!): Location!
@@ -84,17 +83,11 @@ type MessageSubscriptionPayload {
 	node: DirectMessage
 }
 
-type BatchPayload {
-	"""
-	The number of nodes that have been affected by the Batch operation.
-	"""
-	count: Long!
-}
-
 type DirectMessage {
 	id: ID!
 	text: String!
 	from: User!
+	to: User!
 	createdAt: DateTime!
 	updatedAt: DateTime
 	chat: Chat!
@@ -105,13 +98,10 @@ input AddEventInput {
 	title: String!
 	venue: String!
 	image_url: String
-	description: String
 	times: [String]
 	url: String
 	address: String
 	city: String
-	lat: String
-	long: String
 	genre: String
 	category: String
 }
@@ -124,11 +114,8 @@ type User {
 	location: String
 	gender: Gender
 	biography: String
-	age: Int
 	dob: String
 	password: String
-	imageThumbnail: String
-	imageLarge: String
 	img: [ProfilePic]
 	permissions: Permission
 	interests: [Genre]
@@ -158,44 +145,19 @@ type AllEvents {
 
 type Event {
 	id: ID!
-	eventfulID: String
+	tmID: String!
 	title: String!
-	url: String
-	description: String
 	times: [String]
 	attending: [User!]!
-	location: LocationInfo
 	city: String
 	venue: String
-	address: String
 	image_url: String
-	large_url: String
-	price: PriceRange
-	notes: String
 	genre: String
 	category: String
 }
 
-type LocationInfo {
-	city: String
-	venue: String
-	address: String
-	lat: String
-	long: String
-}
-
-type PriceRange {
-	min: String
-	max: String
-	currency: String
-}
-
 type Location {
 	city: String
-}
-
-type GeoHash {
-	geoHash: String
 }
 
 type Message {

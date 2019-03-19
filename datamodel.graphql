@@ -20,8 +20,8 @@ enum Gender {
 
 enum GenderPrefs {
 	MALE
-	FEMALE 
-	OTHER 
+	FEMALE
+	OTHER
 	FRIENDS
 }
 
@@ -31,14 +31,11 @@ type User {
 	lastName: String!
 	password: String!
 	gender: Gender
-	age: Int
 	dob: String
 	location: String
 	email: String! @unique
 	phone: String @unique
 	biography: String
-	imageThumbnail: String
-	imageLarge: String
 	img: [ProfilePic!]!
 	resetToken: String
 	resetTokenExpiry: Float
@@ -67,7 +64,8 @@ type Chat {
 type DirectMessage {
 	id: ID! @unique
 	text: String!
-	from: User!
+	from: User! @relation(name: "FromUser")
+	to: User! @relation(name: "ToUser")
 	createdAt: DateTime!
 	seen: Boolean @default(value: "false")
 	updatedAt: DateTime!
@@ -83,20 +81,15 @@ type ProfilePic {
 
 type Event {
 	id: ID! @unique
-	eventfulID: String @unique
-	title: String
-	genre: String
-	description: String
+	tmID: String! @unique
+	title: String!
+	venue: String!
+	image_url: String!
+	times: [String]!
+	city: String!
+	genre: String!
+	category: String!
 	attending: [User!]!
-	times: [String]
-	location: String
-	image_url: String
-	url: String
-	city: String
-	venue: String
-	address: String
-	lat: String
-	long: String
 }
 
 type Genre {

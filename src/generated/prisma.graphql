@@ -1,5 +1,5 @@
-# source: http://localhost:4466
-# timestamp: Thu Mar 14 2019 23:36:06 GMT-0700 (Pacific Daylight Time)
+# source: http://up4pr-publi-1pn1os38alx3e-1821962472.us-east-1.elb.amazonaws.com
+# timestamp: Mon Mar 18 2019 19:17:14 GMT-0500 (Central Daylight Time)
 
 type AggregateChat {
   count: Int!
@@ -302,6 +302,7 @@ type DirectMessage implements Node {
   id: ID!
   text: String!
   from: User!
+  to: User!
   createdAt: DateTime!
   seen: Boolean
   updatedAt: DateTime!
@@ -322,6 +323,7 @@ input DirectMessageCreateInput {
   text: String!
   seen: Boolean
   from: UserCreateOneInput!
+  to: UserCreateOneInput!
   chat: ChatCreateOneWithoutMessagesInput!
 }
 
@@ -334,6 +336,7 @@ input DirectMessageCreateWithoutChatInput {
   text: String!
   seen: Boolean
   from: UserCreateOneInput!
+  to: UserCreateOneInput!
 }
 
 """An edge in a connection."""
@@ -548,6 +551,7 @@ input DirectMessageUpdateInput {
   text: String
   seen: Boolean
   from: UserUpdateOneRequiredInput
+  to: UserUpdateOneRequiredInput
   chat: ChatUpdateOneRequiredWithoutMessagesInput
 }
 
@@ -582,6 +586,7 @@ input DirectMessageUpdateWithoutChatDataInput {
   text: String
   seen: Boolean
   from: UserUpdateOneRequiredInput
+  to: UserUpdateOneRequiredInput
 }
 
 input DirectMessageUpdateWithWhereUniqueWithoutChatInput {
@@ -733,6 +738,7 @@ input DirectMessageWhereInput {
   """All values greater than or equal the given value."""
   updatedAt_gte: DateTime
   from: UserWhereInput
+  to: UserWhereInput
   chat: ChatWhereInput
 }
 
@@ -742,20 +748,15 @@ input DirectMessageWhereUniqueInput {
 
 type Event implements Node {
   id: ID!
-  eventfulID: String
-  title: String
-  genre: String
-  description: String
-  attending(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  tmID: String!
+  title: String!
+  venue: String!
+  image_url: String!
   times: [String!]!
-  location: String
-  image_url: String
-  url: String
-  city: String
-  venue: String
-  address: String
-  lat: String
-  long: String
+  city: String!
+  genre: String!
+  category: String!
+  attending(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
 }
 
 """A connection to a list of items."""
@@ -769,18 +770,13 @@ type EventConnection {
 }
 
 input EventCreateInput {
-  eventfulID: String
-  title: String
-  genre: String
-  description: String
-  location: String
-  image_url: String
-  url: String
-  city: String
-  venue: String
-  address: String
-  lat: String
-  long: String
+  tmID: String!
+  title: String!
+  venue: String!
+  image_url: String!
+  city: String!
+  genre: String!
+  category: String!
   times: EventCreatetimesInput
   attending: UserCreateManyWithoutEventsInput
 }
@@ -795,18 +791,13 @@ input EventCreatetimesInput {
 }
 
 input EventCreateWithoutAttendingInput {
-  eventfulID: String
-  title: String
-  genre: String
-  description: String
-  location: String
-  image_url: String
-  url: String
-  city: String
-  venue: String
-  address: String
-  lat: String
-  long: String
+  tmID: String!
+  title: String!
+  venue: String!
+  image_url: String!
+  city: String!
+  genre: String!
+  category: String!
   times: EventCreatetimesInput
 }
 
@@ -822,30 +813,20 @@ type EventEdge {
 enum EventOrderByInput {
   id_ASC
   id_DESC
-  eventfulID_ASC
-  eventfulID_DESC
+  tmID_ASC
+  tmID_DESC
   title_ASC
   title_DESC
-  genre_ASC
-  genre_DESC
-  description_ASC
-  description_DESC
-  location_ASC
-  location_DESC
-  image_url_ASC
-  image_url_DESC
-  url_ASC
-  url_DESC
-  city_ASC
-  city_DESC
   venue_ASC
   venue_DESC
-  address_ASC
-  address_DESC
-  lat_ASC
-  lat_DESC
-  long_ASC
-  long_DESC
+  image_url_ASC
+  image_url_DESC
+  city_ASC
+  city_DESC
+  genre_ASC
+  genre_DESC
+  category_ASC
+  category_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -854,19 +835,14 @@ enum EventOrderByInput {
 
 type EventPreviousValues {
   id: ID!
-  eventfulID: String
-  title: String
-  genre: String
-  description: String
+  tmID: String!
+  title: String!
+  venue: String!
+  image_url: String!
   times: [String!]!
-  location: String
-  image_url: String
-  url: String
-  city: String
-  venue: String
-  address: String
-  lat: String
-  long: String
+  city: String!
+  genre: String!
+  category: String!
 }
 
 input EventScalarWhereInput {
@@ -918,46 +894,46 @@ input EventScalarWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
-  eventfulID: String
+  tmID: String
 
   """All values that are not equal to given value."""
-  eventfulID_not: String
+  tmID_not: String
 
   """All values that are contained in given list."""
-  eventfulID_in: [String!]
+  tmID_in: [String!]
 
   """All values that are not contained in given list."""
-  eventfulID_not_in: [String!]
+  tmID_not_in: [String!]
 
   """All values less than the given value."""
-  eventfulID_lt: String
+  tmID_lt: String
 
   """All values less than or equal the given value."""
-  eventfulID_lte: String
+  tmID_lte: String
 
   """All values greater than the given value."""
-  eventfulID_gt: String
+  tmID_gt: String
 
   """All values greater than or equal the given value."""
-  eventfulID_gte: String
+  tmID_gte: String
 
   """All values containing the given string."""
-  eventfulID_contains: String
+  tmID_contains: String
 
   """All values not containing the given string."""
-  eventfulID_not_contains: String
+  tmID_not_contains: String
 
   """All values starting with the given string."""
-  eventfulID_starts_with: String
+  tmID_starts_with: String
 
   """All values not starting with the given string."""
-  eventfulID_not_starts_with: String
+  tmID_not_starts_with: String
 
   """All values ending with the given string."""
-  eventfulID_ends_with: String
+  tmID_ends_with: String
 
   """All values not ending with the given string."""
-  eventfulID_not_ends_with: String
+  tmID_not_ends_with: String
   title: String
 
   """All values that are not equal to given value."""
@@ -998,246 +974,6 @@ input EventScalarWhereInput {
 
   """All values not ending with the given string."""
   title_not_ends_with: String
-  genre: String
-
-  """All values that are not equal to given value."""
-  genre_not: String
-
-  """All values that are contained in given list."""
-  genre_in: [String!]
-
-  """All values that are not contained in given list."""
-  genre_not_in: [String!]
-
-  """All values less than the given value."""
-  genre_lt: String
-
-  """All values less than or equal the given value."""
-  genre_lte: String
-
-  """All values greater than the given value."""
-  genre_gt: String
-
-  """All values greater than or equal the given value."""
-  genre_gte: String
-
-  """All values containing the given string."""
-  genre_contains: String
-
-  """All values not containing the given string."""
-  genre_not_contains: String
-
-  """All values starting with the given string."""
-  genre_starts_with: String
-
-  """All values not starting with the given string."""
-  genre_not_starts_with: String
-
-  """All values ending with the given string."""
-  genre_ends_with: String
-
-  """All values not ending with the given string."""
-  genre_not_ends_with: String
-  description: String
-
-  """All values that are not equal to given value."""
-  description_not: String
-
-  """All values that are contained in given list."""
-  description_in: [String!]
-
-  """All values that are not contained in given list."""
-  description_not_in: [String!]
-
-  """All values less than the given value."""
-  description_lt: String
-
-  """All values less than or equal the given value."""
-  description_lte: String
-
-  """All values greater than the given value."""
-  description_gt: String
-
-  """All values greater than or equal the given value."""
-  description_gte: String
-
-  """All values containing the given string."""
-  description_contains: String
-
-  """All values not containing the given string."""
-  description_not_contains: String
-
-  """All values starting with the given string."""
-  description_starts_with: String
-
-  """All values not starting with the given string."""
-  description_not_starts_with: String
-
-  """All values ending with the given string."""
-  description_ends_with: String
-
-  """All values not ending with the given string."""
-  description_not_ends_with: String
-  location: String
-
-  """All values that are not equal to given value."""
-  location_not: String
-
-  """All values that are contained in given list."""
-  location_in: [String!]
-
-  """All values that are not contained in given list."""
-  location_not_in: [String!]
-
-  """All values less than the given value."""
-  location_lt: String
-
-  """All values less than or equal the given value."""
-  location_lte: String
-
-  """All values greater than the given value."""
-  location_gt: String
-
-  """All values greater than or equal the given value."""
-  location_gte: String
-
-  """All values containing the given string."""
-  location_contains: String
-
-  """All values not containing the given string."""
-  location_not_contains: String
-
-  """All values starting with the given string."""
-  location_starts_with: String
-
-  """All values not starting with the given string."""
-  location_not_starts_with: String
-
-  """All values ending with the given string."""
-  location_ends_with: String
-
-  """All values not ending with the given string."""
-  location_not_ends_with: String
-  image_url: String
-
-  """All values that are not equal to given value."""
-  image_url_not: String
-
-  """All values that are contained in given list."""
-  image_url_in: [String!]
-
-  """All values that are not contained in given list."""
-  image_url_not_in: [String!]
-
-  """All values less than the given value."""
-  image_url_lt: String
-
-  """All values less than or equal the given value."""
-  image_url_lte: String
-
-  """All values greater than the given value."""
-  image_url_gt: String
-
-  """All values greater than or equal the given value."""
-  image_url_gte: String
-
-  """All values containing the given string."""
-  image_url_contains: String
-
-  """All values not containing the given string."""
-  image_url_not_contains: String
-
-  """All values starting with the given string."""
-  image_url_starts_with: String
-
-  """All values not starting with the given string."""
-  image_url_not_starts_with: String
-
-  """All values ending with the given string."""
-  image_url_ends_with: String
-
-  """All values not ending with the given string."""
-  image_url_not_ends_with: String
-  url: String
-
-  """All values that are not equal to given value."""
-  url_not: String
-
-  """All values that are contained in given list."""
-  url_in: [String!]
-
-  """All values that are not contained in given list."""
-  url_not_in: [String!]
-
-  """All values less than the given value."""
-  url_lt: String
-
-  """All values less than or equal the given value."""
-  url_lte: String
-
-  """All values greater than the given value."""
-  url_gt: String
-
-  """All values greater than or equal the given value."""
-  url_gte: String
-
-  """All values containing the given string."""
-  url_contains: String
-
-  """All values not containing the given string."""
-  url_not_contains: String
-
-  """All values starting with the given string."""
-  url_starts_with: String
-
-  """All values not starting with the given string."""
-  url_not_starts_with: String
-
-  """All values ending with the given string."""
-  url_ends_with: String
-
-  """All values not ending with the given string."""
-  url_not_ends_with: String
-  city: String
-
-  """All values that are not equal to given value."""
-  city_not: String
-
-  """All values that are contained in given list."""
-  city_in: [String!]
-
-  """All values that are not contained in given list."""
-  city_not_in: [String!]
-
-  """All values less than the given value."""
-  city_lt: String
-
-  """All values less than or equal the given value."""
-  city_lte: String
-
-  """All values greater than the given value."""
-  city_gt: String
-
-  """All values greater than or equal the given value."""
-  city_gte: String
-
-  """All values containing the given string."""
-  city_contains: String
-
-  """All values not containing the given string."""
-  city_not_contains: String
-
-  """All values starting with the given string."""
-  city_starts_with: String
-
-  """All values not starting with the given string."""
-  city_not_starts_with: String
-
-  """All values ending with the given string."""
-  city_ends_with: String
-
-  """All values not ending with the given string."""
-  city_not_ends_with: String
   venue: String
 
   """All values that are not equal to given value."""
@@ -1278,126 +1014,166 @@ input EventScalarWhereInput {
 
   """All values not ending with the given string."""
   venue_not_ends_with: String
-  address: String
+  image_url: String
 
   """All values that are not equal to given value."""
-  address_not: String
+  image_url_not: String
 
   """All values that are contained in given list."""
-  address_in: [String!]
+  image_url_in: [String!]
 
   """All values that are not contained in given list."""
-  address_not_in: [String!]
+  image_url_not_in: [String!]
 
   """All values less than the given value."""
-  address_lt: String
+  image_url_lt: String
 
   """All values less than or equal the given value."""
-  address_lte: String
+  image_url_lte: String
 
   """All values greater than the given value."""
-  address_gt: String
+  image_url_gt: String
 
   """All values greater than or equal the given value."""
-  address_gte: String
+  image_url_gte: String
 
   """All values containing the given string."""
-  address_contains: String
+  image_url_contains: String
 
   """All values not containing the given string."""
-  address_not_contains: String
+  image_url_not_contains: String
 
   """All values starting with the given string."""
-  address_starts_with: String
+  image_url_starts_with: String
 
   """All values not starting with the given string."""
-  address_not_starts_with: String
+  image_url_not_starts_with: String
 
   """All values ending with the given string."""
-  address_ends_with: String
+  image_url_ends_with: String
 
   """All values not ending with the given string."""
-  address_not_ends_with: String
-  lat: String
+  image_url_not_ends_with: String
+  city: String
 
   """All values that are not equal to given value."""
-  lat_not: String
+  city_not: String
 
   """All values that are contained in given list."""
-  lat_in: [String!]
+  city_in: [String!]
 
   """All values that are not contained in given list."""
-  lat_not_in: [String!]
+  city_not_in: [String!]
 
   """All values less than the given value."""
-  lat_lt: String
+  city_lt: String
 
   """All values less than or equal the given value."""
-  lat_lte: String
+  city_lte: String
 
   """All values greater than the given value."""
-  lat_gt: String
+  city_gt: String
 
   """All values greater than or equal the given value."""
-  lat_gte: String
+  city_gte: String
 
   """All values containing the given string."""
-  lat_contains: String
+  city_contains: String
 
   """All values not containing the given string."""
-  lat_not_contains: String
+  city_not_contains: String
 
   """All values starting with the given string."""
-  lat_starts_with: String
+  city_starts_with: String
 
   """All values not starting with the given string."""
-  lat_not_starts_with: String
+  city_not_starts_with: String
 
   """All values ending with the given string."""
-  lat_ends_with: String
+  city_ends_with: String
 
   """All values not ending with the given string."""
-  lat_not_ends_with: String
-  long: String
+  city_not_ends_with: String
+  genre: String
 
   """All values that are not equal to given value."""
-  long_not: String
+  genre_not: String
 
   """All values that are contained in given list."""
-  long_in: [String!]
+  genre_in: [String!]
 
   """All values that are not contained in given list."""
-  long_not_in: [String!]
+  genre_not_in: [String!]
 
   """All values less than the given value."""
-  long_lt: String
+  genre_lt: String
 
   """All values less than or equal the given value."""
-  long_lte: String
+  genre_lte: String
 
   """All values greater than the given value."""
-  long_gt: String
+  genre_gt: String
 
   """All values greater than or equal the given value."""
-  long_gte: String
+  genre_gte: String
 
   """All values containing the given string."""
-  long_contains: String
+  genre_contains: String
 
   """All values not containing the given string."""
-  long_not_contains: String
+  genre_not_contains: String
 
   """All values starting with the given string."""
-  long_starts_with: String
+  genre_starts_with: String
 
   """All values not starting with the given string."""
-  long_not_starts_with: String
+  genre_not_starts_with: String
 
   """All values ending with the given string."""
-  long_ends_with: String
+  genre_ends_with: String
 
   """All values not ending with the given string."""
-  long_not_ends_with: String
+  genre_not_ends_with: String
+  category: String
+
+  """All values that are not equal to given value."""
+  category_not: String
+
+  """All values that are contained in given list."""
+  category_in: [String!]
+
+  """All values that are not contained in given list."""
+  category_not_in: [String!]
+
+  """All values less than the given value."""
+  category_lt: String
+
+  """All values less than or equal the given value."""
+  category_lte: String
+
+  """All values greater than the given value."""
+  category_gt: String
+
+  """All values greater than or equal the given value."""
+  category_gte: String
+
+  """All values containing the given string."""
+  category_contains: String
+
+  """All values not containing the given string."""
+  category_not_contains: String
+
+  """All values starting with the given string."""
+  category_starts_with: String
+
+  """All values not starting with the given string."""
+  category_not_starts_with: String
+
+  """All values ending with the given string."""
+  category_ends_with: String
+
+  """All values not ending with the given string."""
+  category_not_ends_with: String
 }
 
 type EventSubscriptionPayload {
@@ -1440,51 +1216,36 @@ input EventSubscriptionWhereInput {
 }
 
 input EventUpdateInput {
-  eventfulID: String
+  tmID: String
   title: String
-  genre: String
-  description: String
-  location: String
-  image_url: String
-  url: String
-  city: String
   venue: String
-  address: String
-  lat: String
-  long: String
+  image_url: String
+  city: String
+  genre: String
+  category: String
   times: EventUpdatetimesInput
   attending: UserUpdateManyWithoutEventsInput
 }
 
 input EventUpdateManyDataInput {
-  eventfulID: String
+  tmID: String
   title: String
-  genre: String
-  description: String
-  location: String
-  image_url: String
-  url: String
-  city: String
   venue: String
-  address: String
-  lat: String
-  long: String
+  image_url: String
+  city: String
+  genre: String
+  category: String
   times: EventUpdatetimesInput
 }
 
 input EventUpdateManyMutationInput {
-  eventfulID: String
+  tmID: String
   title: String
-  genre: String
-  description: String
-  location: String
-  image_url: String
-  url: String
-  city: String
   venue: String
-  address: String
-  lat: String
-  long: String
+  image_url: String
+  city: String
+  genre: String
+  category: String
   times: EventUpdatetimesInput
 }
 
@@ -1510,18 +1271,13 @@ input EventUpdatetimesInput {
 }
 
 input EventUpdateWithoutAttendingDataInput {
-  eventfulID: String
+  tmID: String
   title: String
-  genre: String
-  description: String
-  location: String
-  image_url: String
-  url: String
-  city: String
   venue: String
-  address: String
-  lat: String
-  long: String
+  image_url: String
+  city: String
+  genre: String
+  category: String
   times: EventUpdatetimesInput
 }
 
@@ -1585,46 +1341,46 @@ input EventWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
-  eventfulID: String
+  tmID: String
 
   """All values that are not equal to given value."""
-  eventfulID_not: String
+  tmID_not: String
 
   """All values that are contained in given list."""
-  eventfulID_in: [String!]
+  tmID_in: [String!]
 
   """All values that are not contained in given list."""
-  eventfulID_not_in: [String!]
+  tmID_not_in: [String!]
 
   """All values less than the given value."""
-  eventfulID_lt: String
+  tmID_lt: String
 
   """All values less than or equal the given value."""
-  eventfulID_lte: String
+  tmID_lte: String
 
   """All values greater than the given value."""
-  eventfulID_gt: String
+  tmID_gt: String
 
   """All values greater than or equal the given value."""
-  eventfulID_gte: String
+  tmID_gte: String
 
   """All values containing the given string."""
-  eventfulID_contains: String
+  tmID_contains: String
 
   """All values not containing the given string."""
-  eventfulID_not_contains: String
+  tmID_not_contains: String
 
   """All values starting with the given string."""
-  eventfulID_starts_with: String
+  tmID_starts_with: String
 
   """All values not starting with the given string."""
-  eventfulID_not_starts_with: String
+  tmID_not_starts_with: String
 
   """All values ending with the given string."""
-  eventfulID_ends_with: String
+  tmID_ends_with: String
 
   """All values not ending with the given string."""
-  eventfulID_not_ends_with: String
+  tmID_not_ends_with: String
   title: String
 
   """All values that are not equal to given value."""
@@ -1665,246 +1421,6 @@ input EventWhereInput {
 
   """All values not ending with the given string."""
   title_not_ends_with: String
-  genre: String
-
-  """All values that are not equal to given value."""
-  genre_not: String
-
-  """All values that are contained in given list."""
-  genre_in: [String!]
-
-  """All values that are not contained in given list."""
-  genre_not_in: [String!]
-
-  """All values less than the given value."""
-  genre_lt: String
-
-  """All values less than or equal the given value."""
-  genre_lte: String
-
-  """All values greater than the given value."""
-  genre_gt: String
-
-  """All values greater than or equal the given value."""
-  genre_gte: String
-
-  """All values containing the given string."""
-  genre_contains: String
-
-  """All values not containing the given string."""
-  genre_not_contains: String
-
-  """All values starting with the given string."""
-  genre_starts_with: String
-
-  """All values not starting with the given string."""
-  genre_not_starts_with: String
-
-  """All values ending with the given string."""
-  genre_ends_with: String
-
-  """All values not ending with the given string."""
-  genre_not_ends_with: String
-  description: String
-
-  """All values that are not equal to given value."""
-  description_not: String
-
-  """All values that are contained in given list."""
-  description_in: [String!]
-
-  """All values that are not contained in given list."""
-  description_not_in: [String!]
-
-  """All values less than the given value."""
-  description_lt: String
-
-  """All values less than or equal the given value."""
-  description_lte: String
-
-  """All values greater than the given value."""
-  description_gt: String
-
-  """All values greater than or equal the given value."""
-  description_gte: String
-
-  """All values containing the given string."""
-  description_contains: String
-
-  """All values not containing the given string."""
-  description_not_contains: String
-
-  """All values starting with the given string."""
-  description_starts_with: String
-
-  """All values not starting with the given string."""
-  description_not_starts_with: String
-
-  """All values ending with the given string."""
-  description_ends_with: String
-
-  """All values not ending with the given string."""
-  description_not_ends_with: String
-  location: String
-
-  """All values that are not equal to given value."""
-  location_not: String
-
-  """All values that are contained in given list."""
-  location_in: [String!]
-
-  """All values that are not contained in given list."""
-  location_not_in: [String!]
-
-  """All values less than the given value."""
-  location_lt: String
-
-  """All values less than or equal the given value."""
-  location_lte: String
-
-  """All values greater than the given value."""
-  location_gt: String
-
-  """All values greater than or equal the given value."""
-  location_gte: String
-
-  """All values containing the given string."""
-  location_contains: String
-
-  """All values not containing the given string."""
-  location_not_contains: String
-
-  """All values starting with the given string."""
-  location_starts_with: String
-
-  """All values not starting with the given string."""
-  location_not_starts_with: String
-
-  """All values ending with the given string."""
-  location_ends_with: String
-
-  """All values not ending with the given string."""
-  location_not_ends_with: String
-  image_url: String
-
-  """All values that are not equal to given value."""
-  image_url_not: String
-
-  """All values that are contained in given list."""
-  image_url_in: [String!]
-
-  """All values that are not contained in given list."""
-  image_url_not_in: [String!]
-
-  """All values less than the given value."""
-  image_url_lt: String
-
-  """All values less than or equal the given value."""
-  image_url_lte: String
-
-  """All values greater than the given value."""
-  image_url_gt: String
-
-  """All values greater than or equal the given value."""
-  image_url_gte: String
-
-  """All values containing the given string."""
-  image_url_contains: String
-
-  """All values not containing the given string."""
-  image_url_not_contains: String
-
-  """All values starting with the given string."""
-  image_url_starts_with: String
-
-  """All values not starting with the given string."""
-  image_url_not_starts_with: String
-
-  """All values ending with the given string."""
-  image_url_ends_with: String
-
-  """All values not ending with the given string."""
-  image_url_not_ends_with: String
-  url: String
-
-  """All values that are not equal to given value."""
-  url_not: String
-
-  """All values that are contained in given list."""
-  url_in: [String!]
-
-  """All values that are not contained in given list."""
-  url_not_in: [String!]
-
-  """All values less than the given value."""
-  url_lt: String
-
-  """All values less than or equal the given value."""
-  url_lte: String
-
-  """All values greater than the given value."""
-  url_gt: String
-
-  """All values greater than or equal the given value."""
-  url_gte: String
-
-  """All values containing the given string."""
-  url_contains: String
-
-  """All values not containing the given string."""
-  url_not_contains: String
-
-  """All values starting with the given string."""
-  url_starts_with: String
-
-  """All values not starting with the given string."""
-  url_not_starts_with: String
-
-  """All values ending with the given string."""
-  url_ends_with: String
-
-  """All values not ending with the given string."""
-  url_not_ends_with: String
-  city: String
-
-  """All values that are not equal to given value."""
-  city_not: String
-
-  """All values that are contained in given list."""
-  city_in: [String!]
-
-  """All values that are not contained in given list."""
-  city_not_in: [String!]
-
-  """All values less than the given value."""
-  city_lt: String
-
-  """All values less than or equal the given value."""
-  city_lte: String
-
-  """All values greater than the given value."""
-  city_gt: String
-
-  """All values greater than or equal the given value."""
-  city_gte: String
-
-  """All values containing the given string."""
-  city_contains: String
-
-  """All values not containing the given string."""
-  city_not_contains: String
-
-  """All values starting with the given string."""
-  city_starts_with: String
-
-  """All values not starting with the given string."""
-  city_not_starts_with: String
-
-  """All values ending with the given string."""
-  city_ends_with: String
-
-  """All values not ending with the given string."""
-  city_not_ends_with: String
   venue: String
 
   """All values that are not equal to given value."""
@@ -1945,126 +1461,166 @@ input EventWhereInput {
 
   """All values not ending with the given string."""
   venue_not_ends_with: String
-  address: String
+  image_url: String
 
   """All values that are not equal to given value."""
-  address_not: String
+  image_url_not: String
 
   """All values that are contained in given list."""
-  address_in: [String!]
+  image_url_in: [String!]
 
   """All values that are not contained in given list."""
-  address_not_in: [String!]
+  image_url_not_in: [String!]
 
   """All values less than the given value."""
-  address_lt: String
+  image_url_lt: String
 
   """All values less than or equal the given value."""
-  address_lte: String
+  image_url_lte: String
 
   """All values greater than the given value."""
-  address_gt: String
+  image_url_gt: String
 
   """All values greater than or equal the given value."""
-  address_gte: String
+  image_url_gte: String
 
   """All values containing the given string."""
-  address_contains: String
+  image_url_contains: String
 
   """All values not containing the given string."""
-  address_not_contains: String
+  image_url_not_contains: String
 
   """All values starting with the given string."""
-  address_starts_with: String
+  image_url_starts_with: String
 
   """All values not starting with the given string."""
-  address_not_starts_with: String
+  image_url_not_starts_with: String
 
   """All values ending with the given string."""
-  address_ends_with: String
+  image_url_ends_with: String
 
   """All values not ending with the given string."""
-  address_not_ends_with: String
-  lat: String
+  image_url_not_ends_with: String
+  city: String
 
   """All values that are not equal to given value."""
-  lat_not: String
+  city_not: String
 
   """All values that are contained in given list."""
-  lat_in: [String!]
+  city_in: [String!]
 
   """All values that are not contained in given list."""
-  lat_not_in: [String!]
+  city_not_in: [String!]
 
   """All values less than the given value."""
-  lat_lt: String
+  city_lt: String
 
   """All values less than or equal the given value."""
-  lat_lte: String
+  city_lte: String
 
   """All values greater than the given value."""
-  lat_gt: String
+  city_gt: String
 
   """All values greater than or equal the given value."""
-  lat_gte: String
+  city_gte: String
 
   """All values containing the given string."""
-  lat_contains: String
+  city_contains: String
 
   """All values not containing the given string."""
-  lat_not_contains: String
+  city_not_contains: String
 
   """All values starting with the given string."""
-  lat_starts_with: String
+  city_starts_with: String
 
   """All values not starting with the given string."""
-  lat_not_starts_with: String
+  city_not_starts_with: String
 
   """All values ending with the given string."""
-  lat_ends_with: String
+  city_ends_with: String
 
   """All values not ending with the given string."""
-  lat_not_ends_with: String
-  long: String
+  city_not_ends_with: String
+  genre: String
 
   """All values that are not equal to given value."""
-  long_not: String
+  genre_not: String
 
   """All values that are contained in given list."""
-  long_in: [String!]
+  genre_in: [String!]
 
   """All values that are not contained in given list."""
-  long_not_in: [String!]
+  genre_not_in: [String!]
 
   """All values less than the given value."""
-  long_lt: String
+  genre_lt: String
 
   """All values less than or equal the given value."""
-  long_lte: String
+  genre_lte: String
 
   """All values greater than the given value."""
-  long_gt: String
+  genre_gt: String
 
   """All values greater than or equal the given value."""
-  long_gte: String
+  genre_gte: String
 
   """All values containing the given string."""
-  long_contains: String
+  genre_contains: String
 
   """All values not containing the given string."""
-  long_not_contains: String
+  genre_not_contains: String
 
   """All values starting with the given string."""
-  long_starts_with: String
+  genre_starts_with: String
 
   """All values not starting with the given string."""
-  long_not_starts_with: String
+  genre_not_starts_with: String
 
   """All values ending with the given string."""
-  long_ends_with: String
+  genre_ends_with: String
 
   """All values not ending with the given string."""
-  long_not_ends_with: String
+  genre_not_ends_with: String
+  category: String
+
+  """All values that are not equal to given value."""
+  category_not: String
+
+  """All values that are contained in given list."""
+  category_in: [String!]
+
+  """All values that are not contained in given list."""
+  category_not_in: [String!]
+
+  """All values less than the given value."""
+  category_lt: String
+
+  """All values less than or equal the given value."""
+  category_lte: String
+
+  """All values greater than the given value."""
+  category_gt: String
+
+  """All values greater than or equal the given value."""
+  category_gte: String
+
+  """All values containing the given string."""
+  category_contains: String
+
+  """All values not containing the given string."""
+  category_not_contains: String
+
+  """All values starting with the given string."""
+  category_starts_with: String
+
+  """All values not starting with the given string."""
+  category_not_starts_with: String
+
+  """All values ending with the given string."""
+  category_ends_with: String
+
+  """All values not ending with the given string."""
+  category_not_ends_with: String
   attending_every: UserWhereInput
   attending_some: UserWhereInput
   attending_none: UserWhereInput
@@ -2072,7 +1628,7 @@ input EventWhereInput {
 
 input EventWhereUniqueInput {
   id: ID
-  eventfulID: String
+  tmID: String
 }
 
 enum Gender {
@@ -2524,9 +2080,6 @@ input GenreWhereUniqueInput {
   id: ID
 }
 
-"""Raw JSON value"""
-scalar Json
-
 """
 The `Long` scalar type represents non-fractional signed whole numeric values.
 Long can represent values between -(2^63) and 2^63 - 1.
@@ -2569,7 +2122,6 @@ type Mutation {
   deleteManyEvents(where: EventWhereInput): BatchPayload!
   deleteManyGenres(where: GenreWhereInput): BatchPayload!
   deleteManyUsers(where: UserWhereInput): BatchPayload!
-  executeRaw(database: PrismaDatabase, query: String!): Json!
 }
 
 enum MutationType {
@@ -2604,10 +2156,6 @@ enum Permission {
   MONTHLY
   YEARLY
   ADMIN
-}
-
-enum PrismaDatabase {
-  default
 }
 
 type ProfilePic implements Node {
@@ -2996,14 +2544,11 @@ type User implements Node {
   lastName: String!
   password: String!
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String!
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   img(where: ProfilePicWhereInput, orderBy: ProfilePicOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ProfilePic!]
   resetToken: String
   resetTokenExpiry: Float
@@ -3042,14 +2587,11 @@ input UserCreateInput {
   lastName: String!
   password: String!
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String!
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -3097,14 +2639,11 @@ input UserCreateWithoutChatsInput {
   lastName: String!
   password: String!
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String!
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -3126,14 +2665,11 @@ input UserCreateWithoutEventsInput {
   lastName: String!
   password: String!
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String!
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -3155,14 +2691,11 @@ input UserCreateWithoutImgInput {
   lastName: String!
   password: String!
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String!
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -3199,8 +2732,6 @@ enum UserOrderByInput {
   password_DESC
   gender_ASC
   gender_DESC
-  age_ASC
-  age_DESC
   dob_ASC
   dob_DESC
   location_ASC
@@ -3211,10 +2742,6 @@ enum UserOrderByInput {
   phone_DESC
   biography_ASC
   biography_DESC
-  imageThumbnail_ASC
-  imageThumbnail_DESC
-  imageLarge_ASC
-  imageLarge_DESC
   resetToken_ASC
   resetToken_DESC
   resetTokenExpiry_ASC
@@ -3243,14 +2770,11 @@ type UserPreviousValues {
   lastName: String!
   password: String!
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String!
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   genderPrefs: [GenderPrefs!]!
@@ -3443,28 +2967,6 @@ input UserScalarWhereInput {
 
   """All values that are not contained in given list."""
   gender_not_in: [Gender!]
-  age: Int
-
-  """All values that are not equal to given value."""
-  age_not: Int
-
-  """All values that are contained in given list."""
-  age_in: [Int!]
-
-  """All values that are not contained in given list."""
-  age_not_in: [Int!]
-
-  """All values less than the given value."""
-  age_lt: Int
-
-  """All values less than or equal the given value."""
-  age_lte: Int
-
-  """All values greater than the given value."""
-  age_gt: Int
-
-  """All values greater than or equal the given value."""
-  age_gte: Int
   dob: String
 
   """All values that are not equal to given value."""
@@ -3665,86 +3167,6 @@ input UserScalarWhereInput {
 
   """All values not ending with the given string."""
   biography_not_ends_with: String
-  imageThumbnail: String
-
-  """All values that are not equal to given value."""
-  imageThumbnail_not: String
-
-  """All values that are contained in given list."""
-  imageThumbnail_in: [String!]
-
-  """All values that are not contained in given list."""
-  imageThumbnail_not_in: [String!]
-
-  """All values less than the given value."""
-  imageThumbnail_lt: String
-
-  """All values less than or equal the given value."""
-  imageThumbnail_lte: String
-
-  """All values greater than the given value."""
-  imageThumbnail_gt: String
-
-  """All values greater than or equal the given value."""
-  imageThumbnail_gte: String
-
-  """All values containing the given string."""
-  imageThumbnail_contains: String
-
-  """All values not containing the given string."""
-  imageThumbnail_not_contains: String
-
-  """All values starting with the given string."""
-  imageThumbnail_starts_with: String
-
-  """All values not starting with the given string."""
-  imageThumbnail_not_starts_with: String
-
-  """All values ending with the given string."""
-  imageThumbnail_ends_with: String
-
-  """All values not ending with the given string."""
-  imageThumbnail_not_ends_with: String
-  imageLarge: String
-
-  """All values that are not equal to given value."""
-  imageLarge_not: String
-
-  """All values that are contained in given list."""
-  imageLarge_in: [String!]
-
-  """All values that are not contained in given list."""
-  imageLarge_not_in: [String!]
-
-  """All values less than the given value."""
-  imageLarge_lt: String
-
-  """All values less than or equal the given value."""
-  imageLarge_lte: String
-
-  """All values greater than the given value."""
-  imageLarge_gt: String
-
-  """All values greater than or equal the given value."""
-  imageLarge_gte: String
-
-  """All values containing the given string."""
-  imageLarge_contains: String
-
-  """All values not containing the given string."""
-  imageLarge_not_contains: String
-
-  """All values starting with the given string."""
-  imageLarge_starts_with: String
-
-  """All values not starting with the given string."""
-  imageLarge_not_starts_with: String
-
-  """All values ending with the given string."""
-  imageLarge_ends_with: String
-
-  """All values not ending with the given string."""
-  imageLarge_not_ends_with: String
   resetToken: String
 
   """All values that are not equal to given value."""
@@ -4035,14 +3457,11 @@ input UserUpdateDataInput {
   lastName: String
   password: String
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -4069,14 +3488,11 @@ input UserUpdateInput {
   lastName: String
   password: String
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -4099,14 +3515,11 @@ input UserUpdateManyDataInput {
   lastName: String
   password: String
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -4135,14 +3548,11 @@ input UserUpdateManyMutationInput {
   lastName: String
   password: String
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -4202,14 +3612,11 @@ input UserUpdateWithoutChatsDataInput {
   lastName: String
   password: String
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -4231,14 +3638,11 @@ input UserUpdateWithoutEventsDataInput {
   lastName: String
   password: String
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -4260,14 +3664,11 @@ input UserUpdateWithoutImgDataInput {
   lastName: String
   password: String
   gender: Gender
-  age: Int
   dob: String
   location: String
   email: String
   phone: String
   biography: String
-  imageThumbnail: String
-  imageLarge: String
   resetToken: String
   resetTokenExpiry: Float
   minAgePref: Int
@@ -4506,28 +3907,6 @@ input UserWhereInput {
 
   """All values that are not contained in given list."""
   gender_not_in: [Gender!]
-  age: Int
-
-  """All values that are not equal to given value."""
-  age_not: Int
-
-  """All values that are contained in given list."""
-  age_in: [Int!]
-
-  """All values that are not contained in given list."""
-  age_not_in: [Int!]
-
-  """All values less than the given value."""
-  age_lt: Int
-
-  """All values less than or equal the given value."""
-  age_lte: Int
-
-  """All values greater than the given value."""
-  age_gt: Int
-
-  """All values greater than or equal the given value."""
-  age_gte: Int
   dob: String
 
   """All values that are not equal to given value."""
@@ -4728,86 +4107,6 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   biography_not_ends_with: String
-  imageThumbnail: String
-
-  """All values that are not equal to given value."""
-  imageThumbnail_not: String
-
-  """All values that are contained in given list."""
-  imageThumbnail_in: [String!]
-
-  """All values that are not contained in given list."""
-  imageThumbnail_not_in: [String!]
-
-  """All values less than the given value."""
-  imageThumbnail_lt: String
-
-  """All values less than or equal the given value."""
-  imageThumbnail_lte: String
-
-  """All values greater than the given value."""
-  imageThumbnail_gt: String
-
-  """All values greater than or equal the given value."""
-  imageThumbnail_gte: String
-
-  """All values containing the given string."""
-  imageThumbnail_contains: String
-
-  """All values not containing the given string."""
-  imageThumbnail_not_contains: String
-
-  """All values starting with the given string."""
-  imageThumbnail_starts_with: String
-
-  """All values not starting with the given string."""
-  imageThumbnail_not_starts_with: String
-
-  """All values ending with the given string."""
-  imageThumbnail_ends_with: String
-
-  """All values not ending with the given string."""
-  imageThumbnail_not_ends_with: String
-  imageLarge: String
-
-  """All values that are not equal to given value."""
-  imageLarge_not: String
-
-  """All values that are contained in given list."""
-  imageLarge_in: [String!]
-
-  """All values that are not contained in given list."""
-  imageLarge_not_in: [String!]
-
-  """All values less than the given value."""
-  imageLarge_lt: String
-
-  """All values less than or equal the given value."""
-  imageLarge_lte: String
-
-  """All values greater than the given value."""
-  imageLarge_gt: String
-
-  """All values greater than or equal the given value."""
-  imageLarge_gte: String
-
-  """All values containing the given string."""
-  imageLarge_contains: String
-
-  """All values not containing the given string."""
-  imageLarge_not_contains: String
-
-  """All values starting with the given string."""
-  imageLarge_starts_with: String
-
-  """All values not starting with the given string."""
-  imageLarge_not_starts_with: String
-
-  """All values ending with the given string."""
-  imageLarge_ends_with: String
-
-  """All values not ending with the given string."""
-  imageLarge_not_ends_with: String
   resetToken: String
 
   """All values that are not equal to given value."""

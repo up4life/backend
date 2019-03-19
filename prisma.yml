@@ -1,6 +1,9 @@
 endpoint: ${env:PRISMA_ENDPOINT}
 datamodel: datamodel.graphql
 secret: ${env:PRISMA_SECRET}
+generate:
+  - generator: javascript-client
+    output: ./src/generated/prisma-client
 seed:
   run: node ./src/seedGenres.js
 hooks:
