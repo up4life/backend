@@ -10,7 +10,7 @@ type Mutation {
 	signout: Message
 	updateDefaultImage(id: String!): User!
 	updateLocation(city: String!): User!
-	addEvent(event: EventCreateInput): Event
+	addEvent(event: AddEventInput): Event
 	deleteEvent(id: String!, eventId: String!): User!
 	createOrder(token: String!, subscription: Permission!): Message
 	cancelSubscription(id: String!): User!
@@ -94,17 +94,18 @@ type DirectMessage {
 	seen: Boolean
 }
 
-# input AddEventInput {
-# 	title: String!
-# 	venue: String!
-# 	image_url: String
-# 	times: [String]
-# 	url: String
-# 	address: String
-# 	city: String
-# 	genre: String
-# 	category: String
-# }
+input AddEventInput {
+	tmID: String!
+	title: String!
+	venue: String!
+	image_url: String
+	times: [String]
+	url: String
+	address: String
+	city: String
+	genre: String
+	category: String
+}
 
 type User {
 	id: ID!
