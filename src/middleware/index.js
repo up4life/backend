@@ -12,7 +12,7 @@ module.exports = {
 		}
 
 		if (cookie) {
-			const { userId } = jwt.verify(token, process.env.APP_SECRET);
+			const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
 			req.userId = userId;
 		}
 		return next();
