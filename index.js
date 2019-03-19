@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const https = require("https");
 const http = require("http");
-const fs = require("fs");
+// const fs = require("fs");
 
 const schema = require("./src/schema");
 const { bindings } = require("./src/db");
@@ -71,10 +71,10 @@ if (config.ssl) {
 
 apolloServer.installSubscriptionHandlers(server);
 
-server.listen(process.env.PORT || 4000, () =>
+server.listen(process.env.PORT, () =>
 	console.log(
 		"🚀 Server ready at",
-		`http${config.ssl ? "s" : ""}://${config.hostname}:${process.env.PORT || 4000}${
+		`http${config.ssl ? "s" : ""}://${config.hostname}:${process.env.PORT}${
 			apolloServer.graphqlPath
 		}`
 	)
