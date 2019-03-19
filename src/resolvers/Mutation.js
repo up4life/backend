@@ -400,7 +400,7 @@ const Mutation = {
 	async deleteEvent(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be signed in to add delete an event.");
 
-		let updatedUser = await db.mutation.updateUser(
+		const updatedUser = await db.mutation.updateUser(
 			{
 				where: { id: user.id },
 				data: {
@@ -415,7 +415,7 @@ const Mutation = {
 		);
 		let event = await db.query.event({ where: { id: args.eventId } }, `{attending {id}}`);
 		if (event.attending.length === 0) {
-			await db.mutation.deleteEvent({ where: { id: args.id } });
+			await db.mutation.deleteEvent({ where: { id: args.eventId } });
 		}
 
 		return updatedUser;
