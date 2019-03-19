@@ -25,16 +25,18 @@ const Mutation = {
 			throw new Error("Password must be 8 characters with at least 1 number!");
 		}
 		const password = await bcrypt.hash(args.password, 10);
-		const user = await db.createUser(
+		const user = await db.mutation.createUser(
 			{
-				...args,
-				password,
-				permissions: "FREE", // default permission for user is FREE tier
-				img: {
-					create: {
-						img_url:
-							"https://res.cloudinary.com/dcwn6afsq/image/upload/v1552598409/up4/autftv4fj3l7qlkkt56j.jpg",
-						default: true
+				data: {
+					...args,
+					password,
+					permissions: "FREE", // default permission for user is FREE tier
+					img: {
+						create: {
+							img_url:
+								"https://res.cloudinary.com/dcwn6afsq/image/upload/v1552598409/up4/autftv4fj3l7qlkkt56j.jpg",
+							default: true
+						}
 					}
 				}
 			},
