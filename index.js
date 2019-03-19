@@ -36,7 +36,8 @@ const corsConfig = {
 const configurations = {
 	production: {
 		ssl: true,
-		port: process.env.PORT,
+		port: process.env.PORT || 4000,
+		// hostname: "localhost"
 		hostname: "api.up4.life"
 	},
 	development: { ssl: false, port: process.env.PORT || 4000, hostname: "localhost" }
@@ -58,10 +59,10 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 var server;
 if (config.ssl) {
 	server = https.createServer(
-		{
-			key: fs.readFileSync(`./Certs/www_up4_life.key`),
-			cert: fs.readFileSync(`./Certs/www_up4_life.pem`)
-		},
+		// {
+		// 	key: fs.readFileSync(`./Certs/www_up4_life.key`),
+		// 	cert: fs.readFileSync(`./Certs/www_up4_life.pem`)
+		// },
 		app
 	);
 } else {
@@ -70,10 +71,10 @@ if (config.ssl) {
 
 apolloServer.installSubscriptionHandlers(server);
 
-server.listen(process.env.PORT, () =>
+server.listen(process.env.PORT || 4000, () =>
 	console.log(
 		"🚀 Server ready at",
-		`http${config.ssl ? "s" : ""}://${config.hostname}:${process.env.PORT}${
+		`http${config.ssl ? "s" : ""}://${config.hostname}:${process.env.PORT || 4000}${
 			apolloServer.graphqlPath
 		}`
 	)
