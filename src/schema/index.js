@@ -2,6 +2,7 @@ require("dotenv").config({ path: "./.env" });
 const { makeExecutableSchema } = require("apollo-server");
 const { applyMiddleware } = require("graphql-middleware");
 const { importSchema } = require("graphql-import");
+const jwt = require("jsonwebtoken");
 
 const typeDefs = importSchema("./src/schema/schema.graphql");
 const { resolvers } = require("../resolvers");
