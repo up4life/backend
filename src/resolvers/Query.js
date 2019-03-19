@@ -30,7 +30,7 @@ const Query = {
 		// console.log(Object.keys(ctx), "ctx object keys");
 		console.log(ctx.statusMessage, "ctx params");
 		console.log(ctx.body, "ctx body");
-		console.log(info, "info");
+		// console.log(info, "info");
 		// console.log(ctx.cookies, "ctx cookies");
 		// console.log(ctx.secret, "ctx secret");
 		// console.log(ctx.headers, "ctx headers");
@@ -42,12 +42,9 @@ const Query = {
 			return null;
 		}
 
-		const current = await db.query.user(
-			{
-				where: { id: userId }
-			},
-			info
-		);
+		const current = await db.query.user({
+			where: { id: userId }
+		});
 
 		return current;
 	},
