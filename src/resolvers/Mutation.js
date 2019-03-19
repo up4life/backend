@@ -64,22 +64,24 @@ const Mutation = {
 
 			user = await db.mutation.createUser(
 				{
-					firstName: nameArray[0],
-					lastName: nameArray[1] || "",
-					email: email,
-					password: "firebaseAuth",
-					img: {
-						create: {
-							img_url: photoURL
-								? photoURL
-								: "https://res.cloudinary.com/dcwn6afsq/image/upload/v1552598409/up4/autftv4fj3l7qlkkt56j.jpg",
-							default: true
-						}
-					},
-					phone: phoneNumber || null,
-					// imageThumbnail: photoURL || "",
-					// imageLarge: photoURL || "",
-					permissions: "FREE"
+					data: {
+						firstName: nameArray[0],
+						lastName: nameArray[1] || "",
+						email: email,
+						password: "firebaseAuth",
+						img: {
+							create: {
+								img_url: photoURL
+									? photoURL
+									: "https://res.cloudinary.com/dcwn6afsq/image/upload/v1552598409/up4/autftv4fj3l7qlkkt56j.jpg",
+								default: true
+							}
+						},
+						phone: phoneNumber || null,
+						// imageThumbnail: photoURL || "",
+						// imageLarge: photoURL || "",
+						permissions: "FREE"
+					}
 				},
 				`{id firstName email}`
 			);
