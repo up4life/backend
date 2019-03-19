@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
-const { bindings } = require("../db");
+const jwt = require('jsonwebtoken');
+const { bindings } = require('../db');
 
 module.exports = {
 	isAuth: async function(req, res, next) {
@@ -23,11 +23,11 @@ module.exports = {
 
 		const user = await bindings.query.user(
 			{ where: { id: req.userId } },
-			"{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}"
+			'{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}',
 		);
 
 		req.user = user;
 
 		return next();
-	}
+	},
 };
