@@ -35,7 +35,7 @@ const corsConfig = {
 };
 const configurations = {
 	production: {
-		ssl: false,
+		ssl: true,
 		port: process.env.PORT,
 		hostname: "up4test-backend.herokuapp.com"
 	},
