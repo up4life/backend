@@ -4,8 +4,13 @@ const { bindings } = require("../db");
 module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
-
+		const { cookie } = req.headers;
 		if (token) {
+			const { userId } = jwt.verify(token, process.env.APP_SECRET);
+			req.userId = userId;
+		}
+
+		if (cookie) {
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 			req.userId = userId;
 		}

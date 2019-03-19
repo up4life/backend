@@ -27,9 +27,9 @@ const Query = {
 	},
 	currentUser(parent, args, { userId, db }, info) {
 		// check if there is a current user ID
-		if (!userId) {
-			return null;
-		}
+		// if (!userId) {
+		// 	return null;
+		// }
 		return db.query.user(
 			{
 				where: { id: userId }
