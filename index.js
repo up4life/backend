@@ -2,7 +2,7 @@ require("dotenv").config({ path: "./.env" });
 const { ApolloServer } = require("apollo-server-express");
 const cookieParser = require("cookie-parser");
 const express = require("express");
-const https = require("https");
+// const https = require("https");
 const http = require("http");
 
 const schema = require("./src/schema");

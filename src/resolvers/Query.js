@@ -32,9 +32,12 @@ const Query = {
 			return null;
 		}
 
-		const current = await db.query.user({
-			where: { id: userId }
-		});
+		const current = await db.query.user(
+			{
+				where: { id: userId }
+			},
+			info
+		);
 		console.log(current, "current user");
 		return current;
 	},

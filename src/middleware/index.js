@@ -4,15 +4,15 @@ const { bindings } = require("../db");
 module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
-		console.log(req.cookies, "req.cookies here");
-		console.log("\n");
+		// console.log(req.cookies, "req.cookies here");
+		// console.log("\n");
 		const { cookie } = req.headers;
-		console.log(cookie, "cookie here");
-		console.log("\n");
-		console.log("\n");
-		console.log(req.body, "body here");
-		console.log("\n");
-		console.log(res.body, "status here");
+		// console.log(cookie, "cookie here");
+		// console.log("\n");
+		// console.log("\n");
+		// console.log(req.body, "body here");
+		// console.log("\n");
+		// console.log(res.body, "status here");
 		if (token) {
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 			req.userId = userId;
