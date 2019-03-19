@@ -7,7 +7,6 @@ module.exports = {
 		console.log(req.cookies, "req.cookies here");
 		console.log("\n");
 		const { cookie } = req.headers;
-		// console.log(Object.keys(req.headers), "req.headers here");
 		console.log(cookie, "cookie here");
 		console.log("\n");
 		console.log("\n");
@@ -20,10 +19,6 @@ module.exports = {
 			return next();
 		}
 
-		// if (cookie !== null) {
-		// 	const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
-		// 	req.userId = userId;
-		// }
 		return next();
 	},
 

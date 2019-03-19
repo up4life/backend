@@ -47,8 +47,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
 
-// app.use(isAuth);
-// app.use(populateUser);
+app.use(isAuth);
+app.use(populateUser);
 
 apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
@@ -68,7 +68,7 @@ server.listen(process.env.PORT || 4000, () => {
 			apolloServer.graphqlPath
 		}`
 	);
-	console.log(apolloServer.subscriptionsPath);
+	// console.log(apolloServer.subscriptionsPath);
 });
 
 // httpServer.listen(port, () => {

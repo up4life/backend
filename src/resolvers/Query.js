@@ -25,7 +25,9 @@ const Query = {
 
 		return events;
 	},
-	currentUser(parent, args, { userId, db }, info) {
+	currentUser(parent, args, ctx, info) {
+		const { userId, db } = ctx;
+		console.log(Object.keys(ctx), "ctx object keys");
 		// check if there is a current user ID
 		if (!userId) {
 			return null;
