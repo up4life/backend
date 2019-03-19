@@ -27,9 +27,6 @@ const Query = {
 	},
 	async currentUser(parent, args, ctx, info) {
 		const { userId, db } = ctx;
-		// console.log(Object.keys(ctx), "ctx object keys");
-		console.log(ctx.statusMessage, "ctx params");
-		console.log(ctx.body, "ctx body");
 		// check if there is a current user ID
 		if (!userId) {
 			return null;
@@ -38,7 +35,7 @@ const Query = {
 		const current = await db.query.user({
 			where: { id: userId }
 		});
-
+		console.log(current, "current user");
 		return current;
 	},
 	async user(parent, args, { userId, db }, info) {
