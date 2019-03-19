@@ -70,9 +70,11 @@ if (config.ssl) {
 
 apolloServer.installSubscriptionHandlers(server);
 
-server.listen({ port: config.port }, () =>
+server.listen(process.env.PORT, () =>
 	console.log(
 		"🚀 Server ready at",
-		`http${config.ssl ? "s" : ""}://${config.hostname}:${config.port}${apolloServer.graphqlPath}`
+		`http${config.ssl ? "s" : ""}://${config.hostname}:${process.env.PORT}${
+			apolloServer.graphqlPath
+		}`
 	)
 );
