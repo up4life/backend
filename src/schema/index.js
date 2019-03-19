@@ -23,7 +23,7 @@ const middleware = [
 		if (!ctx.userId) return resolve();
 		console.log("made it here");
 		const user = await ctx.db.query.user(
-			{ id: ctx.userId },
+			{ where: { id: ctx.userId } },
 			"{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}"
 		);
 		ctx.user = user;
