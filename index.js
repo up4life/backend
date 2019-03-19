@@ -68,7 +68,7 @@ server.listen(process.env.PORT || 4000, () => {
 			apolloServer.graphqlPath
 		}`
 	);
-	console.log(apolloServer.subscriptionPath);
+	console.log(apolloServer.subscriptionsPath);
 });
 
 // httpServer.listen(port, () => {
