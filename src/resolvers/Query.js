@@ -25,28 +25,31 @@ const Query = {
 
 		return events;
 	},
-	currentUser(parent, args, ctx, info) {
+	async currentUser(parent, args, ctx, info) {
 		const { userId, db } = ctx;
 		// console.log(Object.keys(ctx), "ctx object keys");
-		console.log(ctx.params, "ctx params");
+		console.log(ctx.statusMessage, "ctx params");
 		console.log(ctx.body, "ctx body");
-		console.log(ctx.query, "ctx query");
-		console.log(ctx.cookies, "ctx cookies");
-		console.log(ctx.secret, "ctx secret");
-		console.log(ctx.headers, "ctx headers");
-		console.log(ctx.secret, "ctx");
-		console.log(ctx.statusCode, "ctx statusCode");
-		console.log(ctx.signedCookies, "ctx signed cookies");
+		console.log(info, "info");
+		// console.log(ctx.cookies, "ctx cookies");
+		// console.log(ctx.secret, "ctx secret");
+		// console.log(ctx.headers, "ctx headers");
+		// console.log(ctx.secret, "ctx");
+		// console.log(ctx.statusCode, "ctx statusCode");
+		// console.log(ctx.signedCookies, "ctx signed cookies");
 		// check if there is a current user ID
 		if (!userId) {
 			return null;
 		}
-		return db.query.user(
+
+		const current = await db.query.user(
 			{
 				where: { id: userId }
 			},
 			info
 		);
+
+		return current;
 	},
 	async user(parent, args, { userId, db }, info) {
 		// finds a user based on the args provided in the mutation
