@@ -38,7 +38,8 @@ const configurations = {
 		ssl: true,
 		port: process.env.PORT || 4000,
 		// hostname: "localhost"
-		hostname: "api.up4.life"
+		// hostname: "api.up4.life"
+		hostname: "testup4.herokuapp.com"
 	},
 	development: { ssl: false, port: process.env.PORT || 4000, hostname: "localhost" }
 };
