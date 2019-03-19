@@ -28,7 +28,8 @@ const corsConfig = {
 		"https://up4lifee.herokuapp.com",
 		"/.herokuapp.com$/",
 		"http://localhost:4000",
-		"www.up4.life"
+		"www.up4.life",
+		"https://www.up4.life"
 	],
 	credentials: true
 };
@@ -37,7 +38,7 @@ const configurations = {
 		ssl: false,
 		port: process.env.PORT || 4000,
 		// hostname: "localhost"
-		hostname: "up4test.herokuapp.com"
+		hostname: "api.up4.life"
 	},
 	development: { ssl: false, port: process.env.PORT || 4000, hostname: "localhost" }
 };
