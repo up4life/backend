@@ -352,23 +352,16 @@ const Mutation = {
 
 		const [existingEvents] = await db.query.events({
 			where: {
-				AND: [
-					{
-						venue: event.venue
-					},
-					{
-						title: event.title
-					}
-				]
+				tmID: event.tmID
 			}
 		});
 		let eventId = -1;
 		if (existingEvents) {
 			eventId = existingEvents.id;
 
-			console.log(user.events, "user events");
+			// console.log(user.events, "user events");
 			const [alreadySaved] = user.events.filter(ev => ev.id === eventId);
-			console.log(alreadySaved, "alreadySaved");
+			// console.log(alreadySaved, "alreadySaved");
 			if (alreadySaved) {
 				throw new Error("You've already saved that event!");
 			}
