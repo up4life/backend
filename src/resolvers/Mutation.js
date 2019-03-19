@@ -75,8 +75,8 @@ const Mutation = {
 						}
 					},
 					phone: phoneNumber || null,
-					imageThumbnail: photoURL || "",
-					imageLarge: photoURL || "",
+					// imageThumbnail: photoURL || "",
+					// imageLarge: photoURL || "",
 					permissions: "FREE"
 				},
 				`{id firstName email}`
