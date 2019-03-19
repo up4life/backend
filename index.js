@@ -24,7 +24,13 @@ const apolloServer = new ApolloServer({
 // const port = process.env.PORT || 4000;
 
 const corsConfig = {
-	origin: ["https://up4redirect.herokuapp.com", "/.herokuapp.com$/", "http://localhost:4000"],
+	origin: [
+		"https://www.up4.life",
+		"/.herokuapp.com$/",
+		"http://localhost:4000",
+		"https://up4.life",
+		"up4.life"
+	],
 	credentials: true
 };
 const configurations = {
