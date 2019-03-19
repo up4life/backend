@@ -59,10 +59,10 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 var server;
 if (config.ssl) {
 	server = https.createServer(
-		{
-			key: fs.readFileSync(`./Certs/www_up4_life.key`),
-			cert: fs.readFileSync(`./Certs/www_up4_life.pem`)
-		},
+		// {
+		// 	key: fs.readFileSync(`./Certs/www_up4_life.key`),
+		// 	cert: fs.readFileSync(`./Certs/www_up4_life.pem`)
+		// },
 		app
 	);
 } else {
