@@ -20,13 +20,13 @@ const middleware = [
 	},
 	async function populateUser(resolve, parent, args, ctx, info) {
 		if (!ctx.userId) return resolve();
-
-		const user = await ctx.prisma.user(
+		console.log("made it here");
+		const user = await ctx.db.query.user(
 			{ id: ctx.userId },
 			"{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs age gender blocked { id }}"
 		);
 		ctx.user = user;
-
+		console.log(ctx.user, "user on ctx here");
 		return resolve(parent, args, { ...ctx }, info);
 	}
 ];
