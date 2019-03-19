@@ -20,10 +20,10 @@ module.exports = {
 			return next();
 		}
 
-		if (cookie !== null) {
-			const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
-			req.userId = userId;
-		}
+		// if (cookie !== null) {
+		// 	const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
+		// 	req.userId = userId;
+		// }
 		return next();
 	},
 
