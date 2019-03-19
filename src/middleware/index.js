@@ -1,10 +1,14 @@
-const jwt = require('jsonwebtoken');
-const { bindings } = require('../db');
+const jwt = require("jsonwebtoken");
+const { bindings } = require("../db");
 
 module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
+		console.log(req.cookies, "cookies here");
+		console.log("\n");
 		const { cookie } = req.headers;
+		console.log(Object.keys(req.headers), "cookies here");
+		console.log("\n");
 		if (token) {
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 			req.userId = userId;
@@ -23,11 +27,11 @@ module.exports = {
 
 		const user = await bindings.query.user(
 			{ where: { id: req.userId } },
-			'{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}',
+			"{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}"
 		);
 
 		req.user = user;
 
 		return next();
-	},
+	}
 };
