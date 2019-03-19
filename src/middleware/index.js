@@ -20,8 +20,9 @@ module.exports = {
 		}
 
 		if (cookie) {
-			const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
-			req.userId = userId;
+			console.log(cookie, "cookie here");
+			// const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
+			// req.userId = userId;
 			return next();
 		}
 
