@@ -36,7 +36,7 @@ const corsConfig = {
 const configurations = {
 	production: {
 		ssl: false,
-		port: process.env.PORT || 4000,
+		port: process.env.PORT,
 		hostname: "up4test-backend.herokuapp.com"
 	},
 	development: { ssl: false, port: process.env.PORT || 4000, hostname: "localhost" }
@@ -70,16 +70,9 @@ if (config.ssl) {
 
 apolloServer.installSubscriptionHandlers(server);
 
-server.listen(process.env.PORT, () =>
+server.listen({ port: config.port }, () =>
 	console.log(
 		"🚀 Server ready at",
-		`http${config.ssl ? "s" : ""}://${config.hostname}:${process.env.PORT || 4000}${
-			apolloServer.graphqlPath
-		}`
+		`http${config.ssl ? "s" : ""}://${config.hostname}:${config.port}${apollo.graphqlPath}`
 	)
 );
-
-// httpServer.listen(port, () => {
-// 	console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
-// 	console.log(`🚀 Subscriptions ready at ws://localhost:${port}${server.subscriptionsPath}`);
-// });
