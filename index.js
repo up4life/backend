@@ -54,7 +54,7 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
 var server;
 if (config.ssl) {
-	server = https.createServer(app);
+	server = http.createServer(app);
 } else {
 	server = http.createServer(app);
 }
