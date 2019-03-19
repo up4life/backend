@@ -172,18 +172,18 @@ const Query = {
 		});
 		return city;
 	},
-	async geoHash(parent, { city }, { db }, info) {
-		const response = await axios(
-			`https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${
-				process.env.GOOGLE_API_KEY
-			}`
-		);
-		let { lat, lng } = response.data.results[0].geometry.location;
+	// async geoHash(parent, { city }, { db }, info) {
+	// 	const response = await axios(
+	// 		`https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${
+	// 			process.env.GOOGLE_API_KEY
+	// 		}`
+	// 	);
+	// 	let { lat, lng } = response.data.results[0].geometry.location;
 
-		const geoResponse = await axios(`http://geohash.org?q=${lat},${lng}&format=url`);
-		let geoHash = geoResponse.data.replace("http://geohash.org/", "").slice(0, 8);
-		return { geoHash };
-	},
+	// 	const geoResponse = await axios(`http://geohash.org?q=${lat},${lng}&format=url`);
+	// 	let geoHash = geoResponse.data.replace("http://geohash.org/", "").slice(0, 8);
+	// 	return { geoHash };
+	// },
 	async getRemainingDates(parent, args, { userId, db }, info) {
 		// Check user's login status
 		if (!userId) throw new Error("You must be signed in to access this app.");
