@@ -36,7 +36,7 @@ type User {
 	email: String! @unique
 	phone: String @unique
 	biography: String
-	img: [ProfilePic!]!
+	img: [ProfilePic!]! @relation(name: "UserImage", onDelete: CASCADE)
 	resetToken: String
 	resetTokenExpiry: Float
 	interests: [Genre]
@@ -49,8 +49,8 @@ type User {
 	updatedAt: DateTime!
 	stripeCustomerId: String
 	stripeSubscriptionId: String
-	liked: [User!]! @relation(name: "LikedUser")
-	blocked: [User!]! @relation(name: "BlockedUser")
+	liked: [User!]! @relation(name: "LikedUser", onDelete: CASCADE)
+	blocked: [User!]! @relation(name: "BlockedUser", onDelete: CASCADE)
 	chats: [Chat!]!
 	verified: Boolean @default(value: "false")
 }
@@ -74,7 +74,7 @@ type DirectMessage {
 
 type ProfilePic {
 	id: ID! @unique
-	user: User!
+	user: User! @relation(name: "UserImage")
 	img_url: String!
 	default: Boolean! @default(value: "false")
 }
