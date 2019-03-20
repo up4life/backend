@@ -125,26 +125,23 @@ const Query = {
 	},
 
 	async getEvent(parent, args, ctx, info) {
-		const { data } = await axios.get(
+		const {
+			data: { _embedded, dates, images, name, id, url }
+		} = await axios.get(
 			`https://app.ticketmaster.com/discovery/v2/events/${args.id}.json?apikey=${
 				process.env.TKTMSTR_KEY
 			}`
 		);
 
-		const [img] = data.images.filter(img => img.width > 500);
+		const [img] = images.filter(img => img.width > 500);
 		return {
-			title: data.name,
-			id: data.id,
-			url: data.url,
-			location: {
-				city: data._embedded ? data._embedded.venues[0].city.name : "poop",
-				venue: data._embedded ? data._embedded.venues[0].name : "poopoo",
-				address: data._embedded ? data._embedded.venues[0].address.line1 : "damnit 3",
-				zipCode: data._embedded ? data._embedded.venues[0].postalCode : "shit 4"
-			},
+			title: name,
+			id,
+			url,
+			city: _embedded ? _embedded.venues[0].city.name : "",
+			venue: _embedded ? _embedded.venues[0].name : "",
 			image_url: img.url,
-			description: data.info,
-			times: [data.dates.start.dateTime]
+			times: [dates.start.dateTime]
 		};
 	},
 	async getLocation(parent, { latitude, longitude }, ctx, info) {
