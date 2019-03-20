@@ -1,24 +1,18 @@
 const { transport, report } = require("../../mail");
 
 module.exports = {
-	async blockUser(parent, args, { userId, db }, info) {
-		// current user need to login
+	async blockUser(parent, { id }, { userId, db }, info) {
 		if (!userId) throw new Error("You need to login to block a user");
 
-		// should not block yourself, that's suicidal
-		if (userId === args.id) throw new Error("Please do not block yourself");
+		// if (userId === args.id) throw new Error("Please do not block yourself");
 
-		// query user to block
 		const blockedUser = await db.query.user({
 			where: {
-				id: args.id
+				id
 			}
 		});
-
-		// check if user to block exist
 		if (!blockedUser) throw new Error("User to block does not exist");
 
-		// query current user's liked
 		const currentUser = await db.query.user(
 			{
 				where: {
@@ -37,12 +31,12 @@ module.exports = {
 					data: {
 						blocked: {
 							connect: {
-								id: args.id
+								id
 							}
 						},
 						liked: {
 							disconnect: {
-								id: args.id
+								id
 							}
 						}
 					}
@@ -58,7 +52,7 @@ module.exports = {
 					data: {
 						blocked: {
 							connect: {
-								id: args.id
+								id
 							}
 						}
 					}
@@ -67,18 +61,17 @@ module.exports = {
 			);
 		}
 	},
-	async likeUser(parent, args, { userId, db }, info) {
-		// current user need to login
+	async likeUser(parent, { id }, { userId, db }, info) {
 		if (!userId) throw new Error("You need to login to like a user");
 
 		// should not like yourself, that's creepy
-		if (userId === args.id) throw new Error("Go find someone else to like, really!");
+		if (userId === id) throw new Error("Go find someone else to like, really!");
 
 		// query user to like
 		const userToLike = await db.query.user(
 			{
 				where: {
-					id: args.id
+					id
 				}
 			},
 			`{ id blocked { id } }`
@@ -102,7 +95,7 @@ module.exports = {
 		);
 
 		// check if user to like is on current user block list
-		if (currentUser.blocked.findIndex(user => user.id === args.id) !== -1)
+		if (currentUser.blocked.findIndex(user => user.id === id) !== -1)
 			throw new Error("User to like is on your blocked list");
 
 		// update current user liked list
@@ -114,7 +107,7 @@ module.exports = {
 				data: {
 					liked: {
 						connect: {
-							id: args.id
+							id
 						}
 					}
 				}
@@ -122,7 +115,7 @@ module.exports = {
 			info
 		);
 	},
-	async unblockUser(parent, args, { userId, db }, info) {
+	async unblockUser(parent, { id }, { userId, db }, info) {
 		// current user need to login
 		if (!userId) throw new Error("You need to login to unblock a user");
 
@@ -137,7 +130,7 @@ module.exports = {
 		);
 
 		// check if user to like is on current user liked list
-		if (currentUser.blocked.findIndex(user => user.id === args.id) === -1)
+		if (currentUser.blocked.findIndex(user => user.id === id) === -1)
 			throw new Error("User is not on your blocked list");
 
 		// update current user liked list
@@ -149,7 +142,7 @@ module.exports = {
 				data: {
 					blocked: {
 						disconnect: {
-							id: args.id
+							id
 						}
 					}
 				}
@@ -157,7 +150,7 @@ module.exports = {
 			info
 		);
 	},
-	async unlikeUser(parent, args, { userId, db }, info) {
+	async unlikeUser(parent, { id }, { userId, db }, info) {
 		// current user need to login
 		if (!userId) throw new Error("You need to login to unblock a user");
 
@@ -183,7 +176,7 @@ module.exports = {
 				data: {
 					liked: {
 						disconnect: {
-							id: args.id
+							id
 						}
 					}
 				}
@@ -192,7 +185,6 @@ module.exports = {
 		);
 	},
 	async reportUser(parent, { id, message }, { userId, db }, info) {
-		// current user need to login
 		if (!userId) throw new Error("You need to login to report a user");
 
 		// send mail to Support Team at Up4

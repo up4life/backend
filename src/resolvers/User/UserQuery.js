@@ -78,7 +78,6 @@ module.exports = {
 
 	async getLikedByList(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to use this feature!");
-		//if (user.permissions === 'FREE') throw new Error('You do not have access to this feature')
 
 		return db.query.users(
 			{

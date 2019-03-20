@@ -12,7 +12,8 @@ const Query = {
 	genres: forwardTo("db"),
 	async userEvents(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to use this feature!");
-		let events = await db.query.events(
+
+		return db.query.events(
 			{
 				where: {
 					attending_some: {
@@ -23,27 +24,24 @@ const Query = {
 			info
 		);
 
-		return events;
+		// return events;
 	},
-	async currentUser(parent, args, ctx, info) {
-		const { userId, db } = ctx;
+	async currentUser(parent, args, { userId, db }, info) {
 		// check if there is a current user ID
 		if (!userId) {
 			return null;
 		}
 
-		const current = await db.query.user(
+		return db.query.user(
 			{
 				where: { id: userId }
 			},
 			info
 		);
-		console.log(current, "current user");
-		return current;
+
+		// return current;
 	},
 	async user(parent, args, { userId, db }, info) {
-		// finds a user based on the args provided in the mutation
-
 		let score = 0;
 		if (args.where.id) {
 			score = await getScore(userId, args.where.id, db);
@@ -87,17 +85,17 @@ const Query = {
 		const dates = !args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
 
 		let events;
-		let response = await fetchEvents(location, cats, dates, page, 26, args.genres);
+		let { data } = await fetchEvents(location, cats, dates, page, 26, args.genres);
 
-		events = response.data._embedded.events;
+		events = data._embedded.events;
 
 		let uniques = events.reduce((a, t) => {
 			if (!a.includes(t.name)) a.push(t.name);
 			return a;
 		}, []);
-		let pageNumber = response.data.page.number;
+		let pageNumber = data.page.number;
 
-		if (response.data.page.totalElements > 26) {
+		if (data.page.totalElements > 26) {
 			while (uniques.length < 26) {
 				page = page + 1;
 
@@ -118,9 +116,9 @@ const Query = {
 
 		return {
 			events: eventList,
-			page_count: response.data.page.size,
-			total_items: response.data.page.totalElements,
-			page_total: response.data.page.totalPages,
+			page_count: data.page.size,
+			total_items: data.page.totalElements,
+			page_total: data.page.totalPages,
 			page_number: pageNumber,
 			location: location
 		};
@@ -176,20 +174,7 @@ const Query = {
 		});
 		return city;
 	},
-	// async geoHash(parent, { city }, { db }, info) {
-	// 	const response = await axios(
-	// 		`https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${
-	// 			process.env.GOOGLE_API_KEY
-	// 		}`
-	// 	);
-	// 	let { lat, lng } = response.data.results[0].geometry.location;
-
-	// 	const geoResponse = await axios(`http://geohash.org?q=${lat},${lng}&format=url`);
-	// 	let geoHash = geoResponse.data.replace("http://geohash.org/", "").slice(0, 8);
-	// 	return { geoHash };
-	// },
 	async getRemainingDates(parent, args, { userId, db }, info) {
-		// Check user's login status
 		if (!userId) throw new Error("You must be signed in to access this app.");
 
 		const user = await db.query.user(
