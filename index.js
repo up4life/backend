@@ -25,7 +25,9 @@ const corsConfig = {
 		"/.herokuapp.com$/",
 		"http://localhost:3000",
 		"www.up4.life",
-		"https://www.up4.life"
+		"https://www.up4.life",
+		"https://up4.life",
+		"up4.life"
 	],
 	credentials: true
 };
