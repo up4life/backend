@@ -11,8 +11,9 @@ const { isAuth, populateUser } = require("./src/middleware/index");
 
 const apolloServer = new ApolloServer({
 	schema,
-	context: ({ req }) => ({
+	context: ({ req, res }) => ({
 		...req,
+		...res,
 		db: bindings
 	}),
 	playground: true,
