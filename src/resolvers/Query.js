@@ -13,7 +13,7 @@ const Query = {
 	async userEvents(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to use this feature!");
 
-		return db.query.events(
+		return db.events(
 			{
 				where: {
 					attending_some: {
@@ -23,8 +23,6 @@ const Query = {
 			},
 			info
 		);
-
-		// return events;
 	},
 	async currentUser(parent, args, { userId, db }, info) {
 		// check if there is a current user ID
@@ -32,14 +30,12 @@ const Query = {
 			return null;
 		}
 
-		return db.query.user(
+		return db.user(
 			{
 				where: { id: userId }
 			},
 			info
 		);
-
-		// return current;
 	},
 	async user(parent, args, { userId, db }, info) {
 		let score = 0;
@@ -47,7 +43,7 @@ const Query = {
 			score = await getScore(userId, args.where.id, db);
 		}
 
-		const user = await db.query.user(
+		const user = await db.user(
 			{
 				...args
 			},
@@ -126,7 +122,7 @@ const Query = {
 
 	async getEvent(parent, args, ctx, info) {
 		const {
-			data: { _embedded, dates, images, name, id, url }
+			data: { _embedded, dates, images, name, id }
 		} = await axios.get(
 			`https://app.ticketmaster.com/discovery/v2/events/${args.id}.json?apikey=${
 				process.env.TKTMSTR_KEY
@@ -135,9 +131,8 @@ const Query = {
 
 		const [img] = images.filter(img => img.width > 500);
 		return {
-			title: name,
 			id,
-			url,
+			title: name,
 			city: _embedded ? _embedded.venues[0].city.name : "",
 			venue: _embedded ? _embedded.venues[0].name : "",
 			image_url: img.url,
@@ -145,14 +140,14 @@ const Query = {
 		};
 	},
 	async getLocation(parent, { latitude, longitude }, ctx, info) {
-		const location = await axios.get(
+		const { data } = await axios.get(
 			`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude}, ${longitude}&key=${
 				process.env.GOOGLE_API_KEY
 			}`
 		);
-		let city = location.data.results[0].address_components[3].long_name;
-		let state = location.data.results[0].address_components[5].short_name;
-		let county = location.data.results[0].address_components[4].long_name;
+		let city = data.results[0].address_components[3].long_name;
+		let state = data.results[0].address_components[5].short_name;
+		let county = data.results[0].address_components[4].long_name;
 
 		return {
 			city: `${city}, ${state}`,
@@ -160,12 +155,12 @@ const Query = {
 		};
 	},
 	async locationSearch(parent, args, { db }, info) {
-		const response = await axios(
+		const { data } = await axios(
 			`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${
 				args.city
 			}&types=(cities)&key=${process.env.GOOGLE_API_KEY}`
 		);
-		const results = response.data.predictions;
+		const results = data.predictions;
 		const city = results.map(result => {
 			return { city: result.description };
 		});
@@ -174,7 +169,7 @@ const Query = {
 	async getRemainingDates(parent, args, { userId, db }, info) {
 		if (!userId) throw new Error("You must be signed in to access this app.");
 
-		const user = await db.query.user(
+		const user = await db.user(
 			{ where: { id: userId } },
 			`
 				{id permissions events {id}}
@@ -199,7 +194,7 @@ const Query = {
 	},
 
 	async remainingMessages(parent, args, { user, db }, info) {
-		const sentMessages = await db.query.directMessages({
+		const sentMessages = await db.directMessages({
 			where: {
 				AND: [{ from: { id: user.id } }, { createdAt_gte: moment().startOf("isoWeek") }]
 			}

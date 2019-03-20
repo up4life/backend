@@ -7,7 +7,7 @@ module.exports = {
 
 		// FREE users can only send 10 messages per week
 		if (user.permissions === "FREE") {
-			const sentMessages = await db.query.directMessages({
+			const sentMessages = await db.directMessages({
 				where: {
 					AND: [{ from: { id: user.id } }, { createdAt_gte: moment().startOf("isoWeek") }]
 				}
@@ -18,7 +18,7 @@ module.exports = {
 		}
 
 		// check to see if chat between users already exists
-		let [chat] = await db.query.chats(
+		let [chat] = await db.chats(
 			{
 				where: {
 					AND: [{ users_some: { id: user.id } }, { users_some: { id: args.id } }]
@@ -29,7 +29,7 @@ module.exports = {
 		if (chat) throw new Error("Conversation between these users already exists");
 
 		// create new chat
-		chat = await db.mutation.createChat(
+		chat = await db.createChat(
 			{
 				data: {
 					users: {
@@ -51,7 +51,7 @@ module.exports = {
 
 		// FREE users can only send 20 messages per week
 		if (user.permissions === "FREE") {
-			const sentMessages = await db.query.directMessages({
+			const sentMessages = await db.directMessages({
 				where: {
 					AND: [{ from: { id: user.id } }, { createdAt_gte: moment().startOf("isoWeek") }]
 				}
@@ -61,14 +61,14 @@ module.exports = {
 				throw new Error("You have reached 20 DMs per week for FREE account.");
 		}
 
-		let [chat] = await db.query.chats({
+		let [chat] = await db.chats({
 			where: {
 				AND: [{ users_some: { id: user.id } }, { users_some: { id } }]
 			}
 		});
 
 		if (!chat) {
-			return db.mutation.createChat(
+			return db.createChat(
 				{
 					data: {
 						users: { connect: [{ id: user.id }, { id }] },
@@ -86,7 +86,7 @@ module.exports = {
 				info
 			);
 		} else {
-			return db.mutation.updateChat(
+			return db.updateChat(
 				{
 					where: {
 						id: chat.id
@@ -111,14 +111,14 @@ module.exports = {
 		// simple chat delete to erase entire conversation
 		if (!user) throw new Error("You must be logged in to start a conversation!");
 
-		await db.mutation.deleteChat({
+		await db.deleteChat({
 			where: { id }
 		});
 
 		return { message: "Chat successfully erased" };
 	},
 	async updateSeenMessage(parent, { chatId }, { userId, db }, info) {
-		let updated = await db.mutation.updateManyDirectMessages({
+		let updated = await db.updateManyDirectMessages({
 			where: {
 				chat: {
 					id: chatId
@@ -142,7 +142,7 @@ module.exports = {
 	async markAllAsSeen(parent, args, { userId, user, db }, info) {
 		if (!user) throw new Error("You must be logged in to start a conversation!");
 
-		const chat = db.query.chat({
+		const chat = db.chat({
 			where: {
 				id: args.chatId
 			}
@@ -150,7 +150,7 @@ module.exports = {
 
 		if (!chat) throw new Error("Chat does not exist");
 
-		await db.mutation.updateManyDirectMessages({
+		await db.updateManyDirectMessages({
 			where: {
 				AND: [{ chat: { id: args.chatId } }, { from: { id_not: userId } }, { seen: false }]
 			},
@@ -159,7 +159,7 @@ module.exports = {
 			}
 		});
 
-		return db.mutation.updateChat({
+		return db.updateChat({
 			where: {
 				id: args.chatId
 			},

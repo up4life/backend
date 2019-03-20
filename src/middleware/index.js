@@ -15,8 +15,6 @@ module.exports = {
 
 		if (cookie) {
 			console.log(cookie, "cookie here");
-			// const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
-			// req.userId = userId;
 			return next();
 		}
 
@@ -30,7 +28,6 @@ module.exports = {
 			{ where: { id: req.userId } },
 			"{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}"
 		);
-
 		req.user = user;
 
 		return next();

@@ -4,16 +4,14 @@ module.exports = {
 	async blockUser(parent, { id }, { userId, db }, info) {
 		if (!userId) throw new Error("You need to login to block a user");
 
-		// if (userId === args.id) throw new Error("Please do not block yourself");
-
-		const blockedUser = await db.query.user({
+		const blockedUser = await db.user({
 			where: {
 				id
 			}
 		});
 		if (!blockedUser) throw new Error("User to block does not exist");
 
-		const currentUser = await db.query.user(
+		const currentUser = await db.user(
 			{
 				where: {
 					id: userId
@@ -23,7 +21,7 @@ module.exports = {
 		);
 
 		if (currentUser.liked.findIndex(user => user.id === args.id) !== -1) {
-			return db.mutation.updateUser(
+			return db.updateUser(
 				{
 					where: {
 						id: userId
@@ -44,7 +42,7 @@ module.exports = {
 				info
 			);
 		} else {
-			return db.mutation.updateUser(
+			return db.updateUser(
 				{
 					where: {
 						id: userId
@@ -68,7 +66,7 @@ module.exports = {
 		if (userId === id) throw new Error("Go find someone else to like, really!");
 
 		// query user to like
-		const userToLike = await db.query.user(
+		const userToLike = await db.user(
 			{
 				where: {
 					id
@@ -85,7 +83,7 @@ module.exports = {
 			throw new Error("You have been blocked by the user");
 
 		// query current user
-		const currentUser = await db.query.user(
+		const currentUser = await db.user(
 			{
 				where: {
 					id: userId
@@ -99,7 +97,7 @@ module.exports = {
 			throw new Error("User to like is on your blocked list");
 
 		// update current user liked list
-		return db.mutation.updateUser(
+		return db.updateUser(
 			{
 				where: {
 					id: userId
@@ -120,7 +118,7 @@ module.exports = {
 		if (!userId) throw new Error("You need to login to unblock a user");
 
 		// query current user
-		const currentUser = await db.query.user(
+		const currentUser = await db.user(
 			{
 				where: {
 					id: userId
@@ -134,7 +132,7 @@ module.exports = {
 			throw new Error("User is not on your blocked list");
 
 		// update current user liked list
-		return db.mutation.updateUser(
+		return db.updateUser(
 			{
 				where: {
 					id: userId
@@ -155,7 +153,7 @@ module.exports = {
 		if (!userId) throw new Error("You need to login to unblock a user");
 
 		// query current user
-		const currentUser = await db.query.user(
+		const currentUser = await db.user(
 			{
 				where: {
 					id: userId
@@ -168,7 +166,7 @@ module.exports = {
 			throw new Error("User is not in your liked list");
 
 		// update current user liked list
-		return db.mutation.updateUser(
+		return db.updateUser(
 			{
 				where: {
 					id: userId
@@ -200,7 +198,7 @@ module.exports = {
 		});
 
 		// check to see if reported user is among the 'likes' for our currentUser
-		const currentUser = await db.query.user(
+		const currentUser = await db.user(
 			{
 				where: {
 					id: userId
@@ -210,7 +208,7 @@ module.exports = {
 		);
 
 		if (currentUser.liked.findIndex(user => user.id === id) !== -1) {
-			await db.mutation.updateUser(
+			await db.updateUser(
 				{
 					where: {
 						id: userId
@@ -231,7 +229,7 @@ module.exports = {
 				info
 			);
 		} else {
-			await db.mutation.updateUser(
+			await db.updateUser(
 				{
 					where: {
 						id: userId

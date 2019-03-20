@@ -1,5 +1,5 @@
-const moment = require('moment');
-const axios = require('axios');
+const moment = require("moment");
+const axios = require("axios");
 
 module.exports = {
 	transformEvents: function(user, eventsArr, db) {
@@ -10,20 +10,20 @@ module.exports = {
 			if (existingEvent !== -1) {
 				events[existingEvent].times.push(ev.dates.start.dateTime);
 			} else {
-				let [ dbEvent ] = await db.query.events(
+				let [dbEvent] = await db.events(
 					{
 						where: {
 							AND: [
 								{
-									venue: ev._embedded.venues[0].name,
+									venue: ev._embedded.venues[0].name
 								},
 								{
-									title: ev.name,
-								},
-							],
-						},
+									title: ev.name
+								}
+							]
+						}
 					},
-					`{id times attending {id firstName img {id default img_url} dob gender biography minAgePref maxAgePref genderPrefs blocked { id }}}`,
+					`{id times attending {id firstName img {id default img_url} dob gender biography minAgePref maxAgePref genderPrefs blocked { id }}}`
 				);
 
 				let eventInDb;
@@ -35,22 +35,22 @@ module.exports = {
 						if (attendee.id === user.id) return false;
 
 						return (
-							moment().diff(user.dob, 'years') <= attendee.maxAgePref &&
-							moment().diff(user.dob, 'years') >= attendee.minAgePref &&
+							moment().diff(user.dob, "years") <= attendee.maxAgePref &&
+							moment().diff(user.dob, "years") >= attendee.minAgePref &&
 							attendee.genderPrefs.includes(user.gender) &&
-							moment().diff(attendee.dob, 'years') <= user.maxAgePref &&
-							moment().diff(attendee.dob, 'years') >= user.minAgePref &&
+							moment().diff(attendee.dob, "years") <= user.maxAgePref &&
+							moment().diff(attendee.dob, "years") >= user.minAgePref &&
 							user.genderPrefs.includes(attendee.gender)
 						);
 					});
 
 					eventInDb = {
 						...dbEvent,
-						attending: attendee,
+						attending: attendee
 					};
 				}
 
-				const [ img ] = ev.images.filter(img => img.width > 500);
+				const [img] = ev.images.filter(img => img.width > 500);
 
 				events.push({
 					id: eventInDb ? eventInDb.id : ev.id,
@@ -60,11 +60,11 @@ module.exports = {
 					venue: ev._embedded.venues[0].name,
 					image_url: img.url,
 					times: ev.dates.start.noSpecificTime
-						? [ ev.dates.start.localDate ]
-						: [ ev.dates.start.dateTime ],
+						? [ev.dates.start.localDate]
+						: [ev.dates.start.dateTime],
 					attending: eventInDb ? eventInDb.attending : [],
 					genre: ev.classifications[0].genre ? ev.classifications[0].genre.name : null,
-					category: ev.classifications[0].segment && ev.classifications[0].segment.name,
+					category: ev.classifications[0].segment && ev.classifications[0].segment.name
 					// info: ev.info || null,
 					// description: ev.info || null,
 					// price: {
@@ -90,31 +90,63 @@ module.exports = {
 	setDates: function(dates) {
 		let start, end;
 		switch (dates) {
-			case 'this week':
-			case 'this week,this weekend':
-				start = moment().startOf('isoWeek').format();
-				end = moment().endOf('isoWeek').format();
+			case "this week":
+			case "this week,this weekend":
+				start = moment()
+					.startOf("isoWeek")
+					.format();
+				end = moment()
+					.endOf("isoWeek")
+					.format();
 				break;
-			case 'this week,this weekend,next week':
-			case 'this week,next week':
-				start = moment().startOf('isoWeek').format();
-				end = moment().add(1, 'weeks').endOf('isoWeek').format();
+			case "this week,this weekend,next week":
+			case "this week,next week":
+				start = moment()
+					.startOf("isoWeek")
+					.format();
+				end = moment()
+					.add(1, "weeks")
+					.endOf("isoWeek")
+					.format();
 				break;
-			case 'this weekend,next week':
-				start = moment().endOf('isoWeek').subtract(3, 'days').format();
-				end = moment().add(1, 'weeks').endOf('isoWeek').format();
+			case "this weekend,next week":
+				start = moment()
+					.endOf("isoWeek")
+					.subtract(3, "days")
+					.format();
+				end = moment()
+					.add(1, "weeks")
+					.endOf("isoWeek")
+					.format();
 				break;
-			case 'this weekend':
-				start = moment().endOf('isoWeek').subtract(3, 'days').format();
-				end = moment().endOf('isoWeek').format();
+			case "this weekend":
+				start = moment()
+					.endOf("isoWeek")
+					.subtract(3, "days")
+					.format();
+				end = moment()
+					.endOf("isoWeek")
+					.format();
 				break;
-			case 'next week':
-				start = moment().add(1, 'weeks').startOf('isoWeek').format();
-				end = moment().add(1, 'weeks').endOf('isoWeek').format();
+			case "next week":
+				start = moment()
+					.add(1, "weeks")
+					.startOf("isoWeek")
+					.format();
+				end = moment()
+					.add(1, "weeks")
+					.endOf("isoWeek")
+					.format();
 				break;
 			default:
-				start = moment().add(1, 'day').startOf('day').format();
-				end = moment().add(1, 'day').endOf('day').format();
+				start = moment()
+					.add(1, "day")
+					.startOf("day")
+					.format();
+				end = moment()
+					.add(1, "day")
+					.endOf("day")
+					.format();
 				break;
 		}
 		return { start, end };
@@ -122,76 +154,88 @@ module.exports = {
 	checkDates: function(dates, events) {
 		let date, start, end, filteredEvents;
 		switch (dates.toLowerCase()) {
-			case 'all':
+			case "all":
 				return events;
-			case 'today':
-				date = moment().format('YYYY-MM-DD');
-				return events.filter(ev =>
-					ev.times.some(t => moment(t).format('YYYY-MM-DD') === date),
-				);
-			case 'this weekend':
-				start = moment().endOf('isoWeek').subtract(2, 'days').format('YYYY-MM-DD');
-				end = moment().endOf('isoWeek').format('YYYY-MM-DD');
-				return events.filter(ev =>
-					ev.times.some(
-						t =>
-							moment(t).format('YYYY-MM-DD') >= start &&
-							moment(t).format('YYYY-MM-DD') <= end,
-					),
-				);
-			case 'next week':
-				start = moment().add(1, 'weeks').startOf('isoWeek').format('YYYY-MM-DD');
-				end = moment().add(1, 'weeks').endOf('isoWeek').format('YYYY-MM-DD');
+			case "today":
+				date = moment().format("YYYY-MM-DD");
+				return events.filter(ev => ev.times.some(t => moment(t).format("YYYY-MM-DD") === date));
+			case "this weekend":
+				start = moment()
+					.endOf("isoWeek")
+					.subtract(2, "days")
+					.format("YYYY-MM-DD");
+				end = moment()
+					.endOf("isoWeek")
+					.format("YYYY-MM-DD");
 				return events.filter(ev =>
 					ev.times.some(
-						t =>
-							moment(t).format('YYYY-MM-DD') >= start &&
-							moment(t).format('YYYY-MM-DD') <= end,
-					),
+						t => moment(t).format("YYYY-MM-DD") >= start && moment(t).format("YYYY-MM-DD") <= end
+					)
+				);
+			case "next week":
+				start = moment()
+					.add(1, "weeks")
+					.startOf("isoWeek")
+					.format("YYYY-MM-DD");
+				end = moment()
+					.add(1, "weeks")
+					.endOf("isoWeek")
+					.format("YYYY-MM-DD");
+				return events.filter(ev =>
+					ev.times.some(
+						t => moment(t).format("YYYY-MM-DD") >= start && moment(t).format("YYYY-MM-DD") <= end
+					)
 				);
 			default:
-				date = moment(`${moment().format('YYYY')} ${dates}`, 'YYYY MMM DD').format(
-					'YYYY-MM-DD',
-				);
-				return events.filter(ev =>
-					ev.times.some(t => moment(t).format('YYYY-MM-DD') === date),
-				);
+				date = moment(`${moment().format("YYYY")} ${dates}`, "YYYY MMM DD").format("YYYY-MM-DD");
+				return events.filter(ev => ev.times.some(t => moment(t).format("YYYY-MM-DD") === date));
 		}
 	},
 	fetchEvents: function(geoHash, cats, dates, page, size, genres) {
 		if (dates) {
 			if (genres && genres.length) {
 				return axios.get(
-					`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${dates.start}&endDateTime=${dates.end}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${process
-						.env.TKTMSTR_KEY}`,
+					`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${
+						dates.start
+					}&endDateTime=${
+						dates.end
+					}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${
+						process.env.TKTMSTR_KEY
+					}`
 				);
 			}
 			return axios.get(
-				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${dates.start}&endDateTime=${dates.end}&classificationId=${cats}&city=${geoHash}&apikey=${process
-					.env.TKTMSTR_KEY}`,
+				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${
+					dates.start
+				}&endDateTime=${dates.end}&classificationId=${cats}&city=${geoHash}&apikey=${
+					process.env.TKTMSTR_KEY
+				}`
 			);
 		}
 		if (genres && genres.length) {
 			return axios.get(
-				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${process
-					.env.TKTMSTR_KEY}`,
+				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${
+					process.env.TKTMSTR_KEY
+				}`
 			);
 		}
 		return axios.get(
-			`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&city=${geoHash}&apikey=${process
-				.env.TKTMSTR_KEY}`,
+			`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&city=${geoHash}&apikey=${
+				process.env.TKTMSTR_KEY
+			}`
 		);
 	},
 	getEventImages: function(id) {
 		return axios.get(
-			`https://app.ticketmaster.com/discovery/v2/events/${id}/images.json?apikey=${process.env
-				.TKTMSTR_KEY}`,
+			`https://app.ticketmaster.com/discovery/v2/events/${id}/images.json?apikey=${
+				process.env.TKTMSTR_KEY
+			}`
 		);
 	},
 	async getUser(ctx) {
-		const Authorization = (ctx.req || ctx.request).get('Authorization');
+		const Authorization = (ctx.req || ctx.request).get("Authorization");
 		if (Authorization) {
-			const token = Authorization.replace('Bearer ', '');
+			const token = Authorization.replace("Bearer ", "");
 			const { id, admin } = await verifyUserSessionToken(token);
 			return { id, admin };
 		}
@@ -200,21 +244,21 @@ module.exports = {
 
 	async getScore(currentUserId, matchingUserId, db) {
 		// events that both users have in common
-		const sharedEvents = await db.query.events({
+		const sharedEvents = await db.events({
 			where: {
 				AND: [
 					{
 						attending_some: {
-							id: currentUserId,
-						},
+							id: currentUserId
+						}
 					},
 					{
 						attending_some: {
-							id: matchingUserId,
-						},
-					},
-				],
-			},
+							id: matchingUserId
+						}
+					}
+				]
+			}
 		});
 
 		// calculate eventScore giving 10 max points
@@ -222,13 +266,13 @@ module.exports = {
 		eventScore = eventScore > 5000 ? 5000 : eventScore;
 
 		// query current user events genre and current user interests
-		const currentUser = await db.query.users(
+		const currentUser = await db.users(
 			{
 				where: {
-					id: currentUserId,
-				},
+					id: currentUserId
+				}
 			},
-			`{ events { id genre } interests { id } }`,
+			`{ events { id genre } interests { id } }`
 		);
 
 		// get unique genre list for current user
@@ -240,13 +284,13 @@ module.exports = {
 		}, []);
 
 		// query matching user events genre and matching user interests
-		const matchingUser = await db.query.users(
+		const matchingUser = await db.users(
 			{
 				where: {
-					id: matchingUserId,
-				},
+					id: matchingUserId
+				}
 			},
-			`{ events { genre } interests { id } }`,
+			`{ events { genre } interests { id } }`
 		);
 
 		// get unique genre list for matching user
@@ -279,5 +323,5 @@ module.exports = {
 		// compatibility score is the sum of eventScore, genreScore, and interestScore
 		const score = eventScore + 0 * genreScore + interestScore;
 		return score;
-	},
+	}
 };

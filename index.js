@@ -2,7 +2,6 @@ require("dotenv").config({ path: "./.env" });
 const { ApolloServer } = require("apollo-server-express");
 const cookieParser = require("cookie-parser");
 const express = require("express");
-// const https = require("https");
 const http = require("http");
 
 const schema = require("./src/schema");
@@ -13,7 +12,7 @@ const apolloServer = new ApolloServer({
 	schema,
 	context: ({ req }) => ({
 		...req,
-		db: bindings
+		db: { ...bindings.query, ...bindings.mutation, subscription: bindings.subscription }
 	}),
 	playground: true,
 	introspection: true,
@@ -52,12 +51,12 @@ app.use(populateUser);
 
 apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
-var server;
-if (config.ssl) {
-	server = http.createServer(app);
-} else {
-	server = http.createServer(app);
-}
+// var server;
+// if (config.ssl) {
+const server = http.createServer(app);
+// } else {
+// 	server = http.createServer(app);
+// }
 
 apolloServer.installSubscriptionHandlers(server);
 
