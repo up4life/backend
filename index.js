@@ -50,7 +50,7 @@ app.use(express.json());
 app.use(isAuth);
 app.use(populateUser);
 
-apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
+apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/graphql" });
 
 var server;
 if (config.ssl) {
