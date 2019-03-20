@@ -28,10 +28,12 @@ const createUserToken = async (args, ctx) => {
 		return { error: { message: "Recent sign in required!" }, token: null };
 
 	const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
+
 	ctx.res.cookie("session", sessionCookie, {
 		maxAge: 60 * 60 * 24 * 5 * 1000,
 		httpOnly: true
 	});
+
 	return sessionCookie
 		? sessionCookie
 		: { error: "User Session Token Creation Error", token: null };
@@ -51,18 +53,20 @@ const verifyUserToken = async token => {
 			};
 		});
 
-	if (claims) return claims;
-	//{ error: false, claims };
-	else
-		return {
-			error: { message: "User Session Token Verification Error" },
-			claims: null
-		};
+	return claims
+		? claims
+		: {
+				error: { message: "User Session Token Verification Error" },
+				claims: null
+		  };
 };
 
 const setUserClaims = (uid, data) => admin.auth().setCustomUserClaims(uid, data);
+
 const getUserRecord = uid => admin.auth().getUser(uid);
+
 const verifyIdToken = idToken => admin.auth().verifyIdToken(idToken);
+
 const getUID = async idToken => {
 	const decodedToken = await admin.auth().verifyIdToken(idToken);
 	return decodedToken.uid;

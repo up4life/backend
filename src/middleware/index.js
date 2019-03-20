@@ -4,8 +4,8 @@ const { bindings } = require("../db");
 module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
-		console.log(req.cookies, "req.cookies hereee");
 		const { cookie } = req.headers;
+		console.log(req.cookies, "req.cookies hereee");
 
 		if (token) {
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
@@ -26,7 +26,7 @@ module.exports = {
 
 		const user = await bindings.query.user(
 			{ where: { id: req.userId } },
-			"{ id, email, firstName, lastName, img { img_url}, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}"
+			"{ id, email, firstName, lastName, img { img_url }, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}"
 		);
 		req.user = user;
 

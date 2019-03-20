@@ -21,13 +21,13 @@ const apolloServer = new ApolloServer({
 
 const corsConfig = {
 	origin: [
-		"https://up4lifee.herokuapp.com",
-		"/.herokuapp.com$/",
+		// "https://up4lifee.herokuapp.com",
+		// "/.herokuapp.com$/",
 		"http://localhost:3000",
-		"www.up4.life",
-		"https://www.up4.life",
-		"https://up4.life",
-		"up4.life"
+		// "www.up4.life",
+		"https://www.up4.life"
+		// "https://up4.life",
+		// "up4.life"
 	],
 	credentials: true
 };
@@ -53,12 +53,7 @@ app.use(populateUser);
 
 apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
-// var server;
-// if (config.ssl) {
 const server = http.createServer(app);
-// } else {
-// 	server = http.createServer(app);
-// }
 
 apolloServer.installSubscriptionHandlers(server);
 
@@ -69,10 +64,4 @@ server.listen(process.env.PORT || 4000, () => {
 			apolloServer.graphqlPath
 		}`
 	);
-	// console.log(apolloServer.subscriptionsPath);
 });
-
-// httpServer.listen(port, () => {
-// 	console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
-// 	console.log(`🚀 Subscriptions ready at ws://localhost:${port}${server.subscriptionsPath}`);
-// });

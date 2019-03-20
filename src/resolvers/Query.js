@@ -9,7 +9,9 @@ const UserQuery = require("./User/UserQuery");
 const Query = {
 	...MessageQuery,
 	...UserQuery,
-	genres: forwardTo("db"),
+	genres(parent, args, { db }, info) {
+		return db.genres();
+	},
 	async userEvents(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to use this feature!");
 
@@ -183,7 +185,6 @@ const Query = {
 		return { count: datesCount - user.events.length };
 	},
 	async invoicesList(parent, args, { userId, user }, info) {
-		// const { userId, user } = ctx.request;
 		if (!userId) throw new Error("You must be signed in to access this app.");
 
 		const invoices = await stripe.invoices.list({

@@ -2,8 +2,9 @@ const { randomBytes } = require("crypto");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { forwardTo } = require("prisma-binding");
-const { transport, formatEmail } = require("../mail");
 const authy = require("authy")(process.env.AUTHY_KEY);
+
+const { transport, formatEmail } = require("../mail");
 const stripe = require("../stripe");
 const {
 	createUserToken,
@@ -17,6 +18,7 @@ const UserMutation = require("./User/UserMutation");
 const Mutation = {
 	...MessageMutation,
 	...UserMutation,
+
 	deleteManyGenres: forwardTo("db"),
 	async signup(parent, args, { db, res }, info) {
 		args.email = args.email.toLowerCase();
