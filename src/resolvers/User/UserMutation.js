@@ -18,7 +18,7 @@ module.exports = {
 		// check if user to block exist
 		if (!blockedUser) throw new Error("User to block does not exist");
 
-		// query current user
+		// query current user's liked
 		const currentUser = await db.query.user(
 			{
 				where: {
@@ -202,7 +202,7 @@ module.exports = {
 			subject: `Report User ID: ${id}`,
 			html: report(`User Reported for Inappropriate Behavior
 		  \n\n
-      The reporting User's account of the problem is as follows: 
+      The reporting User (ID: ${userId}) account of the problem is as follows: 
       \n
       "${message}"`)
 		});
