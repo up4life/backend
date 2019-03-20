@@ -11,9 +11,8 @@ const { isAuth, populateUser } = require("./src/middleware/index");
 
 const apolloServer = new ApolloServer({
 	schema,
-	context: ({ req, res }) => ({
+	context: ({ req }) => ({
 		...req,
-		...res,
 		db: bindings
 	}),
 	playground: true,
@@ -51,7 +50,7 @@ app.use(express.json());
 app.use(isAuth);
 app.use(populateUser);
 
-apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/graphql" });
+apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
 var server;
 if (config.ssl) {
