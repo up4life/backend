@@ -46,7 +46,8 @@ const Mutation = {
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year cookie
+			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie
+			path: "/graphql"
 		});
 
 		return user;
@@ -91,7 +92,8 @@ const Mutation = {
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year long cookie bc why not. FIGHT ME
+			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
+			path: "/graphql"
 		});
 
 		return { token, user };
@@ -109,7 +111,8 @@ const Mutation = {
 		// attach token to cookie even if that seems kinda obvious
 		res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year long cookie bc why not. FIGHT ME
+			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
+			path: "/graphql"
 		});
 
 		return user;
