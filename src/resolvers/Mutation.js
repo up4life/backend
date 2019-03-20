@@ -448,14 +448,14 @@ const Mutation = {
 			return { message: "Phone verification code sent!" };
 		});
 	},
-	checkVerify(parent, args, { user, db }, info) {
+	async checkVerify(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to update your profile!");
 
 		authy.phones().verification_check(args.phone, "1", args.code, async (err, res) => {
 			if (err) {
 				throw new Error("Phone verification unsuccessful");
 			}
-			let user = await db.mutation.updateUser({
+			let updatedUser = await db.mutation.updateUser({
 				where: { id: user.id },
 				data: { verified: true }
 			});
