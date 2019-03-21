@@ -412,7 +412,7 @@ const Mutation = {
 		);
 		const event = await db.event({ where: { id: eventId } }, `{attending {id}}`);
 		if (event.attending.length === 0) {
-			await db.mutation.deleteEvent({ where: { id: eventId } });
+			await db.deleteEvent({ where: { id: eventId } });
 		}
 
 		return updatedUser;
