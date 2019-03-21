@@ -20,23 +20,18 @@ const apolloServer = new ApolloServer({
 });
 
 const corsConfig = {
-	origin: ["http://localhost:3000", "https://www.up4.life"],
+	origin: [
+		"http://localhost:3000",
+		"https://www.up4.life",
+		"https://up4lifee.herokuapp.com",
+		"*.herokuapp.com"
+	],
 	credentials: true
 };
-// const configurations = {
-// 	production: {
-// 		ssl: false,
-// 		port: process.env.PORT || 4000,
-// 		hostname: "api.up4.life"
-// 	},
-// 	development: { ssl: false, port: process.env.PORT || 4000, hostname: "localhost" }
-// };
 
-// const environment = process.env.NODE_ENV || "production";
-// const config = configurations[environment];
 const app = express();
 
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -47,6 +42,6 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
 const server = http.createServer(app);
 
-// apolloServer.installSubscriptionHandlers(server);
+apolloServer.installSubscriptionHandlers(server);
 
-server.listen();
+server.listen(process.env.PORT || 4000).then(console.log("woo server uppp"));
