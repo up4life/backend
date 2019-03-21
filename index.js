@@ -32,12 +32,21 @@ const corsConfig = {
 
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.json());
+app.use(
+	"*",
+	express.urlencoded({ extended: true }),
+	cookieParser(),
+	express.json(),
+	isAuth,
+	populateUser
+);
 
-app.use(isAuth);
-app.use(populateUser);
+// app.use(express.urlencoded({ extended: true }));
+// app.use(cookieParser());
+// app.use(express.json());
+
+// app.use(isAuth);
+// app.use(populateUser);
 
 apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
