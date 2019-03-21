@@ -1,7 +1,9 @@
 {
 	"version": 2,
 	"name": "up4api",
-	"public": true,
+	"env": {
+		"NODE_ENV": "production"
+	},
 	"builds": [
 		{
 			"src": "index.js",
