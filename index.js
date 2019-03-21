@@ -44,4 +44,6 @@ const server = http.createServer(app);
 
 apolloServer.installSubscriptionHandlers(server);
 
-server.listen(process.env.PORT || 4000).then(console.log("woo server uppp"));
+server.listen(process.env.PORT || 4000, () => {
+	console.log("woo server uppp");
+});
