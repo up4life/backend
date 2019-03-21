@@ -10,5 +10,11 @@
 			"use": "@now/node-server"
 		}
 	],
+	"routes": [
+		{
+			"src": "/.*",
+			"dest": "index.js"
+		}
+	],
 	"alias": ["api.up4.life"]
 }
