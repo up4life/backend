@@ -5,8 +5,11 @@
 	"builds": [
 		{
 			"src": "index.js",
-			"use": "@now/node-server"
+			"use": "@now/node"
 		}
 	],
-	"alias": ["api.up4.life"]
+	"alias": ["api.up4.life"],
+	"config": {
+		"maxLambdaSize": "20mb"
+	}
 }
