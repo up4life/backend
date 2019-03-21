@@ -9,7 +9,6 @@
 		}
 	],
 	"alias": ["api.up4.life"],
-	"config": {
-		"maxLambdaSize": "20mb"
-	}
+
+	"maxLambdaSize": "20mb"
 }
