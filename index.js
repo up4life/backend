@@ -47,6 +47,6 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
 const server = http.createServer(app);
 
-apolloServer.installSubscriptionHandlers(server);
+// apolloServer.installSubscriptionHandlers(server);
 
 server.listen();
