@@ -49,6 +49,4 @@ const server = http.createServer(app);
 
 apolloServer.installSubscriptionHandlers(server);
 
-server.listen("blah", () => {
-	console.log("🚀 Server ready");
-});
+server.listen();
