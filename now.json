@@ -1,0 +1,12 @@
+{
+	"version": 2,
+	"name": "up4api",
+	"public": true,
+	"builds": [
+		{
+			"src": "index.js",
+			"use": "@now/node-server"
+		}
+	],
+	"alias": ["api.up4.life"]
+}

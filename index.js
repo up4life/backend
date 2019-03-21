@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "./.env" });
+// require("dotenv").config({ path: "./.env" });
 const { ApolloServer } = require("apollo-server-express");
 const cookieParser = require("cookie-parser");
 const express = require("express");
@@ -20,31 +20,23 @@ const apolloServer = new ApolloServer({
 });
 
 const corsConfig = {
-	origin: [
-		// "https://up4lifee.herokuapp.com",
-		// "/.herokuapp.com$/",
-		"http://localhost:3000",
-		// "www.up4.life",
-		"https://www.up4.life"
-		// "https://up4.life",
-		// "up4.life"
-	],
+	origin: ["http://localhost:3000", "https://www.up4.life"],
 	credentials: true
 };
-const configurations = {
-	production: {
-		ssl: false,
-		port: process.env.PORT || 4000,
-		hostname: "api.up4.life"
-	},
-	development: { ssl: false, port: process.env.PORT || 4000, hostname: "localhost" }
-};
+// const configurations = {
+// 	production: {
+// 		ssl: false,
+// 		port: process.env.PORT || 4000,
+// 		hostname: "api.up4.life"
+// 	},
+// 	development: { ssl: false, port: process.env.PORT || 4000, hostname: "localhost" }
+// };
 
-const environment = process.env.NODE_ENV || "production";
-const config = configurations[environment];
+// const environment = process.env.NODE_ENV || "production";
+// const config = configurations[environment];
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -57,11 +49,6 @@ const server = http.createServer(app);
 
 apolloServer.installSubscriptionHandlers(server);
 
-server.listen(process.env.PORT || 4000, () => {
-	console.log(
-		"🚀 Server ready at",
-		`http${config.ssl ? "s" : ""}://${config.hostname}:${process.env.PORT || 4000}${
-			apolloServer.graphqlPath
-		}`
-	);
+server.listen("blah", () => {
+	console.log("🚀 Server ready");
 });
