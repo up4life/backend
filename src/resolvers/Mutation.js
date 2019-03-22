@@ -47,7 +47,8 @@ const Mutation = {
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year cookie
+			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie
+			domain: ".up4.life"
 		});
 
 		return user;
@@ -90,7 +91,8 @@ const Mutation = {
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year long cookie bc why not. FIGHT ME
+			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
+			domain: ".up4.life"
 		});
 
 		return { token, user };
@@ -108,7 +110,8 @@ const Mutation = {
 
 		res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year long cookie bc why not. FIGHT ME
+			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
+			domain: ".up4.life"
 		});
 
 		return user;
@@ -232,7 +235,8 @@ const Mutation = {
 
 		res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365
+			maxAge: 1000 * 60 * 60 * 24 * 365,
+			domain: ".up4.life"
 		});
 		return updatedUser;
 	},
@@ -340,7 +344,8 @@ const Mutation = {
 		// put new token onto cookie
 		res.cookie("token", token, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365
+			maxAge: 1000 * 60 * 60 * 24 * 365,
+			domain: ".up4.life"
 		});
 		return updatedUser;
 	},
