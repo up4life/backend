@@ -32,6 +32,9 @@ const corsConfig = {
 };
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(express.json());
 
 apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
@@ -46,10 +49,6 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 
 // app.use("/", isAuth);
 // app.use("/", populateUser);
-
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.json());
 
 app.use(isAuth);
 app.use(populateUser);
