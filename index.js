@@ -23,6 +23,7 @@ const corsConfig = {
 	origin: [
 		"http://localhost:3000",
 		"https://www.up4.life",
+		"https://up4.life",
 		"https://up4lifee.herokuapp.com",
 		"*.herokuapp.com",
 		"http://up4lifee.herokuapp.com"
