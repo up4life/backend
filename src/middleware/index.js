@@ -5,8 +5,8 @@ module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
 		const { cookie } = req.headers;
-		console.log(res.cookies, "req.cookies hereee");
-		console.log(req.headers, "req.cookies hereee");
+		console.log(res.req, "req.cookies hereee");
+		console.log(res.locals, "req.cookies hereee");
 		console.log(Object.keys(res), "req.cookies hereee");
 
 		if (token) {
