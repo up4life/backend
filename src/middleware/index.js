@@ -6,6 +6,8 @@ module.exports = {
 		const { token } = req.cookies;
 		const { cookie } = req.headers;
 		console.log(req.cookies, "req.cookies hereee");
+		console.log(req.headers.cookie, "req.cookies hereee");
+		console.log(Object.keys(req), "req.cookies hereee");
 
 		if (token) {
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
@@ -18,7 +20,7 @@ module.exports = {
 			return next();
 		}
 
-		return next();
+		next();
 	},
 
 	populateUser: async function(req, res, next) {
@@ -30,6 +32,6 @@ module.exports = {
 		);
 		req.user = user;
 
-		return next();
+		next();
 	}
 };

@@ -35,8 +35,8 @@ const app = express();
 app.use(
 	"*",
 	// express.urlencoded({ extended: true }),
-	cookieParser()
-	// express.json(),
+	cookieParser(),
+	express.json()
 	// isAuth,
 	// populateUser
 );
