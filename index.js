@@ -32,6 +32,9 @@ const corsConfig = {
 };
 
 const app = express();
+
+app.set("trust proxy", 1);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
