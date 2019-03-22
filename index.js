@@ -36,13 +36,13 @@ app.use(
 	"*",
 	// express.urlencoded({ extended: true }),
 	cookieParser(),
-	express.json()
-	// isAuth,
-	// populateUser
+	express.json(),
+	isAuth,
+	populateUser
 );
 
-app.use("/", isAuth);
-app.use("/", populateUser);
+// app.use("/", isAuth);
+// app.use("/", populateUser);
 
 // app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
