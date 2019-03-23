@@ -46,7 +46,7 @@ const Mutation = {
 
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		res.cookie("token", token, {
-			// httpOnly: true,
+			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie
 			domain: ".up4.life"
 			// secure: true
@@ -91,7 +91,7 @@ const Mutation = {
 		const session = await createUserToken(args, ctx);
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		res.cookie("token", token, {
-			// httpOnly: true,
+			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
 			domain: ".up4.life"
 			// secure: true
@@ -111,7 +111,7 @@ const Mutation = {
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 
 		res.cookie("token", token, {
-			// httpOnly: true,
+			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
 			domain: ".up4.life"
 			// secure: true
