@@ -26,7 +26,7 @@ const corsConfig = {
 		"https://up4.life",
 		"https://up4lifee.herokuapp.com",
 		"*.herokuapp.com",
-		"http://up4lifee.herokuapp.com"
+		"https://up4.holdeelocks.now.sh"
 	],
 	credentials: true
 };
