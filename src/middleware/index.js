@@ -1,13 +1,13 @@
-const jwt = require("jsonwebtoken");
-const { bindings } = require("../db");
+const jwt = require('jsonwebtoken');
+const { bindings } = require('../db');
 
 module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
 		const { cookie } = req.headers;
-
+		console.log(Object.keys(req), 'req keys');
 		if (cookie && !token) {
-			console.log(cookie, "cookie here/no token");
+			console.log(cookie, 'cookie here/no token');
 			// console.log(token, "token here");
 			// const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
 			// req.userId = userId;
@@ -15,8 +15,9 @@ module.exports = {
 		}
 
 		if (token) {
-			console.log(cookie, "cookie here");
+			console.log(cookie, 'cookie here');
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
+
 			req.userId = userId;
 			// return next();
 		}
@@ -29,10 +30,10 @@ module.exports = {
 
 		const user = await bindings.query.user(
 			{ where: { id: req.userId } },
-			"{ id, email, firstName, lastName, img { img_url }, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}"
+			'{ id, email, firstName, lastName, img { img_url }, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}',
 		);
 		req.user = user;
 
 		next();
-	}
+	},
 };
