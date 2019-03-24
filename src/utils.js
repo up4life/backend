@@ -10,7 +10,7 @@ module.exports = {
 			if (existingEvent !== -1) {
 				events[existingEvent].times.push(ev.dates.start.dateTime);
 			} else {
-				let [dbEvent] = await db.events(
+				let [dbEvent] = await db.bindings.query.events(
 					{
 						where: {
 							AND: [
@@ -244,7 +244,7 @@ module.exports = {
 
 	async getScore(currentUserId, matchingUserId, db) {
 		// events that both users have in common
-		const sharedEvents = await db.events({
+		const sharedEvents = await db.bindings.query.events({
 			where: {
 				AND: [
 					{
@@ -266,7 +266,7 @@ module.exports = {
 		eventScore = eventScore > 5000 ? 5000 : eventScore;
 
 		// query current user events genre and current user interests
-		const currentUser = await db.users(
+		const currentUser = await db.bindings.query.users(
 			{
 				where: {
 					id: currentUserId
@@ -284,7 +284,7 @@ module.exports = {
 		}, []);
 
 		// query matching user events genre and matching user interests
-		const matchingUser = await db.users(
+		const matchingUser = await db.bindings.query.users(
 			{
 				where: {
 					id: matchingUserId

@@ -5,7 +5,7 @@ const seed = async () => {
 	Promise.all(
 		genres.map(async genre => {
 			try {
-				const response = await db.createGenre({
+				const response = await db.bindings.mutation.createGenre({
 					data: {
 						...genre
 					}

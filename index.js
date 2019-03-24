@@ -5,14 +5,14 @@ const express = require("express");
 const http = require("http");
 
 const schema = require("./src/schema");
-const { bindings } = require("./src/db");
+const db = require("./src/db");
 const { isAuth, populateUser } = require("./src/middleware/index");
 
 const apolloServer = new ApolloServer({
 	schema,
 	context: ({ req }) => ({
 		...req,
-		db: { ...bindings.query, ...bindings.mutation, subscription: bindings.subscription }
+		db
 	}),
 	playground: true,
 	introspection: true,

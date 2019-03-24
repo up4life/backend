@@ -2,14 +2,14 @@ module.exports = {
 	async getSharedEvents(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to use this feature!");
 
-		const userToMatch = await db.users({
+		const userToMatch = await db.bindings.query.users({
 			where: {
 				id: args.userToMatchId
 			}
 		});
 		if (!userToMatch) throw new Error("Cannot find the User To Macth!");
 
-		return (sharedEvent = await db.events(
+		return (sharedEvent = await db.bindings.query.events(
 			{
 				where: {
 					AND: [
@@ -34,7 +34,7 @@ module.exports = {
 
 		const userEventId = user.events.map(event => event.id);
 
-		const matches = await db.users({
+		const matches = await db.bindings.query.users({
 			where: {
 				AND: [
 					{ id_not: user.id },
@@ -51,7 +51,7 @@ module.exports = {
 		});
 
 		const getScore = async userId => {
-			const sharedEvent = await db.events({
+			const sharedEvent = await db.bindings.query.events({
 				where: {
 					AND: [
 						{
@@ -79,7 +79,7 @@ module.exports = {
 	async getLikedByList(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to use this feature!");
 
-		return db.users(
+		return db.bindings.query.users(
 			{
 				where: {
 					liked_some: {
