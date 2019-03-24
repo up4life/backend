@@ -8,6 +8,7 @@ module.exports = {
 
 		if (cookie) {
 			console.log(cookie, "cookie here");
+			console.log(token, "token here");
 			const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
 			req.userId = userId;
 			return next();
