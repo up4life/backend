@@ -6,14 +6,16 @@ module.exports = {
 		const { token } = req.cookies;
 		const { cookie } = req.headers;
 
-		if (token) {
-			const { userId } = jwt.verify(token, process.env.APP_SECRET);
+		if (cookie) {
+			console.log(cookie, "cookie here");
+			const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
 			req.userId = userId;
 			return next();
 		}
 
-		if (cookie) {
-			console.log(cookie, "cookie here");
+		if (token) {
+			const { userId } = jwt.verify(token, process.env.APP_SECRET);
+			req.userId = userId;
 			return next();
 		}
 
