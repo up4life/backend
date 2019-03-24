@@ -7,7 +7,7 @@ module.exports = {
 		const { cookie } = req.headers;
 
 		if (cookie && !token) {
-			console.log(cookie, "cookie here");
+			console.log(cookie, "cookie here/no token");
 			// console.log(token, "token here");
 			// const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
 			// req.userId = userId;
@@ -18,7 +18,7 @@ module.exports = {
 			console.log(cookie, "cookie here");
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 			req.userId = userId;
-			return next();
+			// return next();
 		}
 
 		next();
