@@ -5,6 +5,7 @@ module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
 		const { cookie } = req.headers;
+		console.log('ohai', req);
 		console.log('req.body', req.body, 'req._body', req._body);
 		if (cookie && !token) {
 			console.log(cookie, 'cookie here/no token');
