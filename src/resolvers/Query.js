@@ -28,8 +28,8 @@ const Query = {
 	},
 	async currentUser(parent, args, { userId, db }, info) {
 		// check if there is a current user ID
-		console.log("inside currentUser query");
-		console.log(userId, "userId current user");
+		// console.log("inside currentUser query");
+		// console.log(userId, "userId current user");
 		if (!userId) {
 			return null;
 		}

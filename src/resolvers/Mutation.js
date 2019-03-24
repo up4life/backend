@@ -49,7 +49,6 @@ const Mutation = {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie
 			domain: "up4.life"
-			// secure: true
 		});
 
 		return user;
@@ -94,7 +93,6 @@ const Mutation = {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
 			domain: "up4.life"
-			// secure: true
 		});
 
 		return { token, user };
@@ -114,7 +112,6 @@ const Mutation = {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
 			domain: "up4.life"
-			// secure: true
 		});
 
 		return user;
@@ -240,7 +237,6 @@ const Mutation = {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365,
 			domain: "up4.life"
-			// secure: true
 		});
 		return updatedUser;
 	},
@@ -350,7 +346,6 @@ const Mutation = {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365,
 			domain: "up4.life"
-			// secure: true
 		});
 		return updatedUser;
 	},
@@ -422,7 +417,7 @@ const Mutation = {
 		);
 		const event = await db.bindings.query.event({ where: { id: eventId } }, `{attending {id}}`);
 		if (event.attending.length === 0) {
-			await db.deleteEvent({ where: { id: eventId } });
+			await db.bindings.mutation.deleteEvent({ where: { id: eventId } });
 		}
 
 		return updatedUser;
