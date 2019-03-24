@@ -32,7 +32,7 @@ const createUserToken = async (args, ctx) => {
 	ctx.res.cookie("session", sessionCookie, {
 		maxAge: 60 * 60 * 24 * 5 * 1000,
 		httpOnly: true,
-		domain: "www.up4.life"
+		domain: ".up4.life"
 		// secure: true
 	});
 

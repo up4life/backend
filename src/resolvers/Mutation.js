@@ -48,7 +48,7 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie
-			domain: "www.up4.life"
+			domain: ".up4.life"
 			// secure: true
 		});
 
@@ -93,7 +93,7 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
-			domain: "www.up4.life"
+			domain: ".up4.life"
 			// secure: true
 		});
 
@@ -113,7 +113,7 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
-			domain: "www.up4.life"
+			domain: ".up4.life"
 			// secure: true
 		});
 
@@ -239,7 +239,7 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365,
-			domain: "www.up4.life"
+			domain: ".up4.life"
 			// secure: true
 		});
 		return updatedUser;
