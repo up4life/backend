@@ -351,23 +351,26 @@ const Mutation = {
 	},
 	async addEvent(parent, { event }, { user, db }, info) {
 		if (!user) throw new Error("You must be signed in to add an event.");
+
+		console.log(user, "user obj in addEvent");
 		if (user.permissions === "FREE" && user.events.length >= 10)
 			throw new Error("You have reached maximum saved events for FREE account.");
 
-		const [existingEvents] = await db.bindings.query.events({
+		const [existingEvent] = await db.bindings.query.events({
 			where: {
 				tmID: event.tmID
 			}
 		});
 		let eventId = -1;
-		if (existingEvents) {
-			eventId = existingEvents.id;
+		if (existingEvent) {
+			eventId = existingEvent.id;
 
 			const [alreadySaved] = user.events.filter(ev => ev.id === eventId);
 			if (alreadySaved) {
 				throw new Error("You've already saved that event!");
 			}
 		}
+
 		return db.bindings.mutation.upsertEvent(
 			{
 				where: {
@@ -402,19 +405,16 @@ const Mutation = {
 	async deleteEvent(parent, { eventId }, { user, db }, info) {
 		if (!user) throw new Error("You must be signed in to add delete an event.");
 
-		const updatedUser = await db.bindings.mutation.updateUser(
-			{
-				where: { id: user.id },
-				data: {
-					events: {
-						disconnect: {
-							id: eventId // remove event from user's events and remove user from event's attending
-						}
+		const updatedUser = await db.bindings.mutation.updateUser({
+			where: { id: user.id },
+			data: {
+				events: {
+					disconnect: {
+						id: eventId // remove event from user's events and remove user from event's attending
 					}
 				}
-			},
-			info
-		);
+			}
+		});
 		const event = await db.bindings.query.event({ where: { id: eventId } }, `{attending {id}}`);
 		if (event.attending.length === 0) {
 			await db.bindings.mutation.deleteEvent({ where: { id: eventId } });
