@@ -42,13 +42,13 @@ module.exports = {
 	},
 	myMessage: {
 		async subscribe(parent, { chatId }, { db }, info) {
-			return db.prisma.subscription.directMessage(
+			return db.prisma.subscription.chat(
 				{
 					where: {
 						node: {
-							chat: {
-								id: chatId
-							}
+							// chat: {
+							id: chatId
+							// }
 						}
 					}
 				},
