@@ -124,19 +124,17 @@ const Mutation = {
 		// });
 		res.clearCookie("token", {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
 			domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
 		});
 		res.clearCookie("session", {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
 			domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
 		});
-		res.clearCookie("userId", {
-			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
-			domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
-		});
+		// res.clearCookie("userId", {
+		// 	httpOnly: true,
+		// 	domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
+		// });
+		console.log(res.cookies, "response cookies");
 		return { message: "Goodbye!" };
 	},
 	async requestReset(parent, { email }, { db }, info) {
