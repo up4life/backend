@@ -10,12 +10,12 @@ const Query = {
 	...MessageQuery,
 	...UserQuery,
 	genres(parent, args, { db }, info) {
-		return db.bindings.query.genres();
+		return db.prisma.query.genres();
 	},
 	async userEvents(parent, args, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to use this feature!");
 
-		return db.bindings.query.events(
+		return db.prisma.query.events(
 			{
 				where: {
 					attending_some: {
@@ -34,23 +34,23 @@ const Query = {
 			return null;
 		}
 
-		let currentUser = await db.bindings.query.user(
+		return db.prisma.query.user(
 			{
 				where: { id: userId }
 			},
 			info
 		);
 
-		if (!currentUser) {
-			currentUser = await db.prisma.query.user(
-				{
-					where: { id: userId }
-				},
-				info
-			);
-		}
+		// if (!currentUser) {
+		// 	currentUser = await db.prisma.query.user(
+		// 		{
+		// 			where: { id: userId }
+		// 		},
+		// 		info
+		// 	);
+		// }
 
-		return currentUser;
+		// return currentUser;
 	},
 	async user(parent, args, { userId, db }, info) {
 		let score = 0;
@@ -58,7 +58,7 @@ const Query = {
 			score = await getScore(userId, args.where.id, db);
 		}
 
-		const user = await db.bindings.query.user(
+		const user = await db.prisma.query.user(
 			{
 				...args
 			},
@@ -184,7 +184,7 @@ const Query = {
 	async getRemainingDates(parent, args, { userId, db }, info) {
 		if (!userId) throw new Error("You must be signed in to access this app.");
 
-		const user = await db.bindings.query.user(
+		const user = await db.prisma.query.user(
 			{ where: { id: userId } },
 			`
 				{id permissions events {id}}
@@ -208,7 +208,7 @@ const Query = {
 	},
 
 	async remainingMessages(parent, args, { user, db }, info) {
-		const sentMessages = await db.bindings.query.directMessages({
+		const sentMessages = await db.prisma.query.directMessages({
 			where: {
 				AND: [{ from: { id: user.id } }, { createdAt_gte: moment().startOf("isoWeek") }]
 			}

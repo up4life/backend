@@ -59,6 +59,7 @@ type Chat {
 	id: ID! @unique
 	users: [User!]!
 	messages: [DirectMessage!]!
+	typing: User
 }
 
 type DirectMessage {

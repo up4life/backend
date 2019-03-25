@@ -1,7 +1,7 @@
 module.exports = {
 	myChat: {
 		subscribe(parent, { id }, { db }, info) {
-			return db.bindings.subscription.chat(
+			return db.prisma.subscription.chat(
 				{
 					where: {
 						AND: [
@@ -24,7 +24,7 @@ module.exports = {
 	},
 	myMessages: {
 		async subscribe(parent, { id }, { db }, info) {
-			return db.bindings.subscription.directMessage(
+			return db.prisma.subscription.directMessage(
 				{
 					where: {
 						node: {
@@ -42,7 +42,7 @@ module.exports = {
 	},
 	myMessage: {
 		async subscribe(parent, { chatId }, { db }, info) {
-			return db.bindings.subscription.directMessage(
+			return db.prisma.subscription.directMessage(
 				{
 					where: {
 						node: {

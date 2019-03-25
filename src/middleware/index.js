@@ -33,21 +33,13 @@ const userObject = `{
 module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
-		const { cookie } = req.headers;
 
 		if (token) {
-			// console.log(cookie, "cookie here");
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 			req.userId = userId;
 		}
 
 		next();
-		// console.log("ohai", req);
-		// console.log("req.body", req.body, "req._body", req._body);
-
-		// if (cookie && !token) {
-		// 	console.log(cookie, "cookie here/no token");
-		// }
 	},
 
 	populateUser: async function(req, res, next) {

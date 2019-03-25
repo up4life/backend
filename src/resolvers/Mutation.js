@@ -26,7 +26,7 @@ const Mutation = {
 			throw new Error("Password must be 8 characters with at least 1 number!");
 		}
 		const password = await bcrypt.hash(args.password, 10);
-		const user = await db.bindings.mutation.createUser(
+		const user = await db.prisma.mutation.createUser(
 			{
 				data: {
 					...args,
@@ -48,7 +48,7 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie
-			domain: "up4.life"
+			domain
 		});
 
 		return user;
@@ -60,11 +60,11 @@ const Mutation = {
 		const { providerData } = await getUserRecord(uid);
 		const { email, displayName, photoURL, phoneNumber } = providerData[0];
 		// check to see if user already exists in our db
-		let user = await db.bindings.query.user({ where: { email } });
+		let user = await db.prisma.query.user({ where: { email } });
 		if (!user) {
 			let nameArray = displayName.split(" ");
 
-			user = await db.bindings.mutation.createUser(
+			user = await db.prisma.mutation.createUser(
 				{
 					data: {
 						firstName: nameArray[0],
@@ -92,13 +92,13 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
-			domain: "up4.life"
+			domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
 		});
 
 		return { token, user };
 	},
 	async signin(parent, { email, password }, { db, res }, info) {
-		const user = await db.bindings.query.user({ where: { email } });
+		const user = await db.prisma.query.user({ where: { email } });
 		if (!user) {
 			throw new Error(`No such user found for email ${email}`);
 		}
@@ -111,7 +111,7 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year long cookie bc why not. FIGHT ME
-			domain: "up4.life"
+			domain
 		});
 
 		return user;
@@ -123,7 +123,7 @@ const Mutation = {
 		return { message: "Goodbye!" };
 	},
 	async requestReset(parent, { email }, { db }, info) {
-		const user = await db.bindings.query.user({ where: { email } });
+		const user = await db.prisma.query.user({ where: { email } });
 		if (!user) {
 			throw new Error(`No such user found for email ${email}`);
 		}
@@ -132,7 +132,7 @@ const Mutation = {
 
 		const resetToken = random.toString("hex");
 		const resetTokenExpiry = Date.now() + 3600000; // 1 hr
-		const res = await db.bindings.mutation.updateUser({
+		const res = await db.prisma.mutation.updateUser({
 			where: { email },
 			data: { resetToken, resetTokenExpiry }
 		});
@@ -159,7 +159,7 @@ const Mutation = {
 	async updateDefaultImage(parent, { id }, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in!");
 
-		return db.bindings.mutation.updateUser(
+		return db.prisma.mutation.updateUser(
 			{
 				where: {
 					id: user.id
@@ -196,7 +196,7 @@ const Mutation = {
 	async updateLocation(parent, { city }, { db, user }, info) {
 		if (!user) throw new Error("You must be logged in!");
 
-		return db.bindings.mutation.updateUser(
+		return db.prisma.mutation.updateUser(
 			{
 				where: {
 					id: user.id
@@ -212,7 +212,7 @@ const Mutation = {
 		if (args.password !== args.confirmPassword) {
 			throw new Error("Passwords must match!");
 		}
-		const [user] = await db.bindings.query.users({
+		const [user] = await db.prisma.query.users({
 			where: {
 				resetToken: args.resetToken,
 				resetTokenExpiry_gte: Date.now() - 3600000 // make sure token is within 1hr limit
@@ -223,7 +223,7 @@ const Mutation = {
 		}
 		const password = await bcrypt.hash(args.password, 10);
 		// removed token and expiry fields from user once updated
-		const updatedUser = await db.bindings.mutation.updateUser({
+		const updatedUser = await db.prisma.mutation.updateUser({
 			where: { email: user.email },
 			data: {
 				password,
@@ -236,7 +236,7 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365,
-			domain: "up4.life"
+			domain
 		});
 		return updatedUser;
 	},
@@ -280,7 +280,7 @@ const Mutation = {
 		}
 
 		// Update user's permission type
-		db.bindings.mutation.updateUser({
+		db.prisma.mutation.updateUser({
 			data: {
 				permissions: args.subscription,
 				stripeSubscriptionId: subscription ? subscription.id : user.stripeSubscriptionId,
@@ -309,7 +309,7 @@ const Mutation = {
 		});
 
 		// Update user's permission type
-		return db.bindings.mutation.updateUser(
+		return db.prisma.mutation.updateUser(
 			{
 				data: {
 					permissions: "FREE",
@@ -334,7 +334,7 @@ const Mutation = {
 		if (!samePassword) throw new Error("Incorrect password, please try again.");
 		const newPassword = await bcrypt.hash(args.newPassword1, 10);
 		// update password
-		const updatedUser = await db.bindings.mutation.updateUser({
+		const updatedUser = await db.prisma.mutation.updateUser({
 			where: { id: user.id },
 			data: {
 				password: newPassword
@@ -345,18 +345,25 @@ const Mutation = {
 		res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 1000 * 60 * 60 * 24 * 365,
-			domain: "up4.life"
+			domain
 		});
 		return updatedUser;
 	},
-	async addEvent(parent, { event }, { user, db }, info) {
+	async addEvent(
+		parent,
+		{ event },
+		{
+			user,
+			db: { prisma }
+		},
+		info
+	) {
 		if (!user) throw new Error("You must be signed in to add an event.");
 
-		console.log(user, "user obj in addEvent");
 		if (user.permissions === "FREE" && user.events.length >= 10)
 			throw new Error("You have reached maximum saved events for FREE account.");
 
-		const [existingEvent] = await db.bindings.query.events({
+		const [existingEvent] = await prisma.query.events({
 			where: {
 				tmID: event.tmID
 			}
@@ -371,7 +378,7 @@ const Mutation = {
 			}
 		}
 
-		return db.bindings.mutation.upsertEvent(
+		return prisma.mutation.upsertEvent(
 			{
 				where: {
 					id: eventId
@@ -405,26 +412,26 @@ const Mutation = {
 	async deleteEvent(parent, { eventId }, { user, db }, info) {
 		if (!user) throw new Error("You must be signed in to add delete an event.");
 
-		const updatedUser = await db.bindings.mutation.updateUser({
+		const updatedUser = await db.prisma.mutation.updateUser({
 			where: { id: user.id },
 			data: {
 				events: {
 					disconnect: {
-						id: eventId // remove event from user's events and remove user from event's attending
+						id: eventId // remove event from user's and remove user from attending
 					}
 				}
 			}
 		});
-		const event = await db.bindings.query.event({ where: { id: eventId } }, `{attending {id}}`);
-		if (event.attending.length === 0) {
-			await db.bindings.mutation.deleteEvent({ where: { id: eventId } });
-		}
+		// const event = await db.prisma.query.event({ where: { id: eventId } }, `{attending {id}}`);
+		// if (event.attending.length === 0) {
+		// 	await db.prisma.mutation.deleteEvent({ where: { id: eventId } });
+		// }
 
 		return updatedUser;
 	},
 	async updateUser(parent, { data }, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to update your profile!");
-		const updated = await db.bindings.mutation.updateUser(
+		const updated = await db.prisma.mutation.updateUser(
 			{
 				where: { id: user.id },
 				data: { ...data }
@@ -437,7 +444,7 @@ const Mutation = {
 	async verifyPhone(parent, { phone }, { user, db }, info) {
 		if (!user) throw new Error("You must be logged in to update your profile!");
 
-		await db.bindings.mutation.updateUser({
+		await db.prisma.mutation.updateUser({
 			where: { id: user.id },
 			data: { phone }
 		});
@@ -457,7 +464,7 @@ const Mutation = {
 			if (err) {
 				throw new Error("Phone verification unsuccessful");
 			}
-			await db.bindings.mutation.updateUser({
+			await db.prisma.mutation.updateUser({
 				where: { id: user.id },
 				data: { verified: true }
 			});
@@ -465,7 +472,7 @@ const Mutation = {
 		});
 	},
 	async deleteUser(parent, args, { user, db }, info) {
-		await db.bindings.mutation.deleteUser({
+		await db.prisma.mutation.deleteUser({
 			where: {
 				id: user.id
 			}
@@ -473,7 +480,7 @@ const Mutation = {
 		return { message: "User deleted" };
 	},
 	async uploadImage(parent, { url }, { user, db }, info) {
-		let res = await db.bindings.mutation.createProfilePic(
+		let res = await db.prisma.mutation.createProfilePic(
 			{
 				data: {
 					default: true,
@@ -483,7 +490,7 @@ const Mutation = {
 			},
 			`{id}`
 		);
-		return db.bindings.mutation.updateUser(
+		return db.prisma.mutation.updateUser(
 			{
 				where: { id: user.id },
 				data: {

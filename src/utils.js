@@ -9,6 +9,7 @@ module.exports = {
 			let existingEvent = events.findIndex(e => e.title === ev.name);
 			if (existingEvent !== -1) {
 				events[existingEvent].times.push(ev.dates.start.dateTime);
+				// events[existingEvent].url.push(ev.url);
 			} else {
 				let [dbEvent] = await db.bindings.query.events(
 					{
@@ -29,7 +30,7 @@ module.exports = {
 				let eventInDb;
 
 				if (dbEvent) {
-					const attendee = dbEvent.attending.filter(attendee => {
+					const attendees = dbEvent.attending.filter(attendee => {
 						if (user.blocked && user.blocked.includes(attendee.id)) return false;
 						if (attendee.blocked && attendee.blocked.includes(user.id)) return false;
 						if (attendee.id === user.id) return false;
@@ -46,7 +47,7 @@ module.exports = {
 
 					eventInDb = {
 						...dbEvent,
-						attending: attendee
+						attending: attendees
 					};
 				}
 
@@ -55,6 +56,7 @@ module.exports = {
 				events.push({
 					id: eventInDb ? eventInDb.id : ev.id,
 					tmID: ev.id,
+					url: [ev.url],
 					title: ev.name,
 					city: ev._embedded.venues[0].city.name,
 					venue: ev._embedded.venues[0].name,
@@ -64,14 +66,14 @@ module.exports = {
 						: [ev.dates.start.dateTime],
 					attending: eventInDb ? eventInDb.attending : [],
 					genre: ev.classifications[0].genre ? ev.classifications[0].genre.name : null,
-					category: ev.classifications[0].segment && ev.classifications[0].segment.name
-					// info: ev.info || null,
-					// description: ev.info || null,
-					// price: {
-					// 	min: ev.priceRanges ? ev.priceRanges[0].min : "min",
-					// 	max: ev.priceRanges ? ev.priceRanges[0].max : "max",
-					// 	curr: ev.priceRanges ? ev.priceRanges[0].currency : "USD"
-					// },
+					category: ev.classifications[0].segment && ev.classifications[0].segment.name,
+					info: ev.info || null,
+					description: ev.info || null,
+					price: {
+						min: ev.priceRanges ? ev.priceRanges[0].min : "min",
+						max: ev.priceRanges ? ev.priceRanges[0].max : "max",
+						currency: ev.priceRanges ? ev.priceRanges[0].currency : "USD"
+					}
 					// location: {
 					// 	venue: ev._embedded.venues[0].name,
 					// 	address: ev._embedded.venues[0].address && ev._embedded.venues[0].address.line1,
