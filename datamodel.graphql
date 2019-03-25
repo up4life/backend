@@ -59,7 +59,7 @@ type Chat {
 	id: ID! @unique
 	users: [User!]! @relation(name: "UserChat")
 	messages: [DirectMessage!]!
-	typing: User @relation(name: "TypingUser")
+	typing: [User] @relation(name: "TypingUser")
 }
 
 type DirectMessage {
