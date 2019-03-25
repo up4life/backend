@@ -158,10 +158,10 @@ type Event {
 	url: [String]
 	description: String
 	info: String
-	price: PriceObject
+	price: PriceRange
 }
 
-type PriceObject {
+type PriceRange {
 	min: String
 	max: String
 	currency: String
