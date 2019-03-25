@@ -119,9 +119,6 @@ const Mutation = {
 		return user;
 	},
 	signout(parent, args, { res }, info) {
-		// res.removeHeader("cookie", {
-		// 	domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
-		// });
 		res.clearCookie("token", {
 			httpOnly: true,
 			domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
@@ -130,11 +127,7 @@ const Mutation = {
 			httpOnly: true,
 			domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
 		});
-		// res.clearCookie("userId", {
-		// 	httpOnly: true,
-		// 	domain: process.env.NODE_ENV === "development" ? "localhost" : "up4.life"
-		// });
-		console.log(res.cookies, "response cookies");
+
 		return { message: "Goodbye!" };
 	},
 	async requestReset(parent, { email }, { db }, info) {
