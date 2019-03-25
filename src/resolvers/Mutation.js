@@ -409,10 +409,9 @@ const Mutation = {
 			info
 		);
 	},
-	async deleteEvent(parent, { id, eventId }, { user, db }, info) {
+	async deleteEvent(parent, { eventId }, { user, db }, info) {
 		if (!user) throw new Error("You must be signed in to add delete an event.");
 
-		console.log(id, eventId, "args");
 		const updatedUser = await db.prisma.mutation.updateUser({
 			where: { id: user.id },
 			data: {
@@ -421,12 +420,14 @@ const Mutation = {
 						id: eventId // remove event from user's and remove user from attending
 					}
 				}
-			}
+			},
+			info
 		});
-		// const event = await db.prisma.query.event({ where: { id: eventId } }, `{attending {id}}`);
-		// if (event.attending.length === 0) {
-		// 	await db.prisma.mutation.deleteEvent({ where: { id: eventId } });
-		// }
+
+		const event = await db.prisma.query.event({ where: { id: eventId } }, `{attending {id}}`);
+		if (event.attending.length === 0) {
+			await db.prisma.mutation.deleteEvent({ where: { id: eventId } });
+		}
 
 		return updatedUser;
 	},

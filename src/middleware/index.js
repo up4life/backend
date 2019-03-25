@@ -23,10 +23,6 @@ const userObject = `{
   }
   events {
     id
-    tmID
-    attending {
-      id
-    }
   }
 }`;
 
