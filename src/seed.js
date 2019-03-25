@@ -12,7 +12,7 @@ const seedDatabase = async () => {
 			user.gender = user.gender.toUpperCase();
 			const password = await bcrypt.hash(user.password, 10);
 			try {
-				const response = await db.createUser({
+				const response = await db.prisma.mutation.createUser({
 					data: {
 						...user,
 						password,

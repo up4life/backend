@@ -7,7 +7,7 @@ module.exports = {
 
 		// FREE users can only send 10 messages per week
 		if (user.permissions === "FREE") {
-			const sentMessages = await db.directMessages({
+			const sentMessages = await db.prisma.query.directMessages({
 				where: {
 					AND: [{ from: { id: user.id } }, { createdAt_gte: moment().startOf("isoWeek") }]
 				}
@@ -18,7 +18,7 @@ module.exports = {
 		}
 
 		// check to see if chat between users already exists
-		let [chat] = await db.chats(
+		let [chat] = await db.prisma.query.chats(
 			{
 				where: {
 					AND: [{ users_some: { id: user.id } }, { users_some: { id: args.id } }]
@@ -29,7 +29,7 @@ module.exports = {
 		if (chat) throw new Error("Conversation between these users already exists");
 
 		// create new chat
-		chat = await db.createChat(
+		chat = await db.prisma.mutation.createChat(
 			{
 				data: {
 					users: {
@@ -51,24 +51,24 @@ module.exports = {
 
 		// FREE users can only send 20 messages per week
 		if (user.permissions === "FREE") {
-			const sentMessages = await db.directMessages({
+			const sentMessages = await db.prisma.query.directMessages({
 				where: {
 					AND: [{ from: { id: user.id } }, { createdAt_gte: moment().startOf("isoWeek") }]
 				}
 			});
 
 			if (sentMessages.length >= 20)
-				throw new Error("You have reached 20 DMs per week for FREE account.");
+				throw new Error("You have reached the 20 DM/week free account limit.");
 		}
 
-		let [chat] = await db.chats({
+		let [chat] = await db.prisma.query.chats({
 			where: {
 				AND: [{ users_some: { id: user.id } }, { users_some: { id } }]
 			}
 		});
 
 		if (!chat) {
-			return db.createChat(
+			return db.prisma.mutation.createChat(
 				{
 					data: {
 						users: { connect: [{ id: user.id }, { id }] },
@@ -86,7 +86,7 @@ module.exports = {
 				info
 			);
 		} else {
-			return db.updateChat(
+			return db.prisma.mutation.updateChat(
 				{
 					where: {
 						id: chat.id
@@ -111,14 +111,14 @@ module.exports = {
 		// simple chat delete to erase entire conversation
 		if (!user) throw new Error("You must be logged in to start a conversation!");
 
-		await db.deleteChat({
+		await db.prisma.mutation.deleteChat({
 			where: { id }
 		});
 
 		return { message: "Chat successfully erased" };
 	},
 	async updateSeenMessage(parent, { chatId }, { userId, db }, info) {
-		let updated = await db.updateManyDirectMessages({
+		let updated = await db.prisma.mutation.updateManyDirectMessages({
 			where: {
 				chat: {
 					id: chatId
@@ -132,7 +132,7 @@ module.exports = {
 				seen: true
 			}
 		});
-		return db.query.chat(
+		return db.prisma.query.chat(
 			{
 				where: { id: chatId }
 			},
@@ -142,7 +142,7 @@ module.exports = {
 	async markAllAsSeen(parent, args, { userId, user, db }, info) {
 		if (!user) throw new Error("You must be logged in to start a conversation!");
 
-		const chat = db.chat({
+		const chat = db.prisma.query.chat({
 			where: {
 				id: args.chatId
 			}
@@ -150,7 +150,7 @@ module.exports = {
 
 		if (!chat) throw new Error("Chat does not exist");
 
-		await db.updateManyDirectMessages({
+		await db.prisma.mutation.updateManyDirectMessages({
 			where: {
 				AND: [{ chat: { id: args.chatId } }, { from: { id_not: userId } }, { seen: false }]
 			},
@@ -159,7 +159,7 @@ module.exports = {
 			}
 		});
 
-		return db.updateChat({
+		return db.prisma.mutation.updateChat({
 			where: {
 				id: args.chatId
 			},

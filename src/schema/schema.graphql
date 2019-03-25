@@ -11,7 +11,7 @@ type Mutation {
 	updateDefaultImage(id: String!): User!
 	updateLocation(city: String!): User!
 	addEvent(event: AddEventInput): Event
-	deleteEvent(id: String!, eventId: String!): User!
+	deleteEvent(id: String, eventId: String!): User!
 	createOrder(token: String!, subscription: Permission!): Message
 	cancelSubscription(id: String!): User!
 	updateUser(data: UserUpdateInput!): User
@@ -123,16 +123,16 @@ type User {
 	genderPrefs: [GenderPrefs]
 	minAgePref: Int
 	maxAgePref: Int
-	events: [Event!]!
+	events: [Event!]
 	liked: [User]
 	blocked: [User]
-	createdAt: DateTime!
-	updatedAt: DateTime!
-	stripeCustomerId: String
-	stripeSubscriptionId: String
 	score: Int
 	chats: [Chat]
 	verified: Boolean
+	stripeCustomerId: String
+	stripeSubscriptionId: String
+	createdAt: DateTime!
+	updatedAt: DateTime!
 }
 
 type AllEvents {
@@ -155,6 +155,16 @@ type Event {
 	image_url: String
 	genre: String
 	category: String
+	url: [String]
+	description: String
+	info: String
+	price: PriceRange
+}
+
+type PriceRange {
+	min: String
+	max: String
+	currency: String
 }
 
 type Location {

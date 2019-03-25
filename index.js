@@ -5,18 +5,18 @@ const express = require("express");
 const http = require("http");
 
 const schema = require("./src/schema");
-const { bindings } = require("./src/db");
+const db = require("./src/db");
 const { isAuth, populateUser } = require("./src/middleware/index");
 
 const apolloServer = new ApolloServer({
 	schema,
 	context: ({ req }) => ({
 		...req,
-		db: { ...bindings.query, ...bindings.mutation, subscription: bindings.subscription }
+		db
 	}),
 	playground: true,
 	introspection: true,
-	debug: process.env.NODE_ENV === "development"
+	debug: true
 });
 
 const corsConfig = {
@@ -33,13 +33,20 @@ const corsConfig = {
 
 const app = express();
 
-// app.set("trust proxy", true);
-
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(isAuth);
 app.use(populateUser);
+
+const errorHandler = (err, req, res, next) => {
+	if (res.headersSent) {
+		return next(err);
+	}
+	const { status } = err;
+	res.status(status).json(err);
+};
+app.use(errorHandler);
 
 apolloServer.applyMiddleware({ app, cors: corsConfig, path: "/" });
 

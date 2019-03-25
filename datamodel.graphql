@@ -27,49 +27,50 @@ enum GenderPrefs {
 
 type User {
 	id: ID! @unique
+	email: String! @unique
 	firstName: String!
 	lastName: String!
 	password: String!
 	gender: Gender
 	dob: String
 	location: String
-	email: String! @unique
-	phone: String @unique
 	biography: String
+	phone: String @unique
+	permissions: Permission!
+	genderPrefs: [GenderPrefs]
+	verified: Boolean @default(value: "false")
 	img: [ProfilePic!]! @relation(name: "UserImage", onDelete: CASCADE)
-	resetToken: String
-	resetTokenExpiry: Float
 	interests: [Genre]
 	events: [Event!]!
-	genderPrefs: [GenderPrefs]
 	minAgePref: Int
 	maxAgePref: Int
-	permissions: Permission!
-	createdAt: DateTime!
-	updatedAt: DateTime!
-	stripeCustomerId: String
-	stripeSubscriptionId: String
+	chats: [Chat!]! @relation(name: "UserChat")
 	liked: [User!]! @relation(name: "LikedUser", onDelete: CASCADE)
 	blocked: [User!]! @relation(name: "BlockedUser", onDelete: CASCADE)
-	chats: [Chat!]!
-	verified: Boolean @default(value: "false")
+	resetToken: String
+	resetTokenExpiry: Float
+	stripeCustomerId: String
+	stripeSubscriptionId: String
+	createdAt: DateTime!
+	updatedAt: DateTime!
 }
 
 type Chat {
 	id: ID! @unique
-	users: [User!]!
+	users: [User!]! @relation(name: "UserChat")
 	messages: [DirectMessage!]!
+	typing: User @relation(name: "TypingUser")
 }
 
 type DirectMessage {
 	id: ID! @unique
-	text: String!
-	from: User! @relation(name: "FromUser")
-	to: User! @relation(name: "ToUser")
-	createdAt: DateTime!
-	seen: Boolean @default(value: "false")
-	updatedAt: DateTime!
 	chat: Chat!
+	text: String!
+	to: User! @relation(name: "ToUser")
+	from: User! @relation(name: "FromUser")
+	seen: Boolean @default(value: "false")
+	createdAt: DateTime!
+	updatedAt: DateTime!
 }
 
 type ProfilePic {
@@ -90,6 +91,7 @@ type Event {
 	genre: String!
 	category: String!
 	attending: [User!]!
+	url: [String!]
 }
 
 type Genre {

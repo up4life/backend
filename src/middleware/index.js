@@ -1,26 +1,38 @@
-const jwt = require('jsonwebtoken');
-const { bindings } = require('../db');
+const jwt = require("jsonwebtoken");
+const { prisma } = require("../db");
+
+const userObject = `{
+  id
+  email
+  firstName
+  lastName
+  gender
+  dob
+  location
+  permissions
+  genderPrefs
+  minAgePref
+  maxAgePref
+  stripeCustomerId
+  stripeSubscriptionId
+  img {
+    img_url
+  }
+  blocked {
+    id
+  }
+  events {
+    id
+  }
+}`;
 
 module.exports = {
 	isAuth: async function(req, res, next) {
 		const { token } = req.cookies;
-		const { cookie } = req.headers;
-		console.log('ohai', req);
-		console.log('req.body', req.body, 'req._body', req._body);
-		if (cookie && !token) {
-			console.log(cookie, 'cookie here/no token');
-			// console.log(token, "token here");
-			// const { userId } = jwt.verify(cookie, process.env.APP_SECRET);
-			// req.userId = userId;
-			// return next();
-		}
 
 		if (token) {
-			console.log(cookie, 'cookie here');
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
-
 			req.userId = userId;
-			// return next();
 		}
 
 		next();
@@ -29,12 +41,9 @@ module.exports = {
 	populateUser: async function(req, res, next) {
 		if (!req.userId) return next();
 
-		const user = await bindings.query.user(
-			{ where: { id: req.userId } },
-			'{ id, email, firstName, lastName, img { img_url }, location, permissions, dob stripeCustomerId, stripeSubscriptionId, events { id }, maxAgePref, minAgePref, genderPrefs gender blocked { id }}',
-		);
+		const user = await prisma.query.user({ where: { id: req.userId } }, userObject);
 		req.user = user;
 
 		next();
-	},
+	}
 };
