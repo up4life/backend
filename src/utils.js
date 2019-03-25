@@ -11,7 +11,7 @@ module.exports = {
 				events[existingEvent].times.push(ev.dates.start.dateTime);
 				// events[existingEvent].url.push(ev.url);
 			} else {
-				let [dbEvent] = await db.bindings.query.events(
+				let [dbEvent] = await db.prisma.query.events(
 					{
 						where: {
 							AND: [
