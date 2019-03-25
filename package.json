@@ -22,9 +22,9 @@
 		"nodemailer": "^5.1.1",
 		"nodemon": "^1.18.10",
 		"postmark": "^2.2.4",
-		"prisma": "^1.29.0",
+		"prisma": "^1.29.1",
 		"prisma-binding": "^2.3.9",
-		"prisma-client-lib": "^1.29.0",
+		"prisma-client-lib": "^1.29.1",
 		"stripe": "^6.28.0"
 	},
 	"devDependencies": {

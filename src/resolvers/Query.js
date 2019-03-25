@@ -86,7 +86,7 @@ const Query = {
 			score
 		};
 	},
-	async getEvents(parent, { location, alt, page, ...args }, { user, db }, info) {
+	async getEvents(parent, { location, page, ...args }, { user, db }, info) {
 		location = location.split(",")[0].toLowerCase();
 		let cats =
 			!args.categories || !args.categories.length
@@ -131,7 +131,7 @@ const Query = {
 			total_items: data.page.totalElements,
 			page_total: data.page.totalPages,
 			page_number: pageNumber,
-			location: location
+			location
 		};
 	},
 
