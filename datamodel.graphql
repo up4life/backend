@@ -92,8 +92,6 @@ type Event {
 	category: String!
 	attending: [User!]!
 	# url: [String!]
-	# description: String
-	# info: String
 }
 
 type Genre {
