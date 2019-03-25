@@ -1,5 +1,5 @@
 # source: http://up4pr-publi-1pn1os38alx3e-1821962472.us-east-1.elb.amazonaws.com
-# timestamp: Wed Mar 20 2019 10:37:01 GMT-0500 (Central Daylight Time)
+# timestamp: Mon Mar 25 2019 00:08:42 GMT-0500 (Central Daylight Time)
 
 type AggregateChat {
   count: Int!
@@ -41,6 +41,7 @@ type Chat implements Node {
   id: ID!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   messages(where: DirectMessageWhereInput, orderBy: DirectMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [DirectMessage!]
+  typing: User
 }
 
 """A connection to a list of items."""
@@ -56,6 +57,7 @@ type ChatConnection {
 input ChatCreateInput {
   users: UserCreateManyWithoutChatsInput
   messages: DirectMessageCreateManyWithoutChatInput
+  typing: UserCreateOneInput
 }
 
 input ChatCreateManyWithoutUsersInput {
@@ -70,10 +72,12 @@ input ChatCreateOneWithoutMessagesInput {
 
 input ChatCreateWithoutMessagesInput {
   users: UserCreateManyWithoutChatsInput
+  typing: UserCreateOneInput
 }
 
 input ChatCreateWithoutUsersInput {
   messages: DirectMessageCreateManyWithoutChatInput
+  typing: UserCreateOneInput
 }
 
 """An edge in a connection."""
@@ -191,6 +195,7 @@ input ChatSubscriptionWhereInput {
 input ChatUpdateInput {
   users: UserUpdateManyWithoutChatsInput
   messages: DirectMessageUpdateManyWithoutChatInput
+  typing: UserUpdateOneInput
 }
 
 input ChatUpdateManyWithoutUsersInput {
@@ -213,10 +218,12 @@ input ChatUpdateOneRequiredWithoutMessagesInput {
 
 input ChatUpdateWithoutMessagesDataInput {
   users: UserUpdateManyWithoutChatsInput
+  typing: UserUpdateOneInput
 }
 
 input ChatUpdateWithoutUsersDataInput {
   messages: DirectMessageUpdateManyWithoutChatInput
+  typing: UserUpdateOneInput
 }
 
 input ChatUpdateWithWhereUniqueWithoutUsersInput {
@@ -290,6 +297,7 @@ input ChatWhereInput {
   messages_every: DirectMessageWhereInput
   messages_some: DirectMessageWhereInput
   messages_none: DirectMessageWhereInput
+  typing: UserWhereInput
 }
 
 input ChatWhereUniqueInput {
@@ -300,13 +308,13 @@ scalar DateTime
 
 type DirectMessage implements Node {
   id: ID!
-  text: String!
-  from: User!
-  to: User!
-  createdAt: DateTime!
-  seen: Boolean
-  updatedAt: DateTime!
   chat: Chat!
+  text: String!
+  to: User!
+  from: User!
+  seen: Boolean
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 """A connection to a list of items."""
@@ -322,9 +330,9 @@ type DirectMessageConnection {
 input DirectMessageCreateInput {
   text: String!
   seen: Boolean
-  from: UserCreateOneInput!
-  to: UserCreateOneInput!
   chat: ChatCreateOneWithoutMessagesInput!
+  to: UserCreateOneInput!
+  from: UserCreateOneInput!
 }
 
 input DirectMessageCreateManyWithoutChatInput {
@@ -335,8 +343,8 @@ input DirectMessageCreateManyWithoutChatInput {
 input DirectMessageCreateWithoutChatInput {
   text: String!
   seen: Boolean
-  from: UserCreateOneInput!
   to: UserCreateOneInput!
+  from: UserCreateOneInput!
 }
 
 """An edge in a connection."""
@@ -353,10 +361,10 @@ enum DirectMessageOrderByInput {
   id_DESC
   text_ASC
   text_DESC
-  createdAt_ASC
-  createdAt_DESC
   seen_ASC
   seen_DESC
+  createdAt_ASC
+  createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
 }
@@ -364,8 +372,8 @@ enum DirectMessageOrderByInput {
 type DirectMessagePreviousValues {
   id: ID!
   text: String!
-  createdAt: DateTime!
   seen: Boolean
+  createdAt: DateTime!
   updatedAt: DateTime!
 }
 
@@ -458,6 +466,10 @@ input DirectMessageScalarWhereInput {
 
   """All values not ending with the given string."""
   text_not_ends_with: String
+  seen: Boolean
+
+  """All values that are not equal to given value."""
+  seen_not: Boolean
   createdAt: DateTime
 
   """All values that are not equal to given value."""
@@ -480,10 +492,6 @@ input DirectMessageScalarWhereInput {
 
   """All values greater than or equal the given value."""
   createdAt_gte: DateTime
-  seen: Boolean
-
-  """All values that are not equal to given value."""
-  seen_not: Boolean
   updatedAt: DateTime
 
   """All values that are not equal to given value."""
@@ -550,9 +558,9 @@ input DirectMessageSubscriptionWhereInput {
 input DirectMessageUpdateInput {
   text: String
   seen: Boolean
-  from: UserUpdateOneRequiredInput
-  to: UserUpdateOneRequiredInput
   chat: ChatUpdateOneRequiredWithoutMessagesInput
+  to: UserUpdateOneRequiredInput
+  from: UserUpdateOneRequiredInput
 }
 
 input DirectMessageUpdateManyDataInput {
@@ -585,8 +593,8 @@ input DirectMessageUpdateManyWithWhereNestedInput {
 input DirectMessageUpdateWithoutChatDataInput {
   text: String
   seen: Boolean
-  from: UserUpdateOneRequiredInput
   to: UserUpdateOneRequiredInput
+  from: UserUpdateOneRequiredInput
 }
 
 input DirectMessageUpdateWithWhereUniqueWithoutChatInput {
@@ -689,6 +697,10 @@ input DirectMessageWhereInput {
 
   """All values not ending with the given string."""
   text_not_ends_with: String
+  seen: Boolean
+
+  """All values that are not equal to given value."""
+  seen_not: Boolean
   createdAt: DateTime
 
   """All values that are not equal to given value."""
@@ -711,10 +723,6 @@ input DirectMessageWhereInput {
 
   """All values greater than or equal the given value."""
   createdAt_gte: DateTime
-  seen: Boolean
-
-  """All values that are not equal to given value."""
-  seen_not: Boolean
   updatedAt: DateTime
 
   """All values that are not equal to given value."""
@@ -737,9 +745,9 @@ input DirectMessageWhereInput {
 
   """All values greater than or equal the given value."""
   updatedAt_gte: DateTime
-  from: UserWhereInput
-  to: UserWhereInput
   chat: ChatWhereInput
+  to: UserWhereInput
+  from: UserWhereInput
 }
 
 input DirectMessageWhereUniqueInput {
@@ -757,6 +765,7 @@ type Event implements Node {
   genre: String!
   category: String!
   attending(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  url: [String!]!
 }
 
 """A connection to a list of items."""
@@ -778,6 +787,7 @@ input EventCreateInput {
   genre: String!
   category: String!
   times: EventCreatetimesInput
+  url: EventCreateurlInput
   attending: UserCreateManyWithoutEventsInput
 }
 
@@ -790,6 +800,10 @@ input EventCreatetimesInput {
   set: [String!]
 }
 
+input EventCreateurlInput {
+  set: [String!]
+}
+
 input EventCreateWithoutAttendingInput {
   tmID: String!
   title: String!
@@ -799,6 +813,7 @@ input EventCreateWithoutAttendingInput {
   genre: String!
   category: String!
   times: EventCreatetimesInput
+  url: EventCreateurlInput
 }
 
 """An edge in a connection."""
@@ -843,6 +858,7 @@ type EventPreviousValues {
   city: String!
   genre: String!
   category: String!
+  url: [String!]!
 }
 
 input EventScalarWhereInput {
@@ -1224,6 +1240,7 @@ input EventUpdateInput {
   genre: String
   category: String
   times: EventUpdatetimesInput
+  url: EventUpdateurlInput
   attending: UserUpdateManyWithoutEventsInput
 }
 
@@ -1236,6 +1253,7 @@ input EventUpdateManyDataInput {
   genre: String
   category: String
   times: EventUpdatetimesInput
+  url: EventUpdateurlInput
 }
 
 input EventUpdateManyMutationInput {
@@ -1247,6 +1265,7 @@ input EventUpdateManyMutationInput {
   genre: String
   category: String
   times: EventUpdatetimesInput
+  url: EventUpdateurlInput
 }
 
 input EventUpdateManyWithoutAttendingInput {
@@ -1270,6 +1289,10 @@ input EventUpdatetimesInput {
   set: [String!]
 }
 
+input EventUpdateurlInput {
+  set: [String!]
+}
+
 input EventUpdateWithoutAttendingDataInput {
   tmID: String
   title: String
@@ -1279,6 +1302,7 @@ input EventUpdateWithoutAttendingDataInput {
   genre: String
   category: String
   times: EventUpdatetimesInput
+  url: EventUpdateurlInput
 }
 
 input EventUpdateWithWhereUniqueWithoutAttendingInput {
@@ -2540,32 +2564,32 @@ type Subscription {
 
 type User implements Node {
   id: ID!
+  email: String!
   firstName: String!
   lastName: String!
   password: String!
   gender: Gender
   dob: String
   location: String
-  email: String!
-  phone: String
   biography: String
+  phone: String
+  permissions: Permission!
+  genderPrefs: [GenderPrefs!]!
+  verified: Boolean
   img(where: ProfilePicWhereInput, orderBy: ProfilePicOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ProfilePic!]
-  resetToken: String
-  resetTokenExpiry: Float
   interests(where: GenreWhereInput, orderBy: GenreOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Genre!]
   events(where: EventWhereInput, orderBy: EventOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Event!]
-  genderPrefs: [GenderPrefs!]!
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  stripeCustomerId: String
-  stripeSubscriptionId: String
+  chats(where: ChatWhereInput, orderBy: ChatOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Chat!]
   liked(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   blocked(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
-  chats(where: ChatWhereInput, orderBy: ChatOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Chat!]
-  verified: Boolean
+  resetToken: String
+  resetTokenExpiry: Float
+  stripeCustomerId: String
+  stripeSubscriptionId: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 """A connection to a list of items."""
@@ -2583,30 +2607,30 @@ input UserCreategenderPrefsInput {
 }
 
 input UserCreateInput {
+  email: String!
   firstName: String!
   lastName: String!
   password: String!
   gender: Gender
   dob: String
   location: String
-  email: String!
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission!
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission!
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserCreategenderPrefsInput
   img: ProfilePicCreateManyWithoutUserInput
   interests: GenreCreateManyInput
   events: EventCreateManyWithoutAttendingInput
+  chats: ChatCreateManyWithoutUsersInput
   liked: UserCreateManyInput
   blocked: UserCreateManyInput
-  chats: ChatCreateManyWithoutUsersInput
 }
 
 input UserCreateManyInput {
@@ -2635,23 +2659,23 @@ input UserCreateOneWithoutImgInput {
 }
 
 input UserCreateWithoutChatsInput {
+  email: String!
   firstName: String!
   lastName: String!
   password: String!
   gender: Gender
   dob: String
   location: String
-  email: String!
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission!
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission!
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserCreategenderPrefsInput
   img: ProfilePicCreateManyWithoutUserInput
   interests: GenreCreateManyInput
@@ -2661,55 +2685,55 @@ input UserCreateWithoutChatsInput {
 }
 
 input UserCreateWithoutEventsInput {
+  email: String!
   firstName: String!
   lastName: String!
   password: String!
   gender: Gender
   dob: String
   location: String
-  email: String!
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission!
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission!
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserCreategenderPrefsInput
   img: ProfilePicCreateManyWithoutUserInput
   interests: GenreCreateManyInput
+  chats: ChatCreateManyWithoutUsersInput
   liked: UserCreateManyInput
   blocked: UserCreateManyInput
-  chats: ChatCreateManyWithoutUsersInput
 }
 
 input UserCreateWithoutImgInput {
+  email: String!
   firstName: String!
   lastName: String!
   password: String!
   gender: Gender
   dob: String
   location: String
-  email: String!
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission!
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission!
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserCreategenderPrefsInput
   interests: GenreCreateManyInput
   events: EventCreateManyWithoutAttendingInput
+  chats: ChatCreateManyWithoutUsersInput
   liked: UserCreateManyInput
   blocked: UserCreateManyInput
-  chats: ChatCreateManyWithoutUsersInput
 }
 
 """An edge in a connection."""
@@ -2724,6 +2748,8 @@ type UserEdge {
 enum UserOrderByInput {
   id_ASC
   id_DESC
+  email_ASC
+  email_DESC
   firstName_ASC
   firstName_DESC
   lastName_ASC
@@ -2736,56 +2762,54 @@ enum UserOrderByInput {
   dob_DESC
   location_ASC
   location_DESC
-  email_ASC
-  email_DESC
-  phone_ASC
-  phone_DESC
   biography_ASC
   biography_DESC
-  resetToken_ASC
-  resetToken_DESC
-  resetTokenExpiry_ASC
-  resetTokenExpiry_DESC
+  phone_ASC
+  phone_DESC
+  permissions_ASC
+  permissions_DESC
+  verified_ASC
+  verified_DESC
   minAgePref_ASC
   minAgePref_DESC
   maxAgePref_ASC
   maxAgePref_DESC
-  permissions_ASC
-  permissions_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
+  resetToken_ASC
+  resetToken_DESC
+  resetTokenExpiry_ASC
+  resetTokenExpiry_DESC
   stripeCustomerId_ASC
   stripeCustomerId_DESC
   stripeSubscriptionId_ASC
   stripeSubscriptionId_DESC
-  verified_ASC
-  verified_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
 }
 
 type UserPreviousValues {
   id: ID!
+  email: String!
   firstName: String!
   lastName: String!
   password: String!
   gender: Gender
   dob: String
   location: String
-  email: String!
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission!
   genderPrefs: [GenderPrefs!]!
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 input UserScalarWhereInput {
@@ -2837,6 +2861,46 @@ input UserScalarWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
+  email: String
+
+  """All values that are not equal to given value."""
+  email_not: String
+
+  """All values that are contained in given list."""
+  email_in: [String!]
+
+  """All values that are not contained in given list."""
+  email_not_in: [String!]
+
+  """All values less than the given value."""
+  email_lt: String
+
+  """All values less than or equal the given value."""
+  email_lte: String
+
+  """All values greater than the given value."""
+  email_gt: String
+
+  """All values greater than or equal the given value."""
+  email_gte: String
+
+  """All values containing the given string."""
+  email_contains: String
+
+  """All values not containing the given string."""
+  email_not_contains: String
+
+  """All values starting with the given string."""
+  email_starts_with: String
+
+  """All values not starting with the given string."""
+  email_not_starts_with: String
+
+  """All values ending with the given string."""
+  email_ends_with: String
+
+  """All values not ending with the given string."""
+  email_not_ends_with: String
   firstName: String
 
   """All values that are not equal to given value."""
@@ -3047,86 +3111,6 @@ input UserScalarWhereInput {
 
   """All values not ending with the given string."""
   location_not_ends_with: String
-  email: String
-
-  """All values that are not equal to given value."""
-  email_not: String
-
-  """All values that are contained in given list."""
-  email_in: [String!]
-
-  """All values that are not contained in given list."""
-  email_not_in: [String!]
-
-  """All values less than the given value."""
-  email_lt: String
-
-  """All values less than or equal the given value."""
-  email_lte: String
-
-  """All values greater than the given value."""
-  email_gt: String
-
-  """All values greater than or equal the given value."""
-  email_gte: String
-
-  """All values containing the given string."""
-  email_contains: String
-
-  """All values not containing the given string."""
-  email_not_contains: String
-
-  """All values starting with the given string."""
-  email_starts_with: String
-
-  """All values not starting with the given string."""
-  email_not_starts_with: String
-
-  """All values ending with the given string."""
-  email_ends_with: String
-
-  """All values not ending with the given string."""
-  email_not_ends_with: String
-  phone: String
-
-  """All values that are not equal to given value."""
-  phone_not: String
-
-  """All values that are contained in given list."""
-  phone_in: [String!]
-
-  """All values that are not contained in given list."""
-  phone_not_in: [String!]
-
-  """All values less than the given value."""
-  phone_lt: String
-
-  """All values less than or equal the given value."""
-  phone_lte: String
-
-  """All values greater than the given value."""
-  phone_gt: String
-
-  """All values greater than or equal the given value."""
-  phone_gte: String
-
-  """All values containing the given string."""
-  phone_contains: String
-
-  """All values not containing the given string."""
-  phone_not_contains: String
-
-  """All values starting with the given string."""
-  phone_starts_with: String
-
-  """All values not starting with the given string."""
-  phone_not_starts_with: String
-
-  """All values ending with the given string."""
-  phone_ends_with: String
-
-  """All values not ending with the given string."""
-  phone_not_ends_with: String
   biography: String
 
   """All values that are not equal to given value."""
@@ -3167,6 +3151,104 @@ input UserScalarWhereInput {
 
   """All values not ending with the given string."""
   biography_not_ends_with: String
+  phone: String
+
+  """All values that are not equal to given value."""
+  phone_not: String
+
+  """All values that are contained in given list."""
+  phone_in: [String!]
+
+  """All values that are not contained in given list."""
+  phone_not_in: [String!]
+
+  """All values less than the given value."""
+  phone_lt: String
+
+  """All values less than or equal the given value."""
+  phone_lte: String
+
+  """All values greater than the given value."""
+  phone_gt: String
+
+  """All values greater than or equal the given value."""
+  phone_gte: String
+
+  """All values containing the given string."""
+  phone_contains: String
+
+  """All values not containing the given string."""
+  phone_not_contains: String
+
+  """All values starting with the given string."""
+  phone_starts_with: String
+
+  """All values not starting with the given string."""
+  phone_not_starts_with: String
+
+  """All values ending with the given string."""
+  phone_ends_with: String
+
+  """All values not ending with the given string."""
+  phone_not_ends_with: String
+  permissions: Permission
+
+  """All values that are not equal to given value."""
+  permissions_not: Permission
+
+  """All values that are contained in given list."""
+  permissions_in: [Permission!]
+
+  """All values that are not contained in given list."""
+  permissions_not_in: [Permission!]
+  verified: Boolean
+
+  """All values that are not equal to given value."""
+  verified_not: Boolean
+  minAgePref: Int
+
+  """All values that are not equal to given value."""
+  minAgePref_not: Int
+
+  """All values that are contained in given list."""
+  minAgePref_in: [Int!]
+
+  """All values that are not contained in given list."""
+  minAgePref_not_in: [Int!]
+
+  """All values less than the given value."""
+  minAgePref_lt: Int
+
+  """All values less than or equal the given value."""
+  minAgePref_lte: Int
+
+  """All values greater than the given value."""
+  minAgePref_gt: Int
+
+  """All values greater than or equal the given value."""
+  minAgePref_gte: Int
+  maxAgePref: Int
+
+  """All values that are not equal to given value."""
+  maxAgePref_not: Int
+
+  """All values that are contained in given list."""
+  maxAgePref_in: [Int!]
+
+  """All values that are not contained in given list."""
+  maxAgePref_not_in: [Int!]
+
+  """All values less than the given value."""
+  maxAgePref_lt: Int
+
+  """All values less than or equal the given value."""
+  maxAgePref_lte: Int
+
+  """All values greater than the given value."""
+  maxAgePref_gt: Int
+
+  """All values greater than or equal the given value."""
+  maxAgePref_gte: Int
   resetToken: String
 
   """All values that are not equal to given value."""
@@ -3229,104 +3311,6 @@ input UserScalarWhereInput {
 
   """All values greater than or equal the given value."""
   resetTokenExpiry_gte: Float
-  minAgePref: Int
-
-  """All values that are not equal to given value."""
-  minAgePref_not: Int
-
-  """All values that are contained in given list."""
-  minAgePref_in: [Int!]
-
-  """All values that are not contained in given list."""
-  minAgePref_not_in: [Int!]
-
-  """All values less than the given value."""
-  minAgePref_lt: Int
-
-  """All values less than or equal the given value."""
-  minAgePref_lte: Int
-
-  """All values greater than the given value."""
-  minAgePref_gt: Int
-
-  """All values greater than or equal the given value."""
-  minAgePref_gte: Int
-  maxAgePref: Int
-
-  """All values that are not equal to given value."""
-  maxAgePref_not: Int
-
-  """All values that are contained in given list."""
-  maxAgePref_in: [Int!]
-
-  """All values that are not contained in given list."""
-  maxAgePref_not_in: [Int!]
-
-  """All values less than the given value."""
-  maxAgePref_lt: Int
-
-  """All values less than or equal the given value."""
-  maxAgePref_lte: Int
-
-  """All values greater than the given value."""
-  maxAgePref_gt: Int
-
-  """All values greater than or equal the given value."""
-  maxAgePref_gte: Int
-  permissions: Permission
-
-  """All values that are not equal to given value."""
-  permissions_not: Permission
-
-  """All values that are contained in given list."""
-  permissions_in: [Permission!]
-
-  """All values that are not contained in given list."""
-  permissions_not_in: [Permission!]
-  createdAt: DateTime
-
-  """All values that are not equal to given value."""
-  createdAt_not: DateTime
-
-  """All values that are contained in given list."""
-  createdAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  createdAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  createdAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  createdAt_lte: DateTime
-
-  """All values greater than the given value."""
-  createdAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-
-  """All values that are not equal to given value."""
-  updatedAt_not: DateTime
-
-  """All values that are contained in given list."""
-  updatedAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  updatedAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  updatedAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  updatedAt_lte: DateTime
-
-  """All values greater than the given value."""
-  updatedAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  updatedAt_gte: DateTime
   stripeCustomerId: String
 
   """All values that are not equal to given value."""
@@ -3407,10 +3391,50 @@ input UserScalarWhereInput {
 
   """All values not ending with the given string."""
   stripeSubscriptionId_not_ends_with: String
-  verified: Boolean
+  createdAt: DateTime
 
   """All values that are not equal to given value."""
-  verified_not: Boolean
+  createdAt_not: DateTime
+
+  """All values that are contained in given list."""
+  createdAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  createdAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  createdAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  createdAt_lte: DateTime
+
+  """All values greater than the given value."""
+  createdAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+
+  """All values that are not equal to given value."""
+  updatedAt_not: DateTime
+
+  """All values that are contained in given list."""
+  updatedAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  updatedAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  updatedAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  updatedAt_lte: DateTime
+
+  """All values greater than the given value."""
+  updatedAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  updatedAt_gte: DateTime
 }
 
 type UserSubscriptionPayload {
@@ -3453,30 +3477,30 @@ input UserSubscriptionWhereInput {
 }
 
 input UserUpdateDataInput {
+  email: String
   firstName: String
   lastName: String
   password: String
   gender: Gender
   dob: String
   location: String
-  email: String
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserUpdategenderPrefsInput
   img: ProfilePicUpdateManyWithoutUserInput
   interests: GenreUpdateManyInput
   events: EventUpdateManyWithoutAttendingInput
+  chats: ChatUpdateManyWithoutUsersInput
   liked: UserUpdateManyInput
   blocked: UserUpdateManyInput
-  chats: ChatUpdateManyWithoutUsersInput
 }
 
 input UserUpdategenderPrefsInput {
@@ -3484,50 +3508,50 @@ input UserUpdategenderPrefsInput {
 }
 
 input UserUpdateInput {
+  email: String
   firstName: String
   lastName: String
   password: String
   gender: Gender
   dob: String
   location: String
-  email: String
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserUpdategenderPrefsInput
   img: ProfilePicUpdateManyWithoutUserInput
   interests: GenreUpdateManyInput
   events: EventUpdateManyWithoutAttendingInput
+  chats: ChatUpdateManyWithoutUsersInput
   liked: UserUpdateManyInput
   blocked: UserUpdateManyInput
-  chats: ChatUpdateManyWithoutUsersInput
 }
 
 input UserUpdateManyDataInput {
+  email: String
   firstName: String
   lastName: String
   password: String
   gender: Gender
   dob: String
   location: String
-  email: String
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserUpdategenderPrefsInput
 }
 
@@ -3544,23 +3568,23 @@ input UserUpdateManyInput {
 }
 
 input UserUpdateManyMutationInput {
+  email: String
   firstName: String
   lastName: String
   password: String
   gender: Gender
   dob: String
   location: String
-  email: String
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserUpdategenderPrefsInput
 }
 
@@ -3593,6 +3617,15 @@ input UserUpdateManyWithWhereNestedInput {
   data: UserUpdateManyDataInput!
 }
 
+input UserUpdateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateDataInput
+  upsert: UserUpsertNestedInput
+}
+
 input UserUpdateOneRequiredInput {
   create: UserCreateInput
   connect: UserWhereUniqueInput
@@ -3608,23 +3641,23 @@ input UserUpdateOneRequiredWithoutImgInput {
 }
 
 input UserUpdateWithoutChatsDataInput {
+  email: String
   firstName: String
   lastName: String
   password: String
   gender: Gender
   dob: String
   location: String
-  email: String
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserUpdategenderPrefsInput
   img: ProfilePicUpdateManyWithoutUserInput
   interests: GenreUpdateManyInput
@@ -3634,55 +3667,55 @@ input UserUpdateWithoutChatsDataInput {
 }
 
 input UserUpdateWithoutEventsDataInput {
+  email: String
   firstName: String
   lastName: String
   password: String
   gender: Gender
   dob: String
   location: String
-  email: String
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserUpdategenderPrefsInput
   img: ProfilePicUpdateManyWithoutUserInput
   interests: GenreUpdateManyInput
+  chats: ChatUpdateManyWithoutUsersInput
   liked: UserUpdateManyInput
   blocked: UserUpdateManyInput
-  chats: ChatUpdateManyWithoutUsersInput
 }
 
 input UserUpdateWithoutImgDataInput {
+  email: String
   firstName: String
   lastName: String
   password: String
   gender: Gender
   dob: String
   location: String
-  email: String
-  phone: String
   biography: String
-  resetToken: String
-  resetTokenExpiry: Float
+  phone: String
+  permissions: Permission
+  verified: Boolean
   minAgePref: Int
   maxAgePref: Int
-  permissions: Permission
+  resetToken: String
+  resetTokenExpiry: Float
   stripeCustomerId: String
   stripeSubscriptionId: String
-  verified: Boolean
   genderPrefs: UserUpdategenderPrefsInput
   interests: GenreUpdateManyInput
   events: EventUpdateManyWithoutAttendingInput
+  chats: ChatUpdateManyWithoutUsersInput
   liked: UserUpdateManyInput
   blocked: UserUpdateManyInput
-  chats: ChatUpdateManyWithoutUsersInput
 }
 
 input UserUpdateWithWhereUniqueNestedInput {
@@ -3777,6 +3810,46 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
+  email: String
+
+  """All values that are not equal to given value."""
+  email_not: String
+
+  """All values that are contained in given list."""
+  email_in: [String!]
+
+  """All values that are not contained in given list."""
+  email_not_in: [String!]
+
+  """All values less than the given value."""
+  email_lt: String
+
+  """All values less than or equal the given value."""
+  email_lte: String
+
+  """All values greater than the given value."""
+  email_gt: String
+
+  """All values greater than or equal the given value."""
+  email_gte: String
+
+  """All values containing the given string."""
+  email_contains: String
+
+  """All values not containing the given string."""
+  email_not_contains: String
+
+  """All values starting with the given string."""
+  email_starts_with: String
+
+  """All values not starting with the given string."""
+  email_not_starts_with: String
+
+  """All values ending with the given string."""
+  email_ends_with: String
+
+  """All values not ending with the given string."""
+  email_not_ends_with: String
   firstName: String
 
   """All values that are not equal to given value."""
@@ -3987,86 +4060,6 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   location_not_ends_with: String
-  email: String
-
-  """All values that are not equal to given value."""
-  email_not: String
-
-  """All values that are contained in given list."""
-  email_in: [String!]
-
-  """All values that are not contained in given list."""
-  email_not_in: [String!]
-
-  """All values less than the given value."""
-  email_lt: String
-
-  """All values less than or equal the given value."""
-  email_lte: String
-
-  """All values greater than the given value."""
-  email_gt: String
-
-  """All values greater than or equal the given value."""
-  email_gte: String
-
-  """All values containing the given string."""
-  email_contains: String
-
-  """All values not containing the given string."""
-  email_not_contains: String
-
-  """All values starting with the given string."""
-  email_starts_with: String
-
-  """All values not starting with the given string."""
-  email_not_starts_with: String
-
-  """All values ending with the given string."""
-  email_ends_with: String
-
-  """All values not ending with the given string."""
-  email_not_ends_with: String
-  phone: String
-
-  """All values that are not equal to given value."""
-  phone_not: String
-
-  """All values that are contained in given list."""
-  phone_in: [String!]
-
-  """All values that are not contained in given list."""
-  phone_not_in: [String!]
-
-  """All values less than the given value."""
-  phone_lt: String
-
-  """All values less than or equal the given value."""
-  phone_lte: String
-
-  """All values greater than the given value."""
-  phone_gt: String
-
-  """All values greater than or equal the given value."""
-  phone_gte: String
-
-  """All values containing the given string."""
-  phone_contains: String
-
-  """All values not containing the given string."""
-  phone_not_contains: String
-
-  """All values starting with the given string."""
-  phone_starts_with: String
-
-  """All values not starting with the given string."""
-  phone_not_starts_with: String
-
-  """All values ending with the given string."""
-  phone_ends_with: String
-
-  """All values not ending with the given string."""
-  phone_not_ends_with: String
   biography: String
 
   """All values that are not equal to given value."""
@@ -4107,6 +4100,104 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   biography_not_ends_with: String
+  phone: String
+
+  """All values that are not equal to given value."""
+  phone_not: String
+
+  """All values that are contained in given list."""
+  phone_in: [String!]
+
+  """All values that are not contained in given list."""
+  phone_not_in: [String!]
+
+  """All values less than the given value."""
+  phone_lt: String
+
+  """All values less than or equal the given value."""
+  phone_lte: String
+
+  """All values greater than the given value."""
+  phone_gt: String
+
+  """All values greater than or equal the given value."""
+  phone_gte: String
+
+  """All values containing the given string."""
+  phone_contains: String
+
+  """All values not containing the given string."""
+  phone_not_contains: String
+
+  """All values starting with the given string."""
+  phone_starts_with: String
+
+  """All values not starting with the given string."""
+  phone_not_starts_with: String
+
+  """All values ending with the given string."""
+  phone_ends_with: String
+
+  """All values not ending with the given string."""
+  phone_not_ends_with: String
+  permissions: Permission
+
+  """All values that are not equal to given value."""
+  permissions_not: Permission
+
+  """All values that are contained in given list."""
+  permissions_in: [Permission!]
+
+  """All values that are not contained in given list."""
+  permissions_not_in: [Permission!]
+  verified: Boolean
+
+  """All values that are not equal to given value."""
+  verified_not: Boolean
+  minAgePref: Int
+
+  """All values that are not equal to given value."""
+  minAgePref_not: Int
+
+  """All values that are contained in given list."""
+  minAgePref_in: [Int!]
+
+  """All values that are not contained in given list."""
+  minAgePref_not_in: [Int!]
+
+  """All values less than the given value."""
+  minAgePref_lt: Int
+
+  """All values less than or equal the given value."""
+  minAgePref_lte: Int
+
+  """All values greater than the given value."""
+  minAgePref_gt: Int
+
+  """All values greater than or equal the given value."""
+  minAgePref_gte: Int
+  maxAgePref: Int
+
+  """All values that are not equal to given value."""
+  maxAgePref_not: Int
+
+  """All values that are contained in given list."""
+  maxAgePref_in: [Int!]
+
+  """All values that are not contained in given list."""
+  maxAgePref_not_in: [Int!]
+
+  """All values less than the given value."""
+  maxAgePref_lt: Int
+
+  """All values less than or equal the given value."""
+  maxAgePref_lte: Int
+
+  """All values greater than the given value."""
+  maxAgePref_gt: Int
+
+  """All values greater than or equal the given value."""
+  maxAgePref_gte: Int
   resetToken: String
 
   """All values that are not equal to given value."""
@@ -4169,104 +4260,6 @@ input UserWhereInput {
 
   """All values greater than or equal the given value."""
   resetTokenExpiry_gte: Float
-  minAgePref: Int
-
-  """All values that are not equal to given value."""
-  minAgePref_not: Int
-
-  """All values that are contained in given list."""
-  minAgePref_in: [Int!]
-
-  """All values that are not contained in given list."""
-  minAgePref_not_in: [Int!]
-
-  """All values less than the given value."""
-  minAgePref_lt: Int
-
-  """All values less than or equal the given value."""
-  minAgePref_lte: Int
-
-  """All values greater than the given value."""
-  minAgePref_gt: Int
-
-  """All values greater than or equal the given value."""
-  minAgePref_gte: Int
-  maxAgePref: Int
-
-  """All values that are not equal to given value."""
-  maxAgePref_not: Int
-
-  """All values that are contained in given list."""
-  maxAgePref_in: [Int!]
-
-  """All values that are not contained in given list."""
-  maxAgePref_not_in: [Int!]
-
-  """All values less than the given value."""
-  maxAgePref_lt: Int
-
-  """All values less than or equal the given value."""
-  maxAgePref_lte: Int
-
-  """All values greater than the given value."""
-  maxAgePref_gt: Int
-
-  """All values greater than or equal the given value."""
-  maxAgePref_gte: Int
-  permissions: Permission
-
-  """All values that are not equal to given value."""
-  permissions_not: Permission
-
-  """All values that are contained in given list."""
-  permissions_in: [Permission!]
-
-  """All values that are not contained in given list."""
-  permissions_not_in: [Permission!]
-  createdAt: DateTime
-
-  """All values that are not equal to given value."""
-  createdAt_not: DateTime
-
-  """All values that are contained in given list."""
-  createdAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  createdAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  createdAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  createdAt_lte: DateTime
-
-  """All values greater than the given value."""
-  createdAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-
-  """All values that are not equal to given value."""
-  updatedAt_not: DateTime
-
-  """All values that are contained in given list."""
-  updatedAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  updatedAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  updatedAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  updatedAt_lte: DateTime
-
-  """All values greater than the given value."""
-  updatedAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  updatedAt_gte: DateTime
   stripeCustomerId: String
 
   """All values that are not equal to given value."""
@@ -4347,10 +4340,50 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   stripeSubscriptionId_not_ends_with: String
-  verified: Boolean
+  createdAt: DateTime
 
   """All values that are not equal to given value."""
-  verified_not: Boolean
+  createdAt_not: DateTime
+
+  """All values that are contained in given list."""
+  createdAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  createdAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  createdAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  createdAt_lte: DateTime
+
+  """All values greater than the given value."""
+  createdAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+
+  """All values that are not equal to given value."""
+  updatedAt_not: DateTime
+
+  """All values that are contained in given list."""
+  updatedAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  updatedAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  updatedAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  updatedAt_lte: DateTime
+
+  """All values greater than the given value."""
+  updatedAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  updatedAt_gte: DateTime
   img_every: ProfilePicWhereInput
   img_some: ProfilePicWhereInput
   img_none: ProfilePicWhereInput
@@ -4360,15 +4393,15 @@ input UserWhereInput {
   events_every: EventWhereInput
   events_some: EventWhereInput
   events_none: EventWhereInput
+  chats_every: ChatWhereInput
+  chats_some: ChatWhereInput
+  chats_none: ChatWhereInput
   liked_every: UserWhereInput
   liked_some: UserWhereInput
   liked_none: UserWhereInput
   blocked_every: UserWhereInput
   blocked_some: UserWhereInput
   blocked_none: UserWhereInput
-  chats_every: ChatWhereInput
-  chats_some: ChatWhereInput
-  chats_none: ChatWhereInput
 }
 
 input UserWhereUniqueInput {

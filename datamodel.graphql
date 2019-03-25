@@ -44,7 +44,7 @@ type User {
 	events: [Event!]!
 	minAgePref: Int
 	maxAgePref: Int
-	chats: [Chat!]!
+	chats: [Chat!]! @relation(name: "UserChat")
 	liked: [User!]! @relation(name: "LikedUser", onDelete: CASCADE)
 	blocked: [User!]! @relation(name: "BlockedUser", onDelete: CASCADE)
 	resetToken: String
@@ -57,9 +57,9 @@ type User {
 
 type Chat {
 	id: ID! @unique
-	users: [User!]!
+	users: [User!]! @relation(name: "UserChat")
 	messages: [DirectMessage!]!
-	typing: User
+	typing: User @relation(name: "TypingUser")
 }
 
 type DirectMessage {
@@ -91,7 +91,7 @@ type Event {
 	genre: String!
 	category: String!
 	attending: [User!]!
-	# url: [String!]
+	url: [String!]
 }
 
 type Genre {
