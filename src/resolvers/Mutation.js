@@ -480,14 +480,14 @@ const Mutation = {
 			return { message: "Phone successfully verified!" };
 		});
 	},
-	async deleteUser(parent, args, { user, db }, info) {
-		await db.prisma.mutation.deleteUser({
-			where: {
-				id: user.id
-			}
-		});
-		return { message: "User deleted" };
-	},
+	// async deleteUser(parent, args, { user, db }, info) {
+	// 	await db.prisma.mutation.deleteUser({
+	// 		where: {
+	// 			id: user.id
+	// 		}
+	// 	});
+	// 	return { message: "User deleted" };
+	// },
 	async uploadImage(parent, { url }, { user, db }, info) {
 		let res = await db.prisma.mutation.createProfilePic(
 			{
