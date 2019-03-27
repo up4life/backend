@@ -481,7 +481,7 @@ const Mutation = {
 	async deleteUser(parent, args, { user, db }, info) {
 		await db.prisma.mutation.deleteUser({
 			where: {
-				id: user.id,
+				id: args.id,
 			},
 		});
 		return { message: 'User deleted' };
