@@ -141,6 +141,9 @@ type AllEvents {
 	page_count: Int
 	page_total: Int
 	page_number: Int
+	genres: [String]
+	categories: [String]
+	dates: [String]
 	location: String
 }
 
