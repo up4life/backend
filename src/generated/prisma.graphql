@@ -1,5 +1,5 @@
 # source: http://localhost:4466
-# timestamp: Sun Mar 24 2019 22:35:24 GMT-0700 (Pacific Daylight Time)
+# timestamp: Tue Mar 26 2019 21:31:47 GMT-0700 (Pacific Daylight Time)
 
 type AggregateChat {
   count: Int!
@@ -41,7 +41,7 @@ type Chat implements Node {
   id: ID!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   messages(where: DirectMessageWhereInput, orderBy: DirectMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [DirectMessage!]
-  typing: User
+  typing(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
 }
 
 """A connection to a list of items."""
@@ -57,7 +57,7 @@ type ChatConnection {
 input ChatCreateInput {
   users: UserCreateManyWithoutChatsInput
   messages: DirectMessageCreateManyWithoutChatInput
-  typing: UserCreateOneInput
+  typing: UserCreateManyInput
 }
 
 input ChatCreateManyWithoutUsersInput {
@@ -72,12 +72,12 @@ input ChatCreateOneWithoutMessagesInput {
 
 input ChatCreateWithoutMessagesInput {
   users: UserCreateManyWithoutChatsInput
-  typing: UserCreateOneInput
+  typing: UserCreateManyInput
 }
 
 input ChatCreateWithoutUsersInput {
   messages: DirectMessageCreateManyWithoutChatInput
-  typing: UserCreateOneInput
+  typing: UserCreateManyInput
 }
 
 """An edge in a connection."""
@@ -195,7 +195,7 @@ input ChatSubscriptionWhereInput {
 input ChatUpdateInput {
   users: UserUpdateManyWithoutChatsInput
   messages: DirectMessageUpdateManyWithoutChatInput
-  typing: UserUpdateOneInput
+  typing: UserUpdateManyInput
 }
 
 input ChatUpdateManyWithoutUsersInput {
@@ -218,12 +218,12 @@ input ChatUpdateOneRequiredWithoutMessagesInput {
 
 input ChatUpdateWithoutMessagesDataInput {
   users: UserUpdateManyWithoutChatsInput
-  typing: UserUpdateOneInput
+  typing: UserUpdateManyInput
 }
 
 input ChatUpdateWithoutUsersDataInput {
   messages: DirectMessageUpdateManyWithoutChatInput
-  typing: UserUpdateOneInput
+  typing: UserUpdateManyInput
 }
 
 input ChatUpdateWithWhereUniqueWithoutUsersInput {
@@ -297,7 +297,9 @@ input ChatWhereInput {
   messages_every: DirectMessageWhereInput
   messages_some: DirectMessageWhereInput
   messages_none: DirectMessageWhereInput
-  typing: UserWhereInput
+  typing_every: UserWhereInput
+  typing_some: UserWhereInput
+  typing_none: UserWhereInput
 }
 
 input ChatWhereUniqueInput {
@@ -3623,15 +3625,6 @@ input UserUpdateManyWithoutEventsInput {
 input UserUpdateManyWithWhereNestedInput {
   where: UserScalarWhereInput!
   data: UserUpdateManyDataInput!
-}
-
-input UserUpdateOneInput {
-  create: UserCreateInput
-  connect: UserWhereUniqueInput
-  disconnect: Boolean
-  delete: Boolean
-  update: UserUpdateDataInput
-  upsert: UserUpsertNestedInput
 }
 
 input UserUpdateOneRequiredInput {

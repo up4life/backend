@@ -1,10 +1,10 @@
-const axios = require("axios");
-const { forwardTo } = require("prisma-binding");
-const { transformEvents, fetchEvents, setDates, getScore } = require("../utils");
-const stripe = require("../stripe");
-const moment = require("moment");
-const MessageQuery = require("./Messages/MessageQuery");
-const UserQuery = require("./User/UserQuery");
+const axios = require('axios');
+const { forwardTo } = require('prisma-binding');
+const { transformEvents, fetchEvents, setDates, getScore } = require('../utils');
+const stripe = require('../stripe');
+const moment = require('moment');
+const MessageQuery = require('./Messages/MessageQuery');
+const UserQuery = require('./User/UserQuery');
 
 const Query = {
 	...MessageQuery,
@@ -13,17 +13,17 @@ const Query = {
 		return db.prisma.query.genres();
 	},
 	async userEvents(parent, args, { user, db }, info) {
-		if (!user) throw new Error("You must be logged in to use this feature!");
+		if (!user) throw new Error('You must be logged in to use this feature!');
 
 		return db.prisma.query.events(
 			{
 				where: {
 					attending_some: {
-						id: user.id
-					}
-				}
+						id: user.id,
+					},
+				},
 			},
-			info
+			info,
 		);
 	},
 	async currentUser(parent, args, { userId, db }, info) {
@@ -36,9 +36,9 @@ const Query = {
 
 		return db.prisma.query.user(
 			{
-				where: { id: userId }
+				where: { id: userId },
 			},
-			info
+			info,
 		);
 
 		// if (!currentUser) {
@@ -60,7 +60,7 @@ const Query = {
 
 		const user = await db.prisma.query.user(
 			{
-				...args
+				...args,
 			},
 			`{
 				id
@@ -78,22 +78,23 @@ const Query = {
 				interests {
 					id
 				}
-			}`
+			}`,
 		);
 
 		return {
 			...user,
-			score
+			score,
 		};
 	},
-	async getEvents(parent, { location, page, ...args }, { user, db }, info) {
-		location = location.split(",")[0].toLowerCase();
+	async getEvents(parent, { page, ...args }, { user, db }, info) {
+		let location = args.location.split(',')[0].toLowerCase();
 		let cats =
 			!args.categories || !args.categories.length
-				? ["KZFzniwnSyZfZ7v7nJ", "KZFzniwnSyZfZ7v7na", "KZFzniwnSyZfZ7v7n1"]
+				? [ 'KZFzniwnSyZfZ7v7nJ', 'KZFzniwnSyZfZ7v7na', 'KZFzniwnSyZfZ7v7n1' ]
 				: args.categories;
 
-		const dates = !args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
+		const dates =
+			!args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
 
 		let events;
 		let { data } = await fetchEvents(location, cats, dates, page, 26, args.genres);
@@ -114,7 +115,7 @@ const Query = {
 				pageNumber = res.data.page.number;
 				if (!res.data._embedded) break;
 				else {
-					events = [...events, ...res.data._embedded.events];
+					events = [ ...events, ...res.data._embedded.events ];
 					uniques = res.data._embedded.events.reduce((a, t) => {
 						if (!a.includes(t.name)) a.push(t.name);
 						return a;
@@ -131,34 +132,33 @@ const Query = {
 			total_items: data.page.totalElements,
 			page_total: data.page.totalPages,
 			page_number: pageNumber,
-			location
+			genres: args.genres || [],
+			categories: args.categories || [],
+			dates: args.dates || [],
+			location: args.location,
 		};
 	},
 
 	async getEvent(parent, args, ctx, info) {
-		const {
-			data: { _embedded, dates, images, name, id }
-		} = await axios.get(
-			`https://app.ticketmaster.com/discovery/v2/events/${args.id}.json?apikey=${
-				process.env.TKTMSTR_KEY
-			}`
+		const { data: { _embedded, dates, images, name, id } } = await axios.get(
+			`https://app.ticketmaster.com/discovery/v2/events/${args.id}.json?apikey=${process.env
+				.TKTMSTR_KEY}`,
 		);
 
-		const [img] = images.filter(img => img.width > 500);
+		const [ img ] = images.filter(img => img.width > 500);
 		return {
 			id,
 			title: name,
-			city: _embedded ? _embedded.venues[0].city.name : "",
-			venue: _embedded ? _embedded.venues[0].name : "",
+			city: _embedded ? _embedded.venues[0].city.name : '',
+			venue: _embedded ? _embedded.venues[0].name : '',
 			image_url: img.url,
-			times: [dates.start.dateTime]
+			times: [ dates.start.dateTime ],
 		};
 	},
 	async getLocation(parent, { latitude, longitude }, ctx, info) {
 		const { data } = await axios.get(
-			`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude}, ${longitude}&key=${
-				process.env.GOOGLE_API_KEY
-			}`
+			`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude}, ${longitude}&key=${process
+				.env.GOOGLE_API_KEY}`,
 		);
 		let city = data.results[0].address_components[3].long_name;
 		let state = data.results[0].address_components[5].short_name;
@@ -166,14 +166,13 @@ const Query = {
 
 		return {
 			city: `${city}, ${state}`,
-			county: `${county}, ${state}`
+			county: `${county}, ${state}`,
 		};
 	},
 	async locationSearch(parent, args, { db }, info) {
 		const { data } = await axios(
-			`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${
-				args.city
-			}&types=(cities)&key=${process.env.GOOGLE_API_KEY}`
+			`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${args.city}&types=(cities)&key=${process
+				.env.GOOGLE_API_KEY}`,
 		);
 		const results = data.predictions;
 		const city = results.map(result => {
@@ -182,26 +181,26 @@ const Query = {
 		return city;
 	},
 	async getRemainingDates(parent, args, { userId, db }, info) {
-		if (!userId) throw new Error("You must be signed in to access this app.");
+		if (!userId) throw new Error('You must be signed in to access this app.');
 
 		const user = await db.prisma.query.user(
 			{ where: { id: userId } },
 			`
 				{id permissions events {id}}
-			`
+			`,
 		);
 		// TO DO: define subscription level and benefit!!!
 		let datesCount = 5;
-		if (user.permissions === "MONTHLY") datesCount += 3;
-		if (user.permissions === "YEARLY") datesCount += 5;
+		if (user.permissions === 'MONTHLY') datesCount += 3;
+		if (user.permissions === 'YEARLY') datesCount += 5;
 
 		return { count: datesCount - user.events.length };
 	},
 	async invoicesList(parent, args, { userId, user }, info) {
-		if (!userId) throw new Error("You must be signed in to access this app.");
+		if (!userId) throw new Error('You must be signed in to access this app.');
 
 		const invoices = await stripe.invoices.list({
-			customer: user.stripeCustomerId
+			customer: user.stripeCustomerId,
 		});
 
 		return invoices.data;
@@ -210,12 +209,12 @@ const Query = {
 	async remainingMessages(parent, args, { user, db }, info) {
 		const sentMessages = await db.prisma.query.directMessages({
 			where: {
-				AND: [{ from: { id: user.id } }, { createdAt_gte: moment().startOf("isoWeek") }]
-			}
+				AND: [ { from: { id: user.id } }, { createdAt_gte: moment().startOf('isoWeek') } ],
+			},
 		});
 
 		return 20 - sentMessages.length;
-	}
+	},
 };
 
 module.exports = Query;
