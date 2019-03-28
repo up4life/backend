@@ -185,6 +185,7 @@ type DatesCount {
 type FirebasePayload {
 	token: String!
 	user: User!
+	newUser: Boolean!
 }
 
 type Invoice {

@@ -60,10 +60,11 @@ const Mutation = {
 		const { providerData } = await getUserRecord(uid);
 		const { email, displayName, photoURL, phoneNumber } = providerData[0];
 		// check to see if user already exists in our db
+		let newUser = false;
 		let user = await db.prisma.query.user({ where: { email } });
 		if (!user) {
 			let nameArray = displayName.split(' ');
-
+			newUser = true;
 			user = await db.prisma.mutation.createUser(
 				{
 					data: {
@@ -95,7 +96,7 @@ const Mutation = {
 			domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'up4.life',
 		});
 
-		return { token, user };
+		return { token, user, newUser };
 	},
 	async signin(parent, { email, password }, { db, res }, info) {
 		const user = await db.prisma.query.user({ where: { email } });
