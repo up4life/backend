@@ -97,7 +97,7 @@ const Query = {
 			!args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
 
 		let events;
-		let { data } = await fetchEvents(location, cats, dates, page, 26, args.genres);
+		let { data } = await fetchEvents(location, cats, dates, page, 16, args.genres);
 
 		events = data._embedded.events;
 
@@ -107,11 +107,18 @@ const Query = {
 		}, []);
 		let pageNumber = data.page.number;
 
-		if (data.page.totalElements > 26) {
-			while (uniques.length < 26) {
+		if (data.page.totalElements > 16) {
+			while (uniques.length < 16) {
 				page = page + 1;
 
-				let res = await fetchEvents(location, cats, dates, page, 26, args.genres);
+				let res = await fetchEvents(
+					location,
+					cats,
+					dates,
+					page,
+					16 - uniques.length,
+					args.genres,
+				);
 				pageNumber = res.data.page.number;
 				if (!res.data._embedded) break;
 				else {
