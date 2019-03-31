@@ -1,6 +1,8 @@
 const moment = require('moment');
 const axios = require('axios');
 
+const botId = "cjtx1vw7ukei50814d557uuy9"; // need to the real one in env
+
 module.exports = {
 	transformEvents: function(user, eventsArr, db) {
 		return eventsArr.reduce(async (previousPromise, ev) => {
@@ -273,10 +275,20 @@ module.exports = {
 		return score;
 	},
 
-	async botMessage(toUserId, db, msgType = 'REGISTRATION') {
+	async botMessage(toUserId, db, msgType = 'REGISTRATION', args) {
 		let text;
 
 		switch (msgType) {
+			case 'SUBSCRIPTION':
+				if (args.type === 'MONTHLY') {
+					text = 'Welcome to UP4 montly membership'
+				} else {
+					text = 'Welcome to UP4 yearly membership'
+				}
+				break
+			case 'UNSUBSCRIBE':
+				text = '--- Bot is not happy ---'
+				break
 			default:
 				text = 'Welcome to UP4'
 		}
@@ -285,12 +297,37 @@ module.exports = {
 			await db.prisma.mutation.createChat(
 				{
 					data: {
-						users: { connect: [{ id: toUserId }, { id: "cjtx1vw7ukei50814d557uuy9" }] },
+						users: { connect: [{ id: toUserId }, { id: botId }] },
 						messages: {
 							create: [
 								{
 									text,
-									from: { connect: { id: "cjtx1vw7ukei50814d557uuy9" } },
+									from: { connect: { id: botId } },
+									to: { connect: { id: toUserId } }
+								}
+							]
+						}
+					}
+				}
+			);
+		} else {
+			let [chat] = await db.prisma.query.chats({
+				where: {
+					AND: [{ users_some: { id: toUserId } }, { users_some: { id: botId } }]
+				}
+			});
+
+			await db.prisma.mutation.updateChat(
+				{
+					where: {
+						id: chat.id
+					},
+					data: {
+						messages: {
+							create: [
+								{
+									text,
+									from: { connect: { id: botId } },
 									to: { connect: { id: toUserId } }
 								}
 							]

@@ -312,6 +312,9 @@ const Mutation = {
 			},
 		});
 
+		// UP4-bot thank you note
+		await botMessage(user.id, db, 'SUBSCRIPTION', { type: args.subscription })
+
 		return {
 			message: 'Thank You',
 		};
@@ -328,6 +331,9 @@ const Mutation = {
 			invoice_now: true,
 			prorate: true,
 		});
+
+		// UP4-bot sad note
+		await botMessage(user.id, db, 'UNSUBSCRIBE')
 
 		// Update user's permission type
 		return db.prisma.mutation.updateUser(
