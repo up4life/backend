@@ -377,13 +377,19 @@ const Mutation = {
 		});
 		return updatedUser;
 	},
-	async addEvent(parent, { event }, { user, db: { prisma } }, info) {
+	async addEvent(parent, { event }, { user, db }, info) {
 		if (!user) throw new Error('You must be signed in to add an event.');
 
-		if (user.permissions === 'FREE' && user.events.length >= 10)
-			throw new Error('You have reached maximum saved events for FREE account.');
+		if (user.permissions === 'FREE' && user.events.length >= 10) {
+			throw new Error('You have reached maximum saved events for FREE account.')
+		}
 
-		const [ existingEvent ] = await prisma.query.events({
+		if (user.permissions === 'FREE' && user.events.length == 9) {
+			// UP4-bot error message
+			await botMessage(user.id, db, 'EVENT_LIMIT')
+		}
+
+		const [ existingEvent ] = await db.prisma.query.events({
 			where: {
 				tmID: event.tmID,
 			},
@@ -398,7 +404,7 @@ const Mutation = {
 			}
 		}
 
-		return prisma.mutation.upsertEvent(
+		return db.prisma.mutation.upsertEvent(
 			{
 				where: {
 					id: eventId,
