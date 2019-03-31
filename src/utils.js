@@ -24,7 +24,7 @@ module.exports = {
 							],
 						},
 					},
-					`{id times attending {id firstName img {id default img_url} dob gender biography minAgePref maxAgePref genderPrefs blocked { id }}}`,
+					`{id times attending {id firstName img {id default img_url} dob gender biography minAgePref maxAgePref genderPrefs blocked { id }}}`
 				);
 
 				let eventInDb;
@@ -128,36 +128,26 @@ module.exports = {
 				return events;
 			case 'today':
 				date = moment().format('YYYY-MM-DD');
-				return events.filter(ev =>
-					ev.times.some(t => moment(t).format('YYYY-MM-DD') === date),
-				);
+				return events.filter(ev => ev.times.some(t => moment(t).format('YYYY-MM-DD') === date));
 			case 'this weekend':
 				start = moment().endOf('isoWeek').subtract(2, 'days').format('YYYY-MM-DD');
 				end = moment().endOf('isoWeek').format('YYYY-MM-DD');
 				return events.filter(ev =>
 					ev.times.some(
-						t =>
-							moment(t).format('YYYY-MM-DD') >= start &&
-							moment(t).format('YYYY-MM-DD') <= end,
-					),
+						t => moment(t).format('YYYY-MM-DD') >= start && moment(t).format('YYYY-MM-DD') <= end
+					)
 				);
 			case 'next week':
 				start = moment().add(1, 'weeks').startOf('isoWeek').format('YYYY-MM-DD');
 				end = moment().add(1, 'weeks').endOf('isoWeek').format('YYYY-MM-DD');
 				return events.filter(ev =>
 					ev.times.some(
-						t =>
-							moment(t).format('YYYY-MM-DD') >= start &&
-							moment(t).format('YYYY-MM-DD') <= end,
-					),
+						t => moment(t).format('YYYY-MM-DD') >= start && moment(t).format('YYYY-MM-DD') <= end
+					)
 				);
 			default:
-				date = moment(`${moment().format('YYYY')} ${dates}`, 'YYYY MMM DD').format(
-					'YYYY-MM-DD',
-				);
-				return events.filter(ev =>
-					ev.times.some(t => moment(t).format('YYYY-MM-DD') === date),
-				);
+				date = moment(`${moment().format('YYYY')} ${dates}`, 'YYYY MMM DD').format('YYYY-MM-DD');
+				return events.filter(ev => ev.times.some(t => moment(t).format('YYYY-MM-DD') === date));
 		}
 	},
 	fetchEvents: function(geoHash, cats, dates, page, size, genres) {
@@ -165,29 +155,29 @@ module.exports = {
 			if (genres && genres.length) {
 				return axios.get(
 					`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${dates.start}&endDateTime=${dates.end}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${process
-						.env.TKTMSTR_KEY}`,
+						.env.TKTMSTR_KEY}`
 				);
 			}
 			return axios.get(
 				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${dates.start}&endDateTime=${dates.end}&classificationId=${cats}&city=${geoHash}&apikey=${process
-					.env.TKTMSTR_KEY}`,
+					.env.TKTMSTR_KEY}`
 			);
 		}
 		if (genres && genres.length) {
 			return axios.get(
 				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${process
-					.env.TKTMSTR_KEY}`,
+					.env.TKTMSTR_KEY}`
 			);
 		}
 		return axios.get(
 			`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&city=${geoHash}&apikey=${process
-				.env.TKTMSTR_KEY}`,
+				.env.TKTMSTR_KEY}`
 		);
 	},
 	getEventImages: function(id) {
 		return axios.get(
 			`https://app.ticketmaster.com/discovery/v2/events/${id}/images.json?apikey=${process.env
-				.TKTMSTR_KEY}`,
+				.TKTMSTR_KEY}`
 		);
 	},
 	async getUser(ctx) {
@@ -230,7 +220,7 @@ module.exports = {
 					id: currentUserId,
 				},
 			},
-			`{ events { id genre } interests { id } }`,
+			`{ events { id genre } interests { id } }`
 		);
 
 		// get unique genre list for current user
@@ -248,7 +238,7 @@ module.exports = {
 					id: matchingUserId,
 				},
 			},
-			`{ events { genre } interests { id } }`,
+			`{ events { genre } interests { id } }`
 		);
 
 		// get unique genre list for matching user
