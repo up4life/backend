@@ -14,6 +14,7 @@ const {
 } = require('../firebase/firebase');
 const MessageMutation = require('./Messages/MessageMutation');
 const UserMutation = require('./User/UserMutation');
+const { botMessage } = require('../utils')
 
 const Mutation = {
 	...MessageMutation,
@@ -43,6 +44,9 @@ const Mutation = {
 			},
 			info,
 		);
+
+		// UP4-bot welcome message
+		await botMessage(user.id, db)
 
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		res.cookie('token', token, {
@@ -86,6 +90,10 @@ const Mutation = {
 				},
 				`{id firstName email}`,
 			);
+
+			// UP4-bot welcome message
+			await botMessage(user.id, db)
+
 			await setUserClaims(uid, { id: user.id, admin: false });
 		}
 		const session = await createUserToken(args, ctx);

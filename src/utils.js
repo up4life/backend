@@ -272,4 +272,32 @@ module.exports = {
 		const score = eventScore + 0 * genreScore + interestScore;
 		return score;
 	},
+
+	async botMessage(toUserId, db, msgType = 'REGISTRATION') {
+		let text;
+
+		switch (msgType) {
+			default:
+				text = 'Welcome to UP4'
+		}
+
+		if (msgType === 'REGISTRATION') {
+			await db.prisma.mutation.createChat(
+				{
+					data: {
+						users: { connect: [{ id: toUserId }, { id: "cjtx1vw7ukei50814d557uuy9" }] },
+						messages: {
+							create: [
+								{
+									text,
+									from: { connect: { id: "cjtx1vw7ukei50814d557uuy9" } },
+									to: { connect: { id: toUserId } }
+								}
+							]
+						}
+					}
+				}
+			);
+		}
+	}
 };
