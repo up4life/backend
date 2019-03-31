@@ -30,6 +30,7 @@ type Mutation {
 	deleteUser(id: String!): Message
 	uploadImage(url: String!): User!
 	reportUser(id: String!, message: String!): Message
+	toggleTyping(chatId: String!, isTyping: Boolean!): Chat!
 }
 
 type Query {
@@ -185,6 +186,7 @@ type DatesCount {
 type FirebasePayload {
 	token: String!
 	user: User!
+	newUser: Boolean!
 }
 
 type Invoice {

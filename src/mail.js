@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
 // const postmark = require('postmark'); // will use when we wanna send actual emails
 
 // setup nodemailer service to send test emails
@@ -7,8 +7,8 @@ const transport = nodemailer.createTransport({
 	port: process.env.MAIL_PORT,
 	auth: {
 		user: process.env.MAIL_USER,
-		pass: process.env.MAIL_PASS
-	}
+		pass: process.env.MAIL_PASS,
+	},
 });
 
 // format email with some really simple css n html
@@ -43,5 +43,5 @@ const report = (reportedUser, text) => `
 module.exports = {
 	transport,
 	formatEmail,
-	report
+	report,
 };

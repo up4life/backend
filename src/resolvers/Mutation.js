@@ -14,6 +14,7 @@ const {
 } = require('../firebase/firebase');
 const MessageMutation = require('./Messages/MessageMutation');
 const UserMutation = require('./User/UserMutation');
+const { botMessage } = require('../utils')
 
 const Mutation = {
 	...MessageMutation,
@@ -44,6 +45,9 @@ const Mutation = {
 			info,
 		);
 
+		// UP4-bot welcome message
+		await botMessage(user.id, db)
+
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 		res.cookie('token', token, {
 			httpOnly: true,
@@ -60,10 +64,11 @@ const Mutation = {
 		const { providerData } = await getUserRecord(uid);
 		const { email, displayName, photoURL, phoneNumber } = providerData[0];
 		// check to see if user already exists in our db
+		let newUser = false;
 		let user = await db.prisma.query.user({ where: { email } });
 		if (!user) {
 			let nameArray = displayName.split(' ');
-
+			newUser = true;
 			user = await db.prisma.mutation.createUser(
 				{
 					data: {
@@ -85,6 +90,10 @@ const Mutation = {
 				},
 				`{id firstName email}`,
 			);
+
+			// UP4-bot welcome message
+			await botMessage(user.id, db)
+
 			await setUserClaims(uid, { id: user.id, admin: false });
 		}
 		const session = await createUserToken(args, ctx);
@@ -95,7 +104,7 @@ const Mutation = {
 			domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'up4.life',
 		});
 
-		return { token, user };
+		return { token, user, newUser };
 	},
 	async signin(parent, { email, password }, { db, res }, info) {
 		const user = await db.prisma.query.user({ where: { email } });
@@ -303,6 +312,9 @@ const Mutation = {
 			},
 		});
 
+		// UP4-bot thank you note
+		await botMessage(user.id, db, 'SUBSCRIPTION', { type: args.subscription })
+
 		return {
 			message: 'Thank You',
 		};
@@ -319,6 +331,9 @@ const Mutation = {
 			invoice_now: true,
 			prorate: true,
 		});
+
+		// UP4-bot sad note
+		await botMessage(user.id, db, 'UNSUBSCRIBE')
 
 		// Update user's permission type
 		return db.prisma.mutation.updateUser(
