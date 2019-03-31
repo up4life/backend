@@ -262,44 +262,31 @@ const Mutation = {
 		if (user.permissions === args.subscription) {
 			throw new Error(`User already has ${args.subscription} subscription`);
 		}
+
 		// Create new stripe customer if user is not one already
 		let customer;
-		if (!user.stripeCustomerId) {
+		try {
+			customer = await stripe.customers.retrieve(user.stripeCustomerId);
+		} catch {
 			customer = await stripe.customers.create({
 				email: user.email,
 				source: args.token,
 			});
 		}
-		// Create a subscription if user does not have one already
-		let subscription;
-		if (!user.stripeSubscriptionId) {
-			subscription = await stripe.subscriptions.create({
-				customer: user.stripeCustomerId || customer.id,
-				items: [
-					{
-						plan:
-							args.subscription === 'MONTHLY'
-								? 'plan_EhVWWzHeQHwdJC'
-								: 'plan_EYPg6RkTFwJFRA',
-					},
-				],
-			});
-		} else {
-			subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-			await stripe.subscriptions.update(user.stripeSubscriptionId, {
-				cancel_at_period_end: false,
-				items: [
-					{
-						id: subscription.items.data[0].id,
-						plan:
-							args.subscription === 'MONTHLY'
-								? 'plan_EhVWWzHeQHwdJC'
-								: 'plan_EYPg6RkTFwJFRA',
-					},
-				],
-			});
-		}
-		console.log(subscription, user);
+
+		// Create a subscription
+		const subscription = await stripe.subscriptions.create({
+			customer: customer.id,
+			items: [
+				{
+					plan:
+						args.subscription === 'MONTHLY'
+							? process.env.STRIPE_MONTHLY
+							: process.env.STRIPE_YEARLY,
+				},
+			],
+		});
+
 		// Update user's permission type
 		db.prisma.mutation.updateUser({
 			data: {
@@ -327,10 +314,14 @@ const Mutation = {
 			throw new Error('User has no stripe customer Id or subscription Id');
 		}
 
-		const canceled = await stripe.subscriptions.del(user.stripeSubscriptionId, {
-			invoice_now: true,
-			prorate: true,
-		});
+		try {
+			await stripe.subscriptions.del(user.stripeSubscriptionId, {
+				invoice_now: true,
+				prorate: true,
+			});
+		} catch {
+			console.log('old subscription')
+		}
 
 		// UP4-bot sad note
 		await botMessage(user.id, db, 'UNSUBSCRIBE')
@@ -377,13 +368,19 @@ const Mutation = {
 		});
 		return updatedUser;
 	},
-	async addEvent(parent, { event }, { user, db: { prisma } }, info) {
+	async addEvent(parent, { event }, { user, db }, info) {
 		if (!user) throw new Error('You must be signed in to add an event.');
 
-		if (user.permissions === 'FREE' && user.events.length >= 10)
-			throw new Error('You have reached maximum saved events for FREE account.');
+		if (user.permissions === 'FREE' && user.events.length >= 10) {
+			throw new Error('You have reached maximum saved events for FREE account.')
+		}
 
-		const [ existingEvent ] = await prisma.query.events({
+		if (user.permissions === 'FREE' && user.events.length == 9) {
+			// UP4-bot error message
+			await botMessage(user.id, db, 'EVENT_LIMIT')
+		}
+
+		const [ existingEvent ] = await db.prisma.query.events({
 			where: {
 				tmID: event.tmID,
 			},
@@ -398,7 +395,7 @@ const Mutation = {
 			}
 		}
 
-		return prisma.mutation.upsertEvent(
+		return db.prisma.mutation.upsertEvent(
 			{
 				where: {
 					id: eventId,
