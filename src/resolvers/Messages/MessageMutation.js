@@ -165,5 +165,45 @@ module.exports = {
 			},
 			data: {}
 		});
+	},
+	async toggleTyping(parent, args, { userId, user, db }, info) {
+		if (!userId) throw new Error("You must be logged in to toggle typing!");
+
+		const [chat] = await db.prisma.query.chats({
+			where: {
+				AND: [
+					{ id: args.chatId },
+					{
+						users_some: { id: userId }
+					}
+				]
+			}
+		}, `{ typing { id } }`);
+
+		if (!chat) throw new Error("Cannot find chat")
+
+		if (!args.isTyping) {
+			return db.prisma.mutation.updateChat({
+				where: { id: args.chatId },
+				data: {
+					typing: {
+						disconnect: {
+							id: userId
+						}
+					}
+				}
+			}, info)
+		} else {
+			return db.prisma.mutation.updateChat({
+				where: { id: args.chatId },
+				data: {
+					typing: {
+						connect: {
+							id: userId
+						}
+					}
+				}
+			}, info)
+		}
 	}
 };
