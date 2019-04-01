@@ -5,25 +5,26 @@ const getProduct = async () => {
 		name: 'Up4',
 		type: 'service',
 	});
-	return product;
+	console.log(product);
 };
 
 // only need to run this once.
 // getProduct()
 
-const createPlan = async (name, amount) => {
+const createPlan = async (name, interval, amount) => {
 	const plan = await stripe.plans.create({
-		product: 'prod_EYPNx1SINtpDP0',
+		// product: 'prod_EnmdNIvok3JOk2',
+		product: 'prod_Eno6M8G6y4gbr3',
 		nickname: name,
 		currency: 'usd',
-		interval: 'year',
+		interval,
 		amount: amount,
 	});
-	return plan;
+	console.log(plan);
 };
 
 // only need to run this once.
-// createPlan('Monthly Plan', 999);
-// createPlan('Yearly Plan', 2999);
+// createPlan('UP4 Monthly Plan', 'month', 499);
+// createPlan('UP4 Yearly Plan', 'year', 2999);
 
 module.exports = stripe;

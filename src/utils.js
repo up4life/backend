@@ -1,7 +1,7 @@
 const moment = require('moment');
 const axios = require('axios');
 
-const botId = 'cjtx1vw7ukei50814d557uuy9'; // need to the real one in env
+const botId = 'cjtx1vw7ukei50814d557uuy9'; // need to move the real one to env
 
 module.exports = {
 	formatEvents: function(user, eventsArr, ourEvents) {
@@ -344,11 +344,23 @@ module.exports = {
 			case 'UNSUBSCRIBE':
 				text = '--- Bot is not happy ---';
 				break;
+			case 'EVENT_LIMIT':
+				text = 'You have reached 10 saved events for FREE account. Go PRO.';
+				break;
+			case 'CHAT_LIMIT':
+				text = 'You have reached 20 messages per week for FREE account. Go PRO.';
+				break;
 			default:
 				text = 'Welcome to UP4';
 		}
 
-		if (msgType === 'REGISTRATION') {
+		let [ chat ] = await db.prisma.query.chats({
+			where: {
+				AND: [ { users_some: { id: toUserId } }, { users_some: { id: botId } } ],
+			},
+		});
+
+		if (!chat) {
 			await db.prisma.mutation.createChat({
 				data: {
 					users: { connect: [ { id: toUserId }, { id: botId } ] },
@@ -364,26 +376,9 @@ module.exports = {
 				},
 			});
 		} else {
-			let [ chat ] = await db.prisma.query.chats({
-				where: {
-					AND: [ { users_some: { id: toUserId } }, { users_some: { id: botId } } ],
-				},
-			});
-
 			await db.prisma.mutation.updateChat({
 				where: {
 					id: chat.id,
-				},
-				data: {
-					messages: {
-						create: [
-							{
-								text,
-								from: { connect: { id: botId } },
-								to: { connect: { id: toUserId } },
-							},
-						],
-					},
 				},
 			});
 		}
