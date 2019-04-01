@@ -25,7 +25,7 @@ const createPlan = async (name, interval, amount) => {
 };
 
 // only need to run this once.
-createPlan('UP4 Monthly Plan', 'month', 499);
-createPlan('UP4 Yearly Plan', 'year', 2999);
+// createPlan('UP4 Monthly Plan', 'month', 499);
+// createPlan('UP4 Yearly Plan', 'year', 2999);
 
 module.exports = stripe;
