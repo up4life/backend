@@ -1,7 +1,7 @@
 const moment = require('moment');
 const axios = require('axios');
 
-const botId = "cjtx1vw7ukei50814d557uuy9"; // need to move the real one to env
+const botId = process.env.BOT_ID; // need to move the real one to env
 
 module.exports = {
 	transformEvents: function(user, eventsArr, db) {
