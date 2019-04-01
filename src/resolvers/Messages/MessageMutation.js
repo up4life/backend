@@ -181,8 +181,7 @@ module.exports = {
 		}, `{ typing { id } }`);
 
 		if (!chat) throw new Error("Cannot find chat")
-
-		if (chat.typing.find(user => user.id === userId) && !args.isTyping) {
+		if (!args.isTyping && chat.typing.find(user => user.id === userId)) {
 			return db.prisma.mutation.updateChat({
 				where: { id: args.chatId },
 				data: {
@@ -193,7 +192,7 @@ module.exports = {
 					}
 				}
 			}, info)
-		} else {
+		} else if (args.isTyping) {
 			return db.prisma.mutation.updateChat({
 				where: { id: args.chatId },
 				data: {
@@ -203,6 +202,10 @@ module.exports = {
 						}
 					}
 				}
+			}, info)
+		} else {
+			return db.prisma.query.chat({
+				where: { id: args.chatId }
 			}, info)
 		}
 	}
