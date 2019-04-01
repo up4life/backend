@@ -1,9 +1,65 @@
 const moment = require('moment');
 const axios = require('axios');
 
-const botId = "cjtx1vw7ukei50814d557uuy9"; // need to the real one in env
+const botId = 'cjtx1vw7ukei50814d557uuy9'; // need to the real one in env
 
 module.exports = {
+	formatEvents: function(user, eventsArr, ourEvents) {
+		return eventsArr.reduce((events, ev) => {
+			let existingEvent = events.findIndex(e => e.title === ev.name);
+			if (existingEvent !== -1) {
+				events[existingEvent].times.push(ev.dates.start.dateTime);
+			} else {
+				let eventInDb;
+				let dbEvent = ourEvents.find(e => e.tmID === ev.id);
+				if (dbEvent) {
+					const attendees = dbEvent.attending.filter(attendee => {
+						if (user.blocked && user.blocked.includes(attendee.id)) return false;
+						if (attendee.blocked && attendee.blocked.includes(user.id)) return false;
+						if (attendee.id === user.id) return false;
+
+						return (
+							moment().diff(user.dob, 'years') <= attendee.maxAgePref &&
+							moment().diff(user.dob, 'years') >= attendee.minAgePref &&
+							attendee.genderPrefs.includes(user.gender) &&
+							moment().diff(attendee.dob, 'years') <= user.maxAgePref &&
+							moment().diff(attendee.dob, 'years') >= user.minAgePref &&
+							user.genderPrefs.includes(attendee.gender)
+						);
+					});
+					eventInDb = {
+						...dbEvent,
+						attending: attendees,
+					};
+				}
+
+				const [ img ] = ev.images.filter(img => img.width > 500);
+				events.push({
+					id: eventInDb ? eventInDb.id : ev.id,
+					tmID: ev.id,
+					url: [ ev.url ],
+					title: ev.name,
+					city: ev._embedded.venues[0].city.name,
+					venue: ev._embedded.venues[0].name,
+					image_url: img.url,
+					times: ev.dates.start.noSpecificTime
+						? [ ev.dates.start.localDate ]
+						: [ ev.dates.start.dateTime ],
+					attending: eventInDb ? eventInDb.attending : [],
+					genre: ev.classifications[0].genre ? ev.classifications[0].genre.id : null,
+					category: ev.classifications[0].segment && ev.classifications[0].segment.id,
+					info: ev.info || null,
+					description: ev.info || null,
+					price: {
+						min: ev.priceRanges ? ev.priceRanges[0].min : 'min',
+						max: ev.priceRanges ? ev.priceRanges[0].max : 'max',
+						currency: ev.priceRanges ? ev.priceRanges[0].currency : 'USD',
+					},
+				});
+			}
+			return events;
+		}, []);
+	},
 	transformEvents: function(user, eventsArr, db) {
 		return eventsArr.reduce(async (previousPromise, ev) => {
 			let events = await previousPromise;
@@ -16,14 +72,7 @@ module.exports = {
 				let [ dbEvent ] = await db.prisma.query.events(
 					{
 						where: {
-							AND: [
-								{
-									venue: ev._embedded.venues[0].name,
-								},
-								{
-									title: ev.name,
-								},
-							],
+							tmID: ev.id,
 						},
 					},
 					`{id times attending {id firstName img {id default img_url} dob gender biography minAgePref maxAgePref genderPrefs blocked { id }}}`
@@ -67,8 +116,8 @@ module.exports = {
 						? [ ev.dates.start.localDate ]
 						: [ ev.dates.start.dateTime ],
 					attending: eventInDb ? eventInDb.attending : [],
-					genre: ev.classifications[0].genre ? ev.classifications[0].genre.name : null,
-					category: ev.classifications[0].segment && ev.classifications[0].segment.name,
+					genre: ev.classifications[0].genre ? ev.classifications[0].genre.id : null,
+					category: ev.classifications[0].segment && ev.classifications[0].segment.id,
 					info: ev.info || null,
 					description: ev.info || null,
 					price: {
@@ -182,6 +231,12 @@ module.exports = {
 				.TKTMSTR_KEY}`
 		);
 	},
+	fetchInitialEvents: function(location, genres, page) {
+		return axios.get(
+			`https://app.ticketmaster.com/discovery/v2/events.json?size=100&page=${page}&genreId=${genres}&city=${location}&apikey=${process
+				.env.TKTMSTR_KEY}`
+		);
+	},
 	async getUser(ctx) {
 		const Authorization = (ctx.req || ctx.request).get('Authorization');
 		if (Authorization) {
@@ -281,60 +336,56 @@ module.exports = {
 		switch (msgType) {
 			case 'SUBSCRIPTION':
 				if (args.type === 'MONTHLY') {
-					text = 'Welcome to UP4 montly membership'
+					text = 'Welcome to UP4 montly membership';
 				} else {
-					text = 'Welcome to UP4 yearly membership'
+					text = 'Welcome to UP4 yearly membership';
 				}
-				break
+				break;
 			case 'UNSUBSCRIBE':
-				text = '--- Bot is not happy ---'
-				break
+				text = '--- Bot is not happy ---';
+				break;
 			default:
-				text = 'Welcome to UP4'
+				text = 'Welcome to UP4';
 		}
 
 		if (msgType === 'REGISTRATION') {
-			await db.prisma.mutation.createChat(
-				{
-					data: {
-						users: { connect: [{ id: toUserId }, { id: botId }] },
-						messages: {
-							create: [
-								{
-									text,
-									from: { connect: { id: botId } },
-									to: { connect: { id: toUserId } }
-								}
-							]
-						}
-					}
-				}
-			);
+			await db.prisma.mutation.createChat({
+				data: {
+					users: { connect: [ { id: toUserId }, { id: botId } ] },
+					messages: {
+						create: [
+							{
+								text,
+								from: { connect: { id: botId } },
+								to: { connect: { id: toUserId } },
+							},
+						],
+					},
+				},
+			});
 		} else {
-			let [chat] = await db.prisma.query.chats({
+			let [ chat ] = await db.prisma.query.chats({
 				where: {
-					AND: [{ users_some: { id: toUserId } }, { users_some: { id: botId } }]
-				}
+					AND: [ { users_some: { id: toUserId } }, { users_some: { id: botId } } ],
+				},
 			});
 
-			await db.prisma.mutation.updateChat(
-				{
-					where: {
-						id: chat.id
+			await db.prisma.mutation.updateChat({
+				where: {
+					id: chat.id,
+				},
+				data: {
+					messages: {
+						create: [
+							{
+								text,
+								from: { connect: { id: botId } },
+								to: { connect: { id: toUserId } },
+							},
+						],
 					},
-					data: {
-						messages: {
-							create: [
-								{
-									text,
-									from: { connect: { id: botId } },
-									to: { connect: { id: toUserId } }
-								}
-							]
-						}
-					}
-				}
-			);
+				},
+			});
 		}
-	}
+	},
 };

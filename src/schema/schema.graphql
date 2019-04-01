@@ -42,6 +42,7 @@ type Query {
 		genres: [String]
 	): AllEvents
 	remainingMessages: Int
+
 	getEvent(id: String!): Event
 	currentUser: User
 	user(where: UserWhereUniqueInput!): User

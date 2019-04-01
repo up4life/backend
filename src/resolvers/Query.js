@@ -1,10 +1,18 @@
 const axios = require('axios');
 const { forwardTo } = require('prisma-binding');
-const { transformEvents, fetchEvents, setDates, getScore } = require('../utils');
+const {
+	transformEvents,
+	fetchEvents,
+	setDates,
+	getScore,
+	fetchInitialEvents,
+	formatEvents,
+} = require('../utils');
 const stripe = require('../stripe');
 const moment = require('moment');
 const MessageQuery = require('./Messages/MessageQuery');
 const UserQuery = require('./User/UserQuery');
+const genreFilters = require('../genres');
 
 const Query = {
 	...MessageQuery,
@@ -23,7 +31,7 @@ const Query = {
 					},
 				},
 			},
-			info,
+			info
 		);
 	},
 	async currentUser(parent, args, { userId, db }, info) {
@@ -38,7 +46,7 @@ const Query = {
 			{
 				where: { id: userId },
 			},
-			info,
+			info
 		);
 
 		// if (!currentUser) {
@@ -78,7 +86,7 @@ const Query = {
 				interests {
 					id
 				}
-			}`,
+			}`
 		);
 
 		return {
@@ -86,70 +94,136 @@ const Query = {
 			score,
 		};
 	},
-	async getEvents(parent, { page, ...args }, { user, db }, info) {
+	async getEvents(parent, args, { user, db }, info) {
 		let location = args.location.split(',')[0].toLowerCase();
 		let cats =
 			!args.categories || !args.categories.length
 				? [ 'KZFzniwnSyZfZ7v7nJ', 'KZFzniwnSyZfZ7v7na', 'KZFzniwnSyZfZ7v7n1' ]
 				: args.categories;
 
-		const dates =
-			!args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
+		const dates = !args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
+		let page = args.page || 0;
+		let genres = args.genres && args.genres.length ? args.genres : genreFilters.map(x => x.tmID);
 
-		let events;
-		let { data } = await fetchEvents(location, cats, dates, page, 16, args.genres);
+		try {
+			let { data } = await fetchEvents(location, cats, dates, page, 30, genres);
 
-		events = data._embedded.events;
+			let events = data._embedded.events;
+			let uniques = events.reduce((a, t) => {
+				if (!a.includes(t.name)) a.push(t.name);
+				return a;
+			}, []);
 
-		let uniques = events.reduce((a, t) => {
-			if (!a.includes(t.name)) a.push(t.name);
-			return a;
-		}, []);
-		let pageNumber = data.page.number;
-
-		if (data.page.totalElements > 16) {
-			while (uniques.length < 16) {
-				page = page + 1;
-
-				let res = await fetchEvents(
-					location,
-					cats,
-					dates,
-					page,
-					16 - uniques.length,
-					args.genres,
-				);
-				pageNumber = res.data.page.number;
-				if (!res.data._embedded) break;
-				else {
-					events = [ ...events, ...res.data._embedded.events ];
-					uniques = res.data._embedded.events.reduce((a, t) => {
-						if (!a.includes(t.name)) a.push(t.name);
-						return a;
-					}, uniques);
+			if (data.page.totalElements > 30) {
+				while (uniques.length < 30) {
+					page = page + 1;
+					let res = await fetchEvents(
+						location,
+						cats,
+						dates,
+						page,
+						30 - uniques.length,
+						args.genres
+					);
+					if (!res.data._embedded) break;
+					else {
+						pageNumber = res.data.page.number;
+						events = [ ...events, ...res.data._embedded.events ];
+						uniques = res.data._embedded.events.reduce((a, t) => {
+							if (!a.includes(t.name)) a.push(t.name);
+							return a;
+						}, uniques);
+					}
 				}
 			}
+
+			let ourEvents = await db.prisma.query.events(
+				{
+					where: { city: location },
+				},
+				`{id tmID times attending {id firstName img {id default img_url} dob gender biography minAgePref maxAgePref genderPrefs blocked { id }}}`
+			);
+			return {
+				events: formatEvents(user, events, ourEvents),
+				page_count: data.page.size,
+				total_items: data.page.totalElements,
+				page_total: data.page.totalPages,
+				page_number: pageNumber,
+				genres: args.genres || [],
+				categories: args.categories || [],
+				dates: args.dates || [],
+				location: args.location,
+			};
+		} catch (e) {
+			console.log(e);
 		}
-
-		const eventList = await transformEvents(user, events, db);
-
-		return {
-			events: eventList,
-			page_count: data.page.size,
-			total_items: data.page.totalElements,
-			page_total: data.page.totalPages,
-			page_number: pageNumber,
-			genres: args.genres || [],
-			categories: args.categories || [],
-			dates: args.dates || [],
-			location: args.location,
-		};
 	},
+	// async getEvents(parent, { page, ...args }, { user, db }, info) {
+	// 	let location = args.location.split(',')[0].toLowerCase();
+	// 	let cats =
+	// 		!args.categories || !args.categories.length
+	// 			? [ 'KZFzniwnSyZfZ7v7nJ', 'KZFzniwnSyZfZ7v7na', 'KZFzniwnSyZfZ7v7n1' ]
+	// 			: args.categories;
+
+	// 	const dates = !args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
+	// 	page = 0;
+	// 	let events;
+	// 	try {
+	// 		let { data } = await fetchEvents(location, cats, dates, page, 30, args.genres);
+
+	// 		events = data._embedded.events;
+
+	// 		let uniques = events.reduce((a, t) => {
+	// 			if (!a.includes(t.name)) a.push(t.name);
+	// 			return a;
+	// 		}, []);
+	// 		let pageNumber = data.page.number;
+
+	// 		if (data.page.totalElements > 30) {
+	// 			while (uniques.length < 30) {
+	// 				page = page + 1;
+
+	// 				let res = await fetchEvents(
+	// 					location,
+	// 					cats,
+	// 					dates,
+	// 					page,
+	// 					30 - uniques.length,
+	// 					args.genres
+	// 				);
+	// 				pageNumber = res.data.page.number;
+	// 				if (!res.data._embedded) break;
+	// 				else {
+	// 					events = [ ...events, ...res.data._embedded.events ];
+	// 					uniques = res.data._embedded.events.reduce((a, t) => {
+	// 						if (!a.includes(t.name)) a.push(t.name);
+	// 						return a;
+	// 					}, uniques);
+	// 				}
+	// 			}
+	// 		}
+
+	// 		const eventList = await transformEvents(user, events, db);
+	// 		return {
+	// 			events: eventList,
+	// 			page_count: data.page.size,
+	// 			total_items: data.page.totalElements,
+	// 			page_total: data.page.totalPages,
+	// 			page_number: pageNumber,
+	// 			genres: args.genres || [],
+	// 			categories: args.categories || [],
+	// 			dates: args.dates || [],
+	// 			location: args.location,
+	// 		};
+	// 	} catch (e) {
+	// 		return e;
+	// 	}
+	// },
 
 	async getEvent(parent, args, ctx, info) {
 		const { data: { _embedded, dates, images, name, id } } = await axios.get(
 			`https://app.ticketmaster.com/discovery/v2/events/${args.id}.json?apikey=${process.env
-				.TKTMSTR_KEY}`,
+				.TKTMSTR_KEY}`
 		);
 
 		const [ img ] = images.filter(img => img.width > 500);
@@ -165,7 +239,7 @@ const Query = {
 	async getLocation(parent, { latitude, longitude }, ctx, info) {
 		const { data } = await axios.get(
 			`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude}, ${longitude}&key=${process
-				.env.GOOGLE_API_KEY}`,
+				.env.GOOGLE_API_KEY}`
 		);
 		let city = data.results[0].address_components[3].long_name;
 		let state = data.results[0].address_components[5].short_name;
@@ -179,7 +253,7 @@ const Query = {
 	async locationSearch(parent, args, { db }, info) {
 		const { data } = await axios(
 			`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${args.city}&types=(cities)&key=${process
-				.env.GOOGLE_API_KEY}`,
+				.env.GOOGLE_API_KEY}`
 		);
 		const results = data.predictions;
 		const city = results.map(result => {
@@ -194,7 +268,7 @@ const Query = {
 			{ where: { id: userId } },
 			`
 				{id permissions events {id}}
-			`,
+			`
 		);
 		// TO DO: define subscription level and benefit!!!
 		let datesCount = 5;
