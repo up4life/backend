@@ -117,14 +117,7 @@ const Query = {
 			if (data.page.totalElements > 30) {
 				while (uniques.length < 30) {
 					page = page + 1;
-					let res = await fetchEvents(
-						location,
-						cats,
-						dates,
-						page,
-						30 - uniques.length,
-						args.genres
-					);
+					let res = await fetchEvents(location, cats, dates, page, 30, args.genres);
 					if (!res.data._embedded) break;
 					else {
 						pageNumber = res.data.page.number;
