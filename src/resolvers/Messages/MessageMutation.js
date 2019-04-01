@@ -182,7 +182,7 @@ module.exports = {
 
 		if (!chat) throw new Error("Cannot find chat")
 
-		if (!args.isTyping) {
+		if (chat.typing.find(user => user.id === userId) && !args.isTyping) {
 			return db.prisma.mutation.updateChat({
 				where: { id: args.chatId },
 				data: {
