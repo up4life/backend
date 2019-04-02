@@ -1,5 +1,7 @@
-const jwt = require("jsonwebtoken");
-const { prisma } = require("../db");
+const jwt = require('jsonwebtoken');
+const {
+	prisma: { query }
+} = require('../db');
 
 const userObject = `{
   id
@@ -39,11 +41,19 @@ module.exports = {
 	},
 
 	populateUser: async function(req, res, next) {
-		if (!req.userId) return next();
+		const id = req.userId;
+		if (!id) return next();
 
-		const user = await prisma.query.user({ where: { id: req.userId } }, userObject);
+		const user = await query.user({ where: { id } }, userObject);
 		req.user = user;
 
 		next();
+	},
+	errorHandler: function(err, req, res, next) {
+		if (res.headersSent) {
+			return next(err);
+		}
+		const { status } = err;
+		res.status(status).json(err);
 	}
 };

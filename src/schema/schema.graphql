@@ -42,7 +42,6 @@ type Query {
 		genres: [String]
 	): AllEvents
 	remainingMessages: Int
-
 	getEvent(id: String!): Event
 	currentUser: User
 	user(where: UserWhereUniqueInput!): User
@@ -90,10 +89,10 @@ type DirectMessage {
 	text: String!
 	from: User!
 	to: User!
-	createdAt: DateTime!
-	updatedAt: DateTime
 	chat: Chat!
 	seen: Boolean
+	createdAt: DateTime!
+	updatedAt: DateTime!
 }
 
 input AddEventInput {
@@ -154,16 +153,16 @@ type Event {
 	tmID: String!
 	title: String!
 	times: [String]
-	attending: [User!]!
+	genre: String
 	city: String
 	venue: String
-	image_url: String
-	genre: String
 	category: String
-	url: [String]
-	description: String
-	info: String
+	attending: [User!]!
+	image_url: String
 	price: PriceRange
+	url: [String]
+	# description: String
+	# info: String
 }
 
 type PriceRange {
