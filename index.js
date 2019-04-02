@@ -4,9 +4,9 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const http = require('http');
 
-const schema = require('./src/schema');
-const db = require('./src/db');
 const { isAuth, populateUser, errorHandler } = require('./src/middleware/index');
+const schema = require('./src/schema');
+const { prisma, client } = require('./src/db');
 
 const apolloServer = new ApolloServer({
 	schema,
@@ -18,7 +18,10 @@ const apolloServer = new ApolloServer({
 
 		return {
 			...req,
-			db
+			query: prisma.query,
+			mutation: prisma.mutation,
+			subscription: prisma.subscription,
+			client
 		};
 	},
 	playground: true,
@@ -35,7 +38,7 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.json());
+// app.use(express.json());
 
 app.use(isAuth);
 app.use(populateUser);
@@ -45,13 +48,13 @@ apolloServer.applyMiddleware({ app, cors: corsConfig, path: '/' });
 
 const server = http.createServer(app);
 
-// apolloServer.installSubscriptionHandlers(server);
+apolloServer.installSubscriptionHandlers(server);
 
-server.listen().then(({ url, subscriptionsUrl }) => {
-	console.log(`🚀 Server ready at ${url}`);
-	console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
-});
-
-// server.listen(process.env.PORT || 4000, () => {
-// 	console.log("woo server uppp");
+// server.listen().then(({ url, subscriptionsUrl }) => {
+// 	console.log(`🚀 Server ready at ${url}`);
+// 	console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
 // });
+
+server.listen(process.env.PORT || 4000, () => {
+	console.log(`🚀 Server ready!!`);
+});

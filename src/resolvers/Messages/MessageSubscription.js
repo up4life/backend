@@ -1,12 +1,12 @@
 module.exports = {
 	myChat: {
-		subscribe(parent, { id }, { db }, info) {
-			return db.prisma.subscription.chat(
+		subscribe(parent, { id }, { subscription }, info) {
+			return subscription.chat(
 				{
 					where: {
 						AND: [
 							{
-								mutation_in: ["CREATED", "UPDATED", "DELETED"]
+								mutation_in: ['CREATED', 'UPDATED', 'DELETED']
 							},
 							{
 								node: {
@@ -23,8 +23,8 @@ module.exports = {
 		}
 	},
 	myMessages: {
-		async subscribe(parent, { id }, { db }, info) {
-			return db.prisma.subscription.directMessage(
+		async subscribe(parent, { id }, { subscription }, info) {
+			return subscription.directMessage(
 				{
 					where: {
 						node: {
@@ -41,14 +41,12 @@ module.exports = {
 		}
 	},
 	myMessage: {
-		async subscribe(parent, { chatId }, { db }, info) {
-			return db.prisma.subscription.chat(
+		async subscribe(parent, { chatId }, { subscription }, info) {
+			return subscription.chat(
 				{
 					where: {
 						node: {
-							// chat: {
 							id: chatId
-							// }
 						}
 					}
 				},
