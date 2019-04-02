@@ -5,8 +5,8 @@ const express = require('express');
 const http = require('http');
 
 const { isAuth, populateUser, errorHandler } = require('./src/middleware/index');
-const schema = require('./src/schema');
 const { prisma, client } = require('./src/db');
+const schema = require('./src/schema');
 
 const apolloServer = new ApolloServer({
 	schema,

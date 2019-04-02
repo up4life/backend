@@ -4,17 +4,12 @@ const { randomBytes } = require('crypto');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const { transport, formatEmail } = require('../mail');
-const stripe = require('../stripe');
-const {
-	createUserToken,
-	verifyIdToken,
-	getUserRecord,
-	setUserClaims
-} = require('../firebase/firebase');
+const { createUserToken, verifyIdToken, getUserRecord } = require('../firebase/firebase');
 const MessageMutation = require('./Messages/MessageMutation');
+const { transport, formatEmail } = require('../mail');
 const UserMutation = require('./User/UserMutation');
 const { botMessage } = require('../utils');
+const stripe = require('../stripe');
 
 const Mutation = {
 	...MessageMutation,
