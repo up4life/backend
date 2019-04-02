@@ -12,6 +12,7 @@ const apolloServer = new ApolloServer({
 	schema,
 	context: ({ req, res, connection }) => {
 		if (connection && connection.context && connection.context.auth) {
+			console.log(connection.context, 'websocket connection ctx (backend)');
 			req.auth = connection.context.auth;
 		}
 
