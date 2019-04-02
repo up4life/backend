@@ -107,7 +107,7 @@ const Query = {
 
 		try {
 			let { data } = await fetchEvents(location, cats, dates, page, 30, genres);
-
+			let pageNumber = data.page.number;
 			let events = data._embedded.events;
 			let uniques = events.reduce((a, t) => {
 				if (!a.includes(t.name)) a.push(t.name);
