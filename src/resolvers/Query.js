@@ -10,7 +10,7 @@ const stripe = require('../stripe');
 const Query = {
 	...MessageQuery,
 	...UserQuery,
-	genres: forwardTo('db'),
+	genres: forwardTo('prisma'),
 
 	async userEvents(parent, args, { user, query }, info) {
 		if (!user) throw new Error('You must be logged in to use this feature!');

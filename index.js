@@ -18,10 +18,11 @@ const apolloServer = new ApolloServer({
 
 		return {
 			...req,
+			client,
+			prisma,
 			query: prisma.query,
 			mutation: prisma.mutation,
-			subscription: prisma.subscription,
-			client
+			subscription: prisma.subscription
 		};
 	},
 	playground: true,

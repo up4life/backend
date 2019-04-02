@@ -19,7 +19,7 @@ const { botMessage } = require('../utils');
 const Mutation = {
 	...MessageMutation,
 	...UserMutation,
-	deleteManyGenres: forwardTo('db'),
+	deleteManyGenres: forwardTo('prisma'),
 
 	async signup(parent, args, { query, mutation, res }, info) {
 		args.email = args.email.toLowerCase();
@@ -98,10 +98,8 @@ const Mutation = {
 
 			// UP4-bot welcome message
 			await botMessage(user.id, { query, mutation });
-
 			// await setUserClaims(uid, { id: user.id, admin: false });
 		}
-
 		const session = await createUserToken(args, ctx);
 
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
@@ -148,8 +146,8 @@ const Mutation = {
 
 		return { message: 'Goodbye!' };
 	},
-	async requestReset(parent, { email }, { mutation }, info) {
-		const user = await prisma.query.user({ where: { email } });
+	async requestReset(parent, { email }, { query, mutation }, info) {
+		const user = await query.user({ where: { email } });
 		if (!user) {
 			throw new Error(`No such user found for email ${email}`);
 		}
@@ -171,15 +169,7 @@ const Mutation = {
 		  \n\n
 		  <a href="${process.env.FRONTEND_URL}/reset?resetToken=${resetToken}">Click Here to Reset</a>`)
 		});
-		// this is the SMTP Holden has setup that we can use to send emails once we go into production (have a hard cap of 100 emails/month though)
-		// const mailRes = await client.sendEmail({
-		// 	From: 'support@up4.life',
-		// 	To: `${user.email}`,
-		// 	Subject: 'Your Password Reset Token!',
-		// 	HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
-		//   \n\n
-		//   <a href="${process.env.FRONTEND_URL}/reset?resetToken=${resetToken}">Click Here to Reset</a>`)
-		// });
+
 		return { message: 'Thanks!' };
 	},
 	async updateDefaultImage(parent, { id }, { user, mutation }, info) {
@@ -533,3 +523,13 @@ const Mutation = {
 };
 
 module.exports = Mutation;
+
+// this is the SMTP Holden has setup that we can use to send emails once we go into production (have a hard cap of 100 emails/month though)
+// const mailRes = await client.sendEmail({
+// 	From: 'support@up4.life',
+// 	To: `${user.email}`,
+// 	Subject: 'Your Password Reset Token!',
+// 	HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
+//   \n\n
+//   <a href="${process.env.FRONTEND_URL}/reset?resetToken=${resetToken}">Click Here to Reset</a>`)
+// });
