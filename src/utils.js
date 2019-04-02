@@ -380,7 +380,18 @@ module.exports = {
 				where: {
 					id: chat.id,
 				},
-			});
+				data: {
+					messages: {
+						create: [
+							{
+								text,
+								from: { connect: { id: botId } },
+								to: { connect: { id: toUserId } },
+							},
+						]
+					}
+				}
+			})
 		}
 	},
 };
