@@ -384,24 +384,23 @@ module.exports = {
 			case 'SUBSCRIPTION':
 				if (args.type === 'MONTHLY') {
 					text =
-						' Congrats and welcome aboard!  Now you can enjoy unlimited chat privileges, event saving and more!';
+						'Congrats and welcome aboard! Now you can enjoy unlimited chat privileges, event saving and more!';
 				} else {
 					text =
-						' Congrats and welcome aboard!  Now you can enjoy unlimited chat privileges, event saving and more!';
+						'Congrats and welcome aboard! Now you can enjoy unlimited chat privileges, event saving and more!';
 				}
 				break;
 			case 'UNSUBSCRIBE':
-				text = `Parting is such sweet sorrow...Don't worry.If you change your mind everything in your account will be right where you left it.But we'll miss you.`;
+				text = `Parting is such sweet sorrow...Don't worry. If you change your mind everything in your account will be right where you left it. But we'll miss you.`;
 				break;
 			case 'EVENT_LIMIT':
-				text = `Ruh - roh, looks like you're out of events for now.Try one of our premium accounts and save as many events as you like!`;
+				text = `Ruh - roh, looks like you're out of events for now. Try one of our premium accounts and save as many events as you like!`;
 				break;
 			case 'CHAT_LIMIT':
-				text = `Gahh!  We're out of messages for now.  Try one of our premium accounts and get unlimited chat access!`;
+				text = `Gahh!  We're out of messages for now. Try one of our premium accounts and get unlimited chat access!`;
 				break;
 			default:
-				text =
-					' Welcome To Up4!  This is the chat pane.You can find and reply to all your private messages here as well as navigate to your chat hub.Have fun!';
+				text = `Welcome To Up4!  This is the chat pane.  You can find and reply to all your private messages here as well as navigate to your chat hub.  As a free user you event saving and chats are limited but you can still see everything that's going on near you.Have fun!`;
 		}
 
 		let [chat] = await query.chats({
