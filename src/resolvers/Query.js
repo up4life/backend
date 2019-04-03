@@ -71,7 +71,7 @@ const Query = {
 			score
 		};
 	},
-	async getEvents(parent, args, { user, query, mutation }, info) {
+	async getEvents(parent, args, { user, query }, info) {
 		let location = args.location.split(',')[0].toLowerCase();
 		let cats =
 			!args.categories || !args.categories.length
@@ -79,14 +79,11 @@ const Query = {
 				: args.categories;
 
 		const dates = !args.dates || !args.dates.length ? undefined : setDates(args.dates.toString());
-
+		let page = args.page || 0;
 		let genres = args.genres && args.genres.length ? args.genres : genreFilters.map(x => x.tmID);
 
-		let page = args.page || 0;
-		let pageNumber;
-
 		try {
-			const { data } = await fetchEvents(location, cats, dates, page, 30, genres);
+			let { data } = await fetchEvents(location, cats, dates, page, 30, genres);
 
 			let events = data._embedded.events;
 			let uniques = events.reduce((a, t) => {
@@ -97,14 +94,12 @@ const Query = {
 			if (data.page.totalElements > 30) {
 				while (uniques.length < 30) {
 					page = page + 1;
-					let {
-						data: { page, _embedded }
-					} = await fetchEvents(location, cats, dates, page, 30, args.genres);
-					if (!_embedded) break;
+					let res = await fetchEvents(location, cats, dates, page, 30, args.genres);
+					if (!res.data._embedded) break;
 					else {
-						pageNumber = page.number;
-						events = [...events, ..._embedded.events];
-						uniques = _embedded.events.reduce((a, t) => {
+						pageNumber = res.data.page.number;
+						events = [...events, ...res.data._embedded.events];
+						uniques = res.data._embedded.events.reduce((a, t) => {
 							if (!a.includes(t.name)) a.push(t.name);
 							return a;
 						}, uniques);
@@ -112,13 +107,12 @@ const Query = {
 				}
 			}
 
-			const ourEvents = await query.events(
+			let ourEvents = await query.events(
 				{
 					where: { city: location }
 				},
 				`{id tmID times attending {id firstName img {id default img_url} dob gender biography minAgePref maxAgePref genderPrefs blocked { id }}}`
 			);
-
 			return {
 				events: formatEvents(user, events, ourEvents),
 				page_count: data.page.size,
