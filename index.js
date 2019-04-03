@@ -9,9 +9,6 @@ const { isAuth, populateUser, errorHandler } = require('./src/middleware/index')
 const { prisma, client } = require('./src/db');
 const schema = require('./src/schema');
 
-// email: "holden@loser.ville"
-// password: "123holdenb"
-
 const apolloServer = new ApolloServer({
 	schema,
 	context: async ({ req, connection }) => {
@@ -63,25 +60,6 @@ const server = createServer(app);
 
 apolloServer.installSubscriptionHandlers(server);
 
-// server.listen().then(({ url, subscriptionsUrl }) => {
-// 	console.log(`🚀 Server ready at ${url}`);
-// 	console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
-// });
-
 server.listen(process.env.PORT || 4000, () => {
 	console.log(`🚀 Server ready!!`);
 });
-
-// server.listen(process.env.PORT || 4000, () => {
-// 	new SubscriptionServer(
-// 		{
-// 			execute,
-// 			subscribe,
-// 			schema
-// 		},
-// 		{
-// 			server,
-// 			path: '/graphql'
-// 		}
-// 	);
-// });
