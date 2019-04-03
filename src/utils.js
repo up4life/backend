@@ -377,7 +377,7 @@ module.exports = {
 		return score;
 	},
 
-	async botMessage(toUserId, query, mutation, msgType = 'REGISTRATION', args) {
+	async botMessage(toUserId, { query, mutation }, msgType = 'REGISTRATION', args) {
 		let text;
 
 		switch (msgType) {

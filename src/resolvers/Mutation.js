@@ -42,7 +42,7 @@ const Mutation = {
 		);
 
 		// UP4-bot welcome message
-		await botMessage(user.id, query, mutation);
+		await botMessage(user.id, { query, mutation });
 
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 
@@ -94,7 +94,7 @@ const Mutation = {
 			);
 
 			// UP4-bot welcome message
-			await botMessage(user.id, query, mutation);
+			await botMessage(user.id, { query, mutation });
 			// await setUserClaims(uid, { id: user.id, admin: false });
 		}
 		const session = await createUserToken(args, ctx);
@@ -295,7 +295,7 @@ const Mutation = {
 		});
 
 		// UP4-bot thank you note
-		await botMessage(user.id, query, mutation, 'SUBSCRIPTION', { type: args.subscription });
+		await botMessage(user.id, { query, mutation }, 'SUBSCRIPTION', { type: args.subscription });
 
 		return {
 			message: 'Thank You'
@@ -319,7 +319,7 @@ const Mutation = {
 		}
 
 		// UP4-bot sad note
-		await botMessage(user.id, query, mutation, 'UNSUBSCRIBE');
+		await botMessage(user.id, { query, mutation }, 'UNSUBSCRIBE');
 
 		// Update user's permission type
 		return mutation.updateUser(
@@ -372,7 +372,7 @@ const Mutation = {
 
 		if (user.permissions === 'FREE' && user.events.length == 9) {
 			// UP4-bot error message
-			await botMessage(user.id, query, mutation, 'EVENT_LIMIT');
+			await botMessage(user.id, { query, mutation }, 'EVENT_LIMIT');
 		}
 
 		const [existingEvent] = await query.events({
