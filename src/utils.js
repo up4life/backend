@@ -383,22 +383,25 @@ module.exports = {
 		switch (msgType) {
 			case 'SUBSCRIPTION':
 				if (args.type === 'MONTHLY') {
-					text = 'Welcome to UP4 montly membership';
+					text =
+						' Congrats and welcome aboard!  Now you can enjoy unlimited chat privileges, event saving and more!';
 				} else {
-					text = 'Welcome to UP4 yearly membership';
+					text =
+						' Congrats and welcome aboard!  Now you can enjoy unlimited chat privileges, event saving and more!';
 				}
 				break;
 			case 'UNSUBSCRIBE':
-				text = '--- Bot is not happy ---';
+				text = `Parting is such sweet sorrow...Don't worry.If you change your mind everything in your account will be right where you left it.But we'll miss you.`;
 				break;
 			case 'EVENT_LIMIT':
-				text = 'You have reached 10 saved events for FREE account. Go PRO.';
+				text = `Ruh - roh, looks like you're out of events for now.Try one of our premium accounts and save as many events as you like!`;
 				break;
 			case 'CHAT_LIMIT':
-				text = 'You have reached 20 messages per week for FREE account. Go PRO.';
+				text = `Gahh!  We're out of messages for now.  Try one of our premium accounts and get unlimited chat access!`;
 				break;
 			default:
-				text = 'Welcome to UP4';
+				text =
+					' Welcome To Up4!  This is the chat pane.You can find and reply to all your private messages here as well as navigate to your chat hub.Have fun!';
 		}
 
 		let [chat] = await query.chats({
