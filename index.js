@@ -16,7 +16,13 @@ const apolloServer = new ApolloServer({
 			const { token } = connection.context;
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 
-			return { userId, subscription: prisma.subscription };
+			return {
+				userId,
+				subscription: prisma.subscription,
+				prisma
+				// query: prisma.query,
+				// mutation: prisma.mutation
+			};
 		} else {
 			return {
 				...req,

@@ -1,6 +1,9 @@
 const moment = require('moment');
 const axios = require('axios');
 
+const {
+	prisma: { query, mutation }
+} = require('./db');
 const botId = process.env.BOT_ID; // need to move the real one to env
 
 module.exports = {
@@ -376,7 +379,7 @@ module.exports = {
 		return score;
 	},
 
-	async botMessage(toUserId, prisma, msgType = 'REGISTRATION', args) {
+	async botMessage(toUserId, query = query, mutation = mutation, msgType = 'REGISTRATION', args) {
 		let text;
 
 		switch (msgType) {
@@ -400,14 +403,14 @@ module.exports = {
 				text = 'Welcome to UP4';
 		}
 
-		let [chat] = await prisma.query.chats({
+		let [chat] = await query.chats({
 			where: {
 				AND: [{ users_some: { id: toUserId } }, { users_some: { id: botId } }]
 			}
 		});
 
 		if (!chat) {
-			await prisma.mutation.createChat({
+			await mutation.createChat({
 				data: {
 					users: { connect: [{ id: toUserId }, { id: botId }] },
 					messages: {
@@ -422,7 +425,7 @@ module.exports = {
 				}
 			});
 		} else {
-			await prisma.mutation.updateChat({
+			await mutation.updateChat({
 				where: {
 					id: chat.id
 				},
