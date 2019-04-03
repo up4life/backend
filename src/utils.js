@@ -29,51 +29,51 @@ module.exports = {
 					});
 					eventInDb = {
 						...dbEvent,
-						attending: attendees,
+						attending: attendees
 					};
 				}
 
-				const [ img ] = ev.images.filter(img => img.width > 500);
+				const [img] = ev.images.filter(img => img.width > 500);
 				events.push({
 					id: eventInDb ? eventInDb.id : ev.id,
 					tmID: ev.id,
-					url: [ ev.url ],
+					url: [ev.url],
 					title: ev.name,
 					city: ev._embedded.venues[0].city.name,
 					venue: ev._embedded.venues[0].name,
 					image_url: img.url,
 					times: ev.dates.start.noSpecificTime
-						? [ ev.dates.start.localDate ]
-						: [ ev.dates.start.dateTime ],
+						? [ev.dates.start.localDate]
+						: [ev.dates.start.dateTime],
 					attending: eventInDb ? eventInDb.attending : [],
 					genre: ev.classifications[0].genre ? ev.classifications[0].genre.id : null,
 					category: ev.classifications[0].segment && ev.classifications[0].segment.id,
-					info: ev.info || null,
-					description: ev.info || null,
-					price: {
-						min: ev.priceRanges ? ev.priceRanges[0].min : 'min',
-						max: ev.priceRanges ? ev.priceRanges[0].max : 'max',
-						currency: ev.priceRanges ? ev.priceRanges[0].currency : 'USD',
-					},
+					price: ev.priceRanges
+						? {
+								min: ev.priceRanges[0].min,
+								max: ev.priceRanges[0].max,
+								currency: ev.priceRanges[0].currency
+						  }
+						: null
 				});
 			}
 			return events;
 		}, []);
 	},
-	transformEvents: function(user, eventsArr, db) {
+	transformEvents: function(user, eventsArr, prisma) {
 		return eventsArr.reduce(async (previousPromise, ev) => {
 			let events = await previousPromise;
 
 			let existingEvent = events.findIndex(e => e.title === ev.name);
 			if (existingEvent !== -1) {
 				events[existingEvent].times.push(ev.dates.start.dateTime);
-				// events[existingEvent].url.push(ev.url);
+				events[existingEvent].url.push(ev.url);
 			} else {
-				let [ dbEvent ] = await db.prisma.query.events(
+				let [dbEvent] = await prisma.query.events(
 					{
 						where: {
-							tmID: ev.id,
-						},
+							tmID: ev.id
+						}
 					},
 					`{id times attending {id firstName img {id default img_url} dob gender biography minAgePref maxAgePref genderPrefs blocked { id }}}`
 				);
@@ -98,42 +98,33 @@ module.exports = {
 
 					eventInDb = {
 						...dbEvent,
-						attending: attendees,
+						attending: attendees
 					};
 				}
 
-				const [ img ] = ev.images.filter(img => img.width > 500);
+				const [img] = ev.images.filter(img => img.width > 500);
 
 				events.push({
 					id: eventInDb ? eventInDb.id : ev.id,
 					tmID: ev.id,
-					url: [ ev.url ],
+					url: [ev.url],
 					title: ev.name,
 					city: ev._embedded.venues[0].city.name,
 					venue: ev._embedded.venues[0].name,
 					image_url: img.url,
 					times: ev.dates.start.noSpecificTime
-						? [ ev.dates.start.localDate ]
-						: [ ev.dates.start.dateTime ],
+						? [ev.dates.start.localDate]
+						: [ev.dates.start.dateTime],
 					attending: eventInDb ? eventInDb.attending : [],
 					genre: ev.classifications[0].genre ? ev.classifications[0].genre.id : null,
 					category: ev.classifications[0].segment && ev.classifications[0].segment.id,
-					info: ev.info || null,
-					description: ev.info || null,
-					price: {
-						min: ev.priceRanges ? ev.priceRanges[0].min : 'min',
-						max: ev.priceRanges ? ev.priceRanges[0].max : 'max',
-						currency: ev.priceRanges ? ev.priceRanges[0].currency : 'USD',
-					},
-					// location: {
-					// 	venue: ev._embedded.venues[0].name,
-					// 	address: ev._embedded.venues[0].address && ev._embedded.venues[0].address.line1,
-					// 	city: ev._embedded.venues[0].city.name,
-					// 	lat:
-					// 		ev._embedded.venues[0].location && ev._embedded.venues[0].location.latitude,
-					// 	long:
-					// 		ev._embedded.venues[0].location && ev._embedded.venues[0].location.longitude
-					// }
+					price: ev.priceRanges
+						? {
+								min: ev.priceRanges[0].min,
+								max: ev.priceRanges[0].max,
+								currency: ev.priceRanges[0].currency
+						  }
+						: null
 				});
 			}
 
@@ -145,29 +136,61 @@ module.exports = {
 		switch (dates) {
 			case 'this week':
 			case 'this week,this weekend':
-				start = moment().startOf('isoWeek').format();
-				end = moment().endOf('isoWeek').format();
+				start = moment()
+					.startOf('isoWeek')
+					.format();
+				end = moment()
+					.endOf('isoWeek')
+					.format();
 				break;
 			case 'this week,this weekend,next week':
 			case 'this week,next week':
-				start = moment().startOf('isoWeek').format();
-				end = moment().add(1, 'weeks').endOf('isoWeek').format();
+				start = moment()
+					.startOf('isoWeek')
+					.format();
+				end = moment()
+					.add(1, 'weeks')
+					.endOf('isoWeek')
+					.format();
 				break;
 			case 'this weekend,next week':
-				start = moment().endOf('isoWeek').subtract(3, 'days').format();
-				end = moment().add(1, 'weeks').endOf('isoWeek').format();
+				start = moment()
+					.endOf('isoWeek')
+					.subtract(3, 'days')
+					.format();
+				end = moment()
+					.add(1, 'weeks')
+					.endOf('isoWeek')
+					.format();
 				break;
 			case 'this weekend':
-				start = moment().endOf('isoWeek').subtract(3, 'days').format();
-				end = moment().endOf('isoWeek').format();
+				start = moment()
+					.endOf('isoWeek')
+					.subtract(3, 'days')
+					.format();
+				end = moment()
+					.endOf('isoWeek')
+					.format();
 				break;
 			case 'next week':
-				start = moment().add(1, 'weeks').startOf('isoWeek').format();
-				end = moment().add(1, 'weeks').endOf('isoWeek').format();
+				start = moment()
+					.add(1, 'weeks')
+					.startOf('isoWeek')
+					.format();
+				end = moment()
+					.add(1, 'weeks')
+					.endOf('isoWeek')
+					.format();
 				break;
 			default:
-				start = moment(dates).add(1, 'day').startOf('day').format();
-				end = moment(dates).add(1, 'day').endOf('day').format();
+				start = moment(dates)
+					.add(1, 'day')
+					.startOf('day')
+					.format();
+				end = moment(dates)
+					.add(1, 'day')
+					.endOf('day')
+					.format();
 				break;
 		}
 		return { start, end };
@@ -181,16 +204,27 @@ module.exports = {
 				date = moment().format('YYYY-MM-DD');
 				return events.filter(ev => ev.times.some(t => moment(t).format('YYYY-MM-DD') === date));
 			case 'this weekend':
-				start = moment().endOf('isoWeek').subtract(2, 'days').format('YYYY-MM-DD');
-				end = moment().endOf('isoWeek').format('YYYY-MM-DD');
+				start = moment()
+					.endOf('isoWeek')
+					.subtract(2, 'days')
+					.format('YYYY-MM-DD');
+				end = moment()
+					.endOf('isoWeek')
+					.format('YYYY-MM-DD');
 				return events.filter(ev =>
 					ev.times.some(
 						t => moment(t).format('YYYY-MM-DD') >= start && moment(t).format('YYYY-MM-DD') <= end
 					)
 				);
 			case 'next week':
-				start = moment().add(1, 'weeks').startOf('isoWeek').format('YYYY-MM-DD');
-				end = moment().add(1, 'weeks').endOf('isoWeek').format('YYYY-MM-DD');
+				start = moment()
+					.add(1, 'weeks')
+					.startOf('isoWeek')
+					.format('YYYY-MM-DD');
+				end = moment()
+					.add(1, 'weeks')
+					.endOf('isoWeek')
+					.format('YYYY-MM-DD');
 				return events.filter(ev =>
 					ev.times.some(
 						t => moment(t).format('YYYY-MM-DD') >= start && moment(t).format('YYYY-MM-DD') <= end
@@ -205,40 +239,52 @@ module.exports = {
 		if (dates) {
 			if (genres && genres.length) {
 				return axios.get(
-					`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${dates.start}&endDateTime=${dates.end}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${process
-						.env.TKTMSTR_KEY}`
+					`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${
+						dates.start
+					}&endDateTime=${
+						dates.end
+					}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${
+						process.env.TKTMSTR_KEY
+					}`
 				);
 			}
 			return axios.get(
-				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${dates.start}&endDateTime=${dates.end}&classificationId=${cats}&city=${geoHash}&apikey=${process
-					.env.TKTMSTR_KEY}`
+				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${
+					dates.start
+				}&endDateTime=${dates.end}&classificationId=${cats}&city=${geoHash}&apikey=${
+					process.env.TKTMSTR_KEY
+				}`
 			);
 		}
 		if (genres && genres.length) {
 			return axios.get(
-				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${process
-					.env.TKTMSTR_KEY}`
+				`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&genreId=${genres}&city=${geoHash}&apikey=${
+					process.env.TKTMSTR_KEY
+				}`
 			);
 		}
 		return axios.get(
-			`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&city=${geoHash}&apikey=${process
-				.env.TKTMSTR_KEY}`
+			`https://app.ticketmaster.com/discovery/v2/events.json?size=${size}&page=${page}&startDateTime=${moment().format()}&classificationId=${cats}&city=${geoHash}&apikey=${
+				process.env.TKTMSTR_KEY
+			}`
 		);
 	},
 	getEventImages: function(id) {
 		return axios.get(
-			`https://app.ticketmaster.com/discovery/v2/events/${id}/images.json?apikey=${process.env
-				.TKTMSTR_KEY}`
+			`https://app.ticketmaster.com/discovery/v2/events/${id}/images.json?apikey=${
+				process.env.TKTMSTR_KEY
+			}`
 		);
 	},
 	fetchInitialEvents: function(location, genres, page) {
 		return axios.get(
-			`https://app.ticketmaster.com/discovery/v2/events.json?size=100&page=${page}&genreId=${genres}&city=${location}&apikey=${process
-				.env.TKTMSTR_KEY}`
+			`https://app.ticketmaster.com/discovery/v2/events.json?size=100&page=${page}&genreId=${genres}&city=${location}&apikey=${
+				process.env.TKTMSTR_KEY
+			}`
 		);
 	},
 	async getUser(ctx) {
-		const Authorization = (ctx.req || ctx.request).get('Authorization');
+		const Authorization = ctx.req.get('Authorization');
 		if (Authorization) {
 			const token = Authorization.replace('Bearer ', '');
 			const { id, admin } = await verifyUserSessionToken(token);
@@ -247,23 +293,23 @@ module.exports = {
 		return null;
 	},
 
-	async getScore(currentUserId, matchingUserId, db) {
+	async getScore(currentUserId, matchingUserId, query) {
 		// events that both users have in common
-		const sharedEvents = await db.prisma.query.events({
+		const sharedEvents = await query.events({
 			where: {
 				AND: [
 					{
 						attending_some: {
-							id: currentUserId,
-						},
+							id: currentUserId
+						}
 					},
 					{
 						attending_some: {
-							id: matchingUserId,
-						},
-					},
-				],
-			},
+							id: matchingUserId
+						}
+					}
+				]
+			}
 		});
 
 		// calculate eventScore giving 10 max points
@@ -271,11 +317,11 @@ module.exports = {
 		eventScore = eventScore > 5000 ? 5000 : eventScore;
 
 		// query current user events genre and current user interests
-		const currentUser = await db.prisma.query.users(
+		const currentUser = await query.users(
 			{
 				where: {
-					id: currentUserId,
-				},
+					id: currentUserId
+				}
 			},
 			`{ events { id genre } interests { id } }`
 		);
@@ -289,11 +335,11 @@ module.exports = {
 		}, []);
 
 		// query matching user events genre and matching user interests
-		const matchingUser = await db.prisma.query.users(
+		const matchingUser = await query.users(
 			{
 				where: {
-					id: matchingUserId,
-				},
+					id: matchingUserId
+				}
 			},
 			`{ events { genre } interests { id } }`
 		);
@@ -330,7 +376,7 @@ module.exports = {
 		return score;
 	},
 
-	async botMessage(toUserId, db, msgType = 'REGISTRATION', args) {
+	async botMessage(toUserId, prisma, msgType = 'REGISTRATION', args) {
 		let text;
 
 		switch (msgType) {
@@ -354,44 +400,44 @@ module.exports = {
 				text = 'Welcome to UP4';
 		}
 
-		let [ chat ] = await db.prisma.query.chats({
+		let [chat] = await prisma.query.chats({
 			where: {
-				AND: [ { users_some: { id: toUserId } }, { users_some: { id: botId } } ],
-			},
+				AND: [{ users_some: { id: toUserId } }, { users_some: { id: botId } }]
+			}
 		});
 
 		if (!chat) {
-			await db.prisma.mutation.createChat({
+			await prisma.mutation.createChat({
 				data: {
-					users: { connect: [ { id: toUserId }, { id: botId } ] },
+					users: { connect: [{ id: toUserId }, { id: botId }] },
 					messages: {
 						create: [
 							{
 								text,
 								from: { connect: { id: botId } },
-								to: { connect: { id: toUserId } },
-							},
-						],
-					},
-				},
-			});
-		} else {
-			await db.prisma.mutation.updateChat({
-				where: {
-					id: chat.id,
-				},
-				data: {
-					messages: {
-						create: [
-							{
-								text,
-								from: { connect: { id: botId } },
-								to: { connect: { id: toUserId } },
-							},
+								to: { connect: { id: toUserId } }
+							}
 						]
 					}
 				}
-			})
+			});
+		} else {
+			await prisma.mutation.updateChat({
+				where: {
+					id: chat.id
+				},
+				data: {
+					messages: {
+						create: [
+							{
+								text,
+								from: { connect: { id: botId } },
+								to: { connect: { id: toUserId } }
+							}
+						]
+					}
+				}
+			});
 		}
-	},
+	}
 };

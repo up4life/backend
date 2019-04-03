@@ -8,11 +8,11 @@ const admin = firebaseAdmin.initializeApp(
 			private_key_id: process.PRIVATE_KEY_ID,
 			private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
 			client_email: process.env.FIREBASE_CLIENT_EMAIL,
-			client_id: process.env.FIREBASE_CLIENT_ID,
+			client_id: process.env.FIREBASE_CLIENT_ID
 		}),
-		databaseURL: process.env.FIREBASE_DATABASE_URL,
+		databaseURL: process.env.FIREBASE_DATABASE_URL
 	},
-	'server',
+	'server'
 );
 
 const createUserToken = async (args, ctx) => {
@@ -32,8 +32,7 @@ const createUserToken = async (args, ctx) => {
 	ctx.res.cookie('session', sessionCookie, {
 		maxAge: 60 * 60 * 24 * 5 * 1000,
 		httpOnly: true,
-		domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'up4.life',
-		// secure: true
+		domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'up4.life'
 	});
 
 	return sessionCookie
@@ -42,22 +41,25 @@ const createUserToken = async (args, ctx) => {
 };
 
 const verifyUserToken = async token => {
-	const claims = await admin.auth().verifySessionCookie(token, true).catch(error => {
-		return {
-			error: {
-				message: 'User Session Token Verification Error',
-				stack: error,
-			},
-			claims: null,
-		};
-	});
+	const claims = await admin
+		.auth()
+		.verifySessionCookie(token, true)
+		.catch(error => {
+			return {
+				error: {
+					message: 'User Session Token Verification Error',
+					stack: error
+				},
+				claims: null
+			};
+		});
 
 	return claims
 		? claims
 		: {
 				error: { message: 'User Session Token Verification Error' },
-				claims: null,
-			};
+				claims: null
+		  };
 };
 
 const setUserClaims = (uid, data) => admin.auth().setCustomUserClaims(uid, data);
@@ -78,5 +80,5 @@ module.exports = {
 	setUserClaims,
 	verifyIdToken,
 	getUserRecord,
-	getUID,
+	getUID
 };

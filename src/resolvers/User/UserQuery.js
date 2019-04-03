@@ -1,15 +1,15 @@
 module.exports = {
-	async getSharedEvents(parent, args, { user, db }, info) {
-		if (!user) throw new Error("You must be logged in to use this feature!");
+	async getSharedEvents(parent, args, { user, query }, info) {
+		if (!user) throw new Error('You must be logged in to use this feature!');
 
-		const userToMatch = await db.prisma.query.users({
+		const userToMatch = await query.users({
 			where: {
 				id: args.userToMatchId
 			}
 		});
-		if (!userToMatch) throw new Error("Cannot find the User To Macth!");
+		if (!userToMatch) throw new Error('Cannot find the User To Macth!');
 
-		return (sharedEvent = await db.prisma.query.events(
+		return (sharedEvent = await query.events(
 			{
 				where: {
 					AND: [
@@ -29,12 +29,12 @@ module.exports = {
 			info
 		));
 	},
-	async getMatchUsers(parent, args, { user, db }, info) {
-		if (!user) throw new Error("You must be logged in to use this feature!");
+	async getMatchUsers(parent, args, { user, query }, info) {
+		if (!user) throw new Error('You must be logged in to use this feature!');
 
 		const userEventId = user.events.map(event => event.id);
 
-		const matches = await db.prisma.query.users({
+		const matches = await query.users({
 			where: {
 				AND: [
 					{ id_not: user.id },
@@ -51,7 +51,7 @@ module.exports = {
 		});
 
 		const getScore = async userId => {
-			const sharedEvent = await db.prisma.query.events({
+			const sharedEvent = await query.events({
 				where: {
 					AND: [
 						{
@@ -76,10 +76,10 @@ module.exports = {
 		}));
 	},
 
-	async getLikedByList(parent, args, { user, db }, info) {
-		if (!user) throw new Error("You must be logged in to use this feature!");
+	async getLikedByList(parent, args, { user, query }, info) {
+		if (!user) throw new Error('You must be logged in to use this feature!');
 
-		return db.prisma.query.users(
+		return query.users(
 			{
 				where: {
 					liked_some: {
