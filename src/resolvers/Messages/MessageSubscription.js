@@ -1,6 +1,8 @@
 module.exports = {
 	myChat: {
-		subscribe(parent, { id }, { subscription }, info) {
+		subscribe(parent, args, { subscription, userId }, info) {
+			if (!userId) throw new Error('You gotta be logged in for that!');
+
 			return subscription.chat(
 				{
 					where: {
@@ -11,7 +13,7 @@ module.exports = {
 							{
 								node: {
 									users_some: {
-										id
+										id: userId
 									}
 								}
 							}
@@ -23,14 +25,16 @@ module.exports = {
 		}
 	},
 	myMessages: {
-		async subscribe(parent, { id }, { subscription }, info) {
+		async subscribe(parent, args, { subscription, userId }, info) {
+			if (!userId) throw new Error('You gotta be logged in for that!');
+
 			return subscription.directMessage(
 				{
 					where: {
 						node: {
 							chat: {
 								users_some: {
-									id
+									id: userId
 								}
 							}
 						}
@@ -41,12 +45,14 @@ module.exports = {
 		}
 	},
 	myMessage: {
-		async subscribe(parent, { chatId }, { subscription }, info) {
+		async subscribe(parent, args, { subscription, userId }, info) {
+			if (!userId) throw new Error('You gotta be logged in for that!');
+
 			return subscription.chat(
 				{
 					where: {
 						node: {
-							id: chatId
+							id: args.chatId
 						}
 					}
 				},

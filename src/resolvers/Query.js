@@ -1,6 +1,7 @@
 const { forwardTo } = require('prisma-binding');
 const moment = require('moment');
 const axios = require('axios');
+
 const { fetchEvents, setDates, getScore, formatEvents } = require('../utils');
 const MessageQuery = require('./Messages/MessageQuery');
 const UserQuery = require('./User/UserQuery');
@@ -70,7 +71,7 @@ const Query = {
 			score
 		};
 	},
-	async getEvents(parent, args, { user, db }, info) {
+	async getEvents(parent, args, { user, query, mutation }, info) {
 		let location = args.location.split(',')[0].toLowerCase();
 		let cats =
 			!args.categories || !args.categories.length
@@ -82,6 +83,7 @@ const Query = {
 		let genres = args.genres && args.genres.length ? args.genres : genreFilters.map(x => x.tmID);
 
 		let page = args.page || 0;
+		let pageNumber;
 
 		try {
 			const { data } = await fetchEvents(location, cats, dates, page, 30, genres);
@@ -110,7 +112,7 @@ const Query = {
 				}
 			}
 
-			const ourEvents = await db.prisma.query.events(
+			const ourEvents = await query.events(
 				{
 					where: { city: location }
 				},
@@ -179,10 +181,10 @@ const Query = {
 		});
 		return city;
 	},
-	async getRemainingDates(parent, args, { userId, db }, info) {
+	async getRemainingDates(parent, args, { userId, query }, info) {
 		if (!userId) throw new Error('You must be signed in to access this app.');
 
-		const user = await db.prisma.query.user(
+		const user = await query.user(
 			{ where: { id: userId } },
 			`
 				{id permissions events {id}}
@@ -205,8 +207,8 @@ const Query = {
 		return data;
 	},
 
-	async remainingMessages(parent, args, { user, db }, info) {
-		const sentMessages = await db.prisma.query.directMessages({
+	async remainingMessages(parent, args, { user, query }, info) {
+		const sentMessages = await query.directMessages({
 			where: {
 				AND: [{ from: { id: user.id } }, { createdAt_gte: moment().startOf('isoWeek') }]
 			}

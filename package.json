@@ -16,6 +16,7 @@
 		"firebase-admin": "^7.2.0",
 		"graphql": "^14.2.1",
 		"graphql-import": "^0.7.1",
+		"graphql-subscriptions": "^1.1.0",
 		"http": "0.0.0",
 		"jsonwebtoken": "^8.5.1",
 		"moment": "^2.24.0",
@@ -25,7 +26,8 @@
 		"prisma": "^1.29.2",
 		"prisma-binding": "^2.3.10",
 		"prisma-client-lib": "^1.29.2",
-		"stripe": "^6.28.0"
+		"stripe": "^6.28.0",
+		"subscriptions-transport-ws": "^0.9.16"
 	},
 	"devDependencies": {
 		"graphql-tools": "^4.0.4",

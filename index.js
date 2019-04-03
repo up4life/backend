@@ -1,33 +1,45 @@
 require('dotenv').config({ path: './.env' });
 const { ApolloServer } = require('apollo-server-express');
 const cookieParser = require('cookie-parser');
+const { createServer } = require('http');
+const jwt = require('jsonwebtoken');
 const express = require('express');
-const http = require('http');
 
 const { isAuth, populateUser, errorHandler } = require('./src/middleware/index');
 const { prisma, client } = require('./src/db');
 const schema = require('./src/schema');
 
+// email: "holden@loser.ville"
+// password: "123holdenb"
+
 const apolloServer = new ApolloServer({
 	schema,
-	context: ({ req, res, connection }) => {
-		if (connection && connection.context && connection.context.auth) {
-			console.log(connection.context, 'websocket connection ctx (backend)');
-			req.auth = connection.context.auth;
-		}
+	context: async ({ req, connection }) => {
+		if (connection) {
+			const { token } = connection.context;
+			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 
-		return {
-			...req,
-			client,
-			prisma,
-			query: prisma.query,
-			mutation: prisma.mutation,
-			subscription: prisma.subscription
-		};
+			return { userId, subscription: prisma.subscription };
+		} else {
+			return {
+				...req,
+				client,
+				prisma,
+				query: prisma.query,
+				mutation: prisma.mutation,
+				subscription: prisma.subscription
+			};
+		}
 	},
 	playground: true,
 	introspection: true,
-	debug: true
+	debug: true,
+	subscriptions: {
+		onConnect: (connectionParams, webSocket, context) => {
+			const token = context.request.headers.cookie.slice(6);
+			return { token };
+		}
+	}
 });
 
 const corsConfig = {
@@ -47,7 +59,7 @@ app.use(errorHandler);
 
 apolloServer.applyMiddleware({ app, cors: corsConfig, path: '/' });
 
-const server = http.createServer(app);
+const server = createServer(app);
 
 apolloServer.installSubscriptionHandlers(server);
 
@@ -59,3 +71,17 @@ apolloServer.installSubscriptionHandlers(server);
 server.listen(process.env.PORT || 4000, () => {
 	console.log(`🚀 Server ready!!`);
 });
+
+// server.listen(process.env.PORT || 4000, () => {
+// 	new SubscriptionServer(
+// 		{
+// 			execute,
+// 			subscribe,
+// 			schema
+// 		},
+// 		{
+// 			server,
+// 			path: '/graphql'
+// 		}
+// 	);
+// });

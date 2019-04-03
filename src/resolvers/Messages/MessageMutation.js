@@ -167,7 +167,7 @@ module.exports = {
 			data: {}
 		});
 	},
-	async toggleTyping(parent, { chatId }, { userId, query, mutation }, info) {
+	async toggleTyping(parent, { chatId, isTyping }, { userId, query, mutation }, info) {
 		if (!userId) throw new Error('You must be logged in to toggle typing!');
 
 		const [chat] = await query.chats(
@@ -185,7 +185,7 @@ module.exports = {
 		);
 
 		if (!chat) throw new Error('Cannot find chat');
-		if (!args.isTyping && chat.typing.find(user => user.id === userId)) {
+		if (!isTyping && chat.typing.find(user => user.id === userId)) {
 			return mutation.updateChat(
 				{
 					where: { id: chatId },
@@ -199,7 +199,7 @@ module.exports = {
 				},
 				info
 			);
-		} else if (args.isTyping) {
+		} else if (isTyping) {
 			return mutation.updateChat(
 				{
 					where: { id: chatId },
