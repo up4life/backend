@@ -18,10 +18,7 @@ const apolloServer = new ApolloServer({
 
 			return {
 				userId,
-				subscription: prisma.subscription,
-				prisma
-				// query: prisma.query,
-				// mutation: prisma.mutation
+				subscription: prisma.subscription
 			};
 		} else {
 			return {

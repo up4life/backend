@@ -1,9 +1,7 @@
 const moment = require('moment');
 const axios = require('axios');
 
-const {
-	prisma: { query, mutation }
-} = require('./db');
+// const { prisma } = require('./db');
 const botId = process.env.BOT_ID; // need to move the real one to env
 
 module.exports = {
@@ -379,7 +377,7 @@ module.exports = {
 		return score;
 	},
 
-	async botMessage(toUserId, query = query, mutation = mutation, msgType = 'REGISTRATION', args) {
+	async botMessage(toUserId, query, mutation, msgType = 'REGISTRATION', args) {
 		let text;
 
 		switch (msgType) {
