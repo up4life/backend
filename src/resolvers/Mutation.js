@@ -54,8 +54,8 @@ const Mutation = {
 
 		return user;
 	},
-	async firebaseAuth(parent, args, ctx, info) {
-		const { query, mutation, res } = ctx;
+	async firebaseAuth(parent, args, { query, mutation, res }, info) {
+		// const { query, mutation, res } = ctx;
 
 		const { uid } = await verifyIdToken(args.idToken);
 		const { providerData } = await getUserRecord(uid);
@@ -97,7 +97,7 @@ const Mutation = {
 			await botMessage(user.id, { query, mutation });
 			await setUserClaims(uid, { id: user.id, admin: false });
 		}
-		const session = await createUserToken(args, ctx);
+		const session = await createUserToken(args, res);
 
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 

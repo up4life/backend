@@ -15,7 +15,7 @@ const admin = firebaseAdmin.initializeApp(
 	'server'
 );
 
-const createUserToken = async (args, ctx) => {
+const createUserToken = async (args, res) => {
 	const idToken = args.idToken.toString();
 	// const csrfToken = args.csrfToken.toString(); // what is the csrf token for?
 	// if (csrfToken !== ctx.request.cookies.csrfToken) {
@@ -29,7 +29,7 @@ const createUserToken = async (args, ctx) => {
 
 	const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
-	ctx.res.cookie('session', sessionCookie, {
+	res.cookie('session', sessionCookie, {
 		maxAge: 60 * 60 * 24 * 5 * 1000,
 		httpOnly: true,
 		domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'up4.life'

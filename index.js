@@ -20,6 +20,8 @@ const apolloServer = new ApolloServer({
 			try {
 				const decodedToken = jwt.verify(token, process.env.APP_SECRET);
 				userId = decodedToken.userId;
+
+				console.log(userId, 'userId here');
 			} catch (e) {
 				console.log(e, 'error decoding token');
 			}
