@@ -14,20 +14,17 @@ const apolloServer = new ApolloServer({
 	context: async ({ req, connection }) => {
 		if (connection) {
 			const { token } = connection.context;
-			console.log(token, 'token inside ctx');
-			let userId;
-			// console.log(Object.keys(connection.context), 'context here');
-			try {
-				const decodedToken = jwt.verify(token, process.env.APP_SECRET);
-				userId = decodedToken.userId;
 
+			try {
+				const { userId } = jwt.verify(token, process.env.APP_SECRET);
 				console.log(userId, 'userId here');
+
+				return { userId, subscription: prisma.subscription };
 			} catch (e) {
 				console.log(e, 'error decoding token');
 			}
 
 			return {
-				userId,
 				subscription: prisma.subscription
 			};
 		} else {
@@ -46,13 +43,18 @@ const apolloServer = new ApolloServer({
 	debug: true,
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
-			const token = context.request.headers.cookie.slice(6);
-			if (context.request.headers) {
-				console.log(context.request.headers.cookie, 'cookie inside onConnect\n');
-				console.log(context.request.headers.token, 'token inside onConnect\n');
-				// console.log(Object.keys(context.request.headers));
+			console.log(Object.keys(context.request.headers), 'context headers onConnect');
+			const cookies = context.request.headers.cookie;
+			let token = context.request.headers.cookie.slice(6);
+
+			if (cookies.length < 1000) {
+				console.log(cookies, 'cookie inside onConnect');
+				return { token };
+			} else {
+				token = token.slice(1157);
+				console.log('longer cookie slice', token);
+				return { token };
 			}
-			return { token };
 		}
 	}
 });
@@ -66,7 +68,7 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.json());
+// app.use(express.json());
 
 app.use(isAuth);
 app.use(populateUser);

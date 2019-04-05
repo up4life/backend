@@ -55,19 +55,14 @@ const Mutation = {
 		return user;
 	},
 	async firebaseAuth(parent, args, { query, mutation, res }, info) {
-		// const { query, mutation, res } = ctx;
-
 		const { uid } = await verifyIdToken(args.idToken);
 		const { providerData } = await getUserRecord(uid);
-
-		console.log(uid, 'uid firebaseAuth');
 
 		const { email, displayName, photoURL, phoneNumber } = providerData[0];
 
 		let newUser = false;
 		let user = await query.user({ where: { email } });
 
-		console.log(user, 'user');
 		if (!user) {
 			let nameArray = displayName.split(' ');
 			newUser = true;
@@ -97,7 +92,7 @@ const Mutation = {
 			await botMessage(user.id, { query, mutation });
 			await setUserClaims(uid, { id: user.id, admin: false });
 		}
-		const session = await createUserToken(args, res);
+		// const session = await createUserToken(args, res);
 
 		const token = await jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 
