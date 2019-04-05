@@ -14,7 +14,7 @@ const apolloServer = new ApolloServer({
 	context: async ({ req, connection }) => {
 		if (connection) {
 			// const { token } = connection.context;
-
+			console.log(Object.keys(connection), 'context connection obj keys');
 			// try {
 			// 	const { userId } = jwt.verify(token, process.env.APP_SECRET);
 			// 	console.log(userId, 'userId here');
@@ -43,18 +43,20 @@ const apolloServer = new ApolloServer({
 	debug: true,
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
-			console.log(Object.keys(webSocket.upgradeReq), 'context headers onConnect');
-			const cookies = context.request.headers.cookie;
-			let token = context.request.headers.cookie.slice(6);
+			console.log(Object.keys(webSocket.upgradeReq.headers), 'context headers onConnect');
+			console.log(webSocket.upgradeReq.headers, 'context headers onConnect');
+			return {};
+			// const cookies = context.request.headers.cookie;
+			// let token = context.request.headers.cookie.slice(6);
 
-			if (cookies.length < 1000) {
-				console.log(cookies, 'cookie inside onConnect');
-				return { token };
-			} else {
-				token = token.slice(1164);
-				console.log('longer cookie slice', token);
-				return { token };
-			}
+			// if (cookies.length < 1000) {
+			// 	console.log(cookies, 'cookie inside onConnect');
+			// 	return { token };
+			// } else {
+			// 	token = token.slice(1164);
+			// 	console.log('longer cookie slice', token);
+			// 	return { token };
+			// }
 		}
 	}
 });
