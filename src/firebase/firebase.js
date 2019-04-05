@@ -29,12 +29,12 @@ const createUserToken = async (args, res) => {
 
 	const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
-	res.cookie('session', sessionCookie, {
-		maxAge: 60 * 60 * 24 * 5 * 1000,
-		httpOnly: true,
-		domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'up4.life'
-		// secure: true
-	});
+	// res.cookie('session', sessionCookie, {
+	// 	maxAge: 60 * 60 * 24 * 5 * 1000,
+	// 	httpOnly: true,
+	// 	domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'up4.life'
+	// 	// secure: true
+	// });
 
 	return sessionCookie
 		? sessionCookie

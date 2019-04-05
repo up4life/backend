@@ -44,14 +44,14 @@ const apolloServer = new ApolloServer({
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
 			console.log(Object.keys(webSocket.upgradeReq.headers), 'context headers onConnect');
-			console.log(webSocket.upgradeReq.headers, 'context headers onConnect');
-			return {};
+			console.log(webSocket.upgradeReq.headers.cookie, 'context headers onConnect');
+
 			// const cookies = context.request.headers.cookie;
-			// let token = context.request.headers.cookie.slice(6);
+			let token = context.request.headers.cookie.slice(6);
 
 			// if (cookies.length < 1000) {
 			// 	console.log(cookies, 'cookie inside onConnect');
-			// 	return { token };
+			return { token };
 			// } else {
 			// 	token = token.slice(1164);
 			// 	console.log('longer cookie slice', token);
