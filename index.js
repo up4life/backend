@@ -14,10 +14,11 @@ const apolloServer = new ApolloServer({
 	context: async ({ req, connection }) => {
 		if (connection) {
 			const { token } = connection.context;
-			console.log(Object.keys(connection), 'context connection obj keys');
+			console.log(Object.keys(connection), 'connection obj keys');
+			console.log(Object.keys(connection.context), 'ctx obj keys');
 			try {
 				const { userId } = jwt.verify(token, process.env.APP_SECRET);
-				console.log(userId, 'userId here');
+				// console.log(userId, 'userId here');
 
 				return { userId, subscription: prisma.subscription };
 			} catch (e) {

@@ -1,8 +1,8 @@
 module.exports = {
 	myChat: {
 		subscribe(parent, args, { subscription, userId }, info) {
-			console.log(userId, 'userId inside subs');
-			// if (!userId) throw new Error('You gotta be logged in for that!');
+			// console.log(userId, 'userId inside subs');
+			if (!userId) throw new Error('You gotta be logged in for that!');
 
 			return subscription.chat(
 				{
@@ -27,8 +27,8 @@ module.exports = {
 	},
 	myMessages: {
 		async subscribe(parent, args, { subscription, userId }, info) {
-			console.log(userId, 'userId inside subs');
-			// if (!userId) throw new Error('You gotta be logged in for that!');
+			// console.log(userId, 'userId inside subs');
+			if (!userId) throw new Error('You gotta be logged in for that!');
 
 			return subscription.directMessage(
 				{
@@ -48,8 +48,8 @@ module.exports = {
 	},
 	myMessage: {
 		async subscribe(parent, args, { subscription, userId }, info) {
-			console.log(userId, 'userId inside subs');
-			// if (!userId) throw new Error('You gotta be logged in for that!');
+			// console.log(userId, 'userId inside subs');
+			if (!userId) throw new Error('You gotta be logged in for that!');
 
 			return subscription.chat(
 				{
