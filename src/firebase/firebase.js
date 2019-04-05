@@ -33,6 +33,7 @@ const createUserToken = async (args, ctx) => {
 		maxAge: 60 * 60 * 24 * 5 * 1000,
 		httpOnly: true,
 		domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'up4.life'
+		// secure: true
 	});
 
 	return sessionCookie

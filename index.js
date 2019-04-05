@@ -14,9 +14,15 @@ const apolloServer = new ApolloServer({
 	context: async ({ req, connection }) => {
 		if (connection) {
 			const { token } = connection.context;
-			console.log(token, 'token here');
-			console.log(Object.keys(connection.context), 'context here');
-			const { userId } = jwt.verify(token, process.env.APP_SECRET);
+			console.log(token, 'token inside ctx');
+			let userId;
+			// console.log(Object.keys(connection.context), 'context here');
+			try {
+				const decodedToken = jwt.verify(token, process.env.APP_SECRET);
+				userId = decodedToken.userId;
+			} catch (e) {
+				console.log(e, 'error decoding token');
+			}
 
 			return {
 				userId,
@@ -40,9 +46,9 @@ const apolloServer = new ApolloServer({
 		onConnect: (connectionParams, webSocket, context) => {
 			const token = context.request.headers.cookie.slice(6);
 			if (context.request.headers) {
-				console.log(context.request.headers.cookie, 'cookie inside onConnect');
-				console.log(context.request.headers.cookie, 'token inside onConnect');
-				console.log(Object.keys(context.request.headers));
+				console.log(context.request.headers.cookie, 'cookie inside onConnect\n');
+				console.log(context.request.headers.token, 'token inside onConnect\n');
+				// console.log(Object.keys(context.request.headers));
 			}
 			return { token };
 		}

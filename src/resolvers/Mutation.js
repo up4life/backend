@@ -95,7 +95,7 @@ const Mutation = {
 
 			// UP4-bot welcome message
 			await botMessage(user.id, { query, mutation });
-			// await setUserClaims(uid, { id: user.id, admin: false });
+			await setUserClaims(uid, { id: user.id, admin: false });
 		}
 		const session = await createUserToken(args, ctx);
 
