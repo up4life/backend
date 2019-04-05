@@ -13,16 +13,16 @@ const apolloServer = new ApolloServer({
 	schema,
 	context: async ({ req, connection }) => {
 		if (connection) {
-			// const { token } = connection.context;
+			const { token } = connection.context;
 			console.log(Object.keys(connection), 'context connection obj keys');
-			// try {
-			// 	const { userId } = jwt.verify(token, process.env.APP_SECRET);
-			// 	console.log(userId, 'userId here');
+			try {
+				const { userId } = jwt.verify(token, process.env.APP_SECRET);
+				console.log(userId, 'userId here');
 
-			// 	return { userId, subscription: prisma.subscription };
-			// } catch (e) {
-			// 	console.log(e, 'error decoding token');
-			// }
+				return { userId, subscription: prisma.subscription };
+			} catch (e) {
+				console.log(e, 'error decoding token');
+			}
 
 			return {
 				subscription: prisma.subscription
@@ -43,11 +43,18 @@ const apolloServer = new ApolloServer({
 	debug: true,
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
-			console.log(Object.keys(webSocket.upgradeReq.headers), 'context headers onConnect');
-			console.log(webSocket.upgradeReq.headers.cookie, 'context headers onConnect');
-
+			// console.log(Object.keys(webSocket.upgradeReq.headers), 'context headers onConnect');
+			// console.log(webSocket.upgradeReq.headers.cookie, 'context headers onConnect');
+			try {
+				cookieParser(webSocket.upgradeReq.headers, {}, function() {
+					console.log(webSocket.upgradeReq.headers, 'parsed headers');
+					// do stuff with the session here
+				});
+			} catch (e) {
+				console.log(e);
+			}
 			// const cookies = context.request.headers.cookie;
-			let token = context.request.headers.cookie.slice(6);
+			const token = context.request.headers.cookie.slice(6);
 
 			// if (cookies.length < 1000) {
 			// 	console.log(cookies, 'cookie inside onConnect');
