@@ -15,6 +15,7 @@ const apolloServer = new ApolloServer({
 		if (connection) {
 			const { token } = connection.context;
 			console.log(token, 'token here');
+			console.log(Object.keys(connection.context), 'context here');
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 
 			return {
@@ -39,7 +40,9 @@ const apolloServer = new ApolloServer({
 		onConnect: (connectionParams, webSocket, context) => {
 			const token = context.request.headers.cookie.slice(6);
 			if (context.request.headers) {
-				console.log(context.request.headers.token);
+				console.log(context.request.headers.cookie, 'cookie inside onConnect');
+				console.log(context.request.headers.cookie, 'token inside onConnect');
+				console.log(Object.keys(context.request.headers));
 			}
 			return { token };
 		}
@@ -55,7 +58,7 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-// app.use(express.json());
+app.use(express.json());
 
 app.use(isAuth);
 app.use(populateUser);
