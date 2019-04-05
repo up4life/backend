@@ -13,16 +13,16 @@ const apolloServer = new ApolloServer({
 	schema,
 	context: async ({ req, connection }) => {
 		if (connection) {
-			const { token } = connection.context;
+			// const { token } = connection.context;
 
-			try {
-				const { userId } = jwt.verify(token, process.env.APP_SECRET);
-				console.log(userId, 'userId here');
+			// try {
+			// 	const { userId } = jwt.verify(token, process.env.APP_SECRET);
+			// 	console.log(userId, 'userId here');
 
-				return { userId, subscription: prisma.subscription };
-			} catch (e) {
-				console.log(e, 'error decoding token');
-			}
+			// 	return { userId, subscription: prisma.subscription };
+			// } catch (e) {
+			// 	console.log(e, 'error decoding token');
+			// }
 
 			return {
 				subscription: prisma.subscription
@@ -43,7 +43,7 @@ const apolloServer = new ApolloServer({
 	debug: true,
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
-			console.log(Object.keys(webSocket), 'context headers onConnect');
+			console.log(Object.keys(webSocket.upgradeReq), 'context headers onConnect');
 			const cookies = context.request.headers.cookie;
 			let token = context.request.headers.cookie.slice(6);
 
