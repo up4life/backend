@@ -43,7 +43,7 @@ const apolloServer = new ApolloServer({
 	debug: true,
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
-			console.log(Object.keys(context.request.headers), 'context headers onConnect');
+			console.log(Object.keys(webSocket), 'context headers onConnect');
 			const cookies = context.request.headers.cookie;
 			let token = context.request.headers.cookie.slice(6);
 
@@ -51,7 +51,7 @@ const apolloServer = new ApolloServer({
 				console.log(cookies, 'cookie inside onConnect');
 				return { token };
 			} else {
-				token = token.slice(1163);
+				token = token.slice(1164);
 				console.log('longer cookie slice', token);
 				return { token };
 			}
