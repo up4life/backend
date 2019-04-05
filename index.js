@@ -51,7 +51,7 @@ const apolloServer = new ApolloServer({
 				console.log(cookies, 'cookie inside onConnect');
 				return { token };
 			} else {
-				token = token.slice(1157);
+				token = token.slice(1163);
 				console.log('longer cookie slice', token);
 				return { token };
 			}
