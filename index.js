@@ -14,6 +14,7 @@ const apolloServer = new ApolloServer({
 	context: async ({ req, connection }) => {
 		if (connection) {
 			const { token } = connection.context;
+			console.log(token, 'token here');
 			const { userId } = jwt.verify(token, process.env.APP_SECRET);
 
 			return {
@@ -37,6 +38,9 @@ const apolloServer = new ApolloServer({
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
 			const token = context.request.headers.cookie.slice(6);
+			if (context.request.headers) {
+				console.log(context.request.headers.token);
+			}
 			return { token };
 		}
 	}
